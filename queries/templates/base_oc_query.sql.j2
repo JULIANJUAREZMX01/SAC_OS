@@ -1,0 +1,99 @@
+{#
+═══════════════════════════════════════════════════════════════
+TEMPLATE: Base Query para Órdenes de Compra (OC)
+Sistema SAC - CEDIS Chedraui Cancún 427
+═══════════════════════════════════════════════════════════════
+
+Template Jinja2 para generar queries de OC con parámetros
+dinámicos. Soporta filtros, columnas personalizadas y joins.
+
+Variables disponibles:
+- schema: Schema de BD (default: WMWHSE1)
+- storerkey: Código de almacén
+- columns: Lista de columnas a seleccionar
+- include_detail: Incluir detalle de líneas (bool)
+- include_sku: Incluir info de SKU (bool)
+- status_filter: Lista de status a filtrar
+- date_column: Columna para filtro de fecha
+- date_start: Fecha inicio
+- date_end: Fecha fin
+- order_by: Lista de columnas para ordenar
+- limit: Número máximo de registros
+═══════════════════════════════════════════════════════════════
+#}
+
+SELECT
+    {# Columnas de cabecera #}
+    {% if columns %}
+        {% for col in columns %}
+    o.{{ col }}{% if not loop.last %},{% endif %}
+
+        {% endfor %}
+    {% else %}
+    o.ORDERKEY AS oc_numero,
+    o.EXTERNORDERKEY AS oc_externa,
+    o.STORERKEY AS almacen,
+    o.ORDERDATE AS fecha_orden,
+    o.DELIVERYDATE AS fecha_entrega,
+    o.ADDDATE AS fecha_creacion,
+    o.STATUS AS status,
+    CASE o.STATUS
+        WHEN '0' THEN 'Abierta'
+        WHEN '1' THEN 'En Proceso'
+        WHEN '2' THEN 'Parcial'
+        WHEN '5' THEN 'Cerrada'
+        WHEN '9' THEN 'Completada'
+        WHEN '95' THEN 'Cancelada'
+        ELSE 'Desconocido'
+    END AS status_descripcion
+    {% endif %}
+    {# Columnas de detalle si se requiere #}
+    {% if include_detail %}
+    ,
+    od.ORDERLINENUMBER AS linea,
+    od.SKU AS sku,
+    od.ORIGINALQTY AS qty_original,
+    od.OPENQTY AS qty_pendiente,
+    od.SHIPPEDQTY AS qty_enviada
+    {% endif %}
+    {# Información de SKU si se requiere #}
+    {% if include_sku %}
+    ,
+    sk.DESCR AS descripcion_sku,
+    sk.INNERPACK AS inner_pack
+    {% endif %}
+FROM
+    {{ schema | default('WMWHSE1') }}.ORDERS o
+{% if include_detail %}
+    INNER JOIN {{ schema | default('WMWHSE1') }}.ORDERDETAIL od ON o.ORDERKEY = od.ORDERKEY
+{% endif %}
+{% if include_sku %}
+    LEFT JOIN {{ schema | default('WMWHSE1') }}.SKU sk ON od.SKU = sk.SKU AND o.STORERKEY = sk.STORERKEY
+{% endif %}
+WHERE
+    o.STORERKEY = '{{ storerkey | default('C22') }}'
+    {# Filtro de status #}
+    {% if status_filter %}
+    AND o.STATUS IN ({% for s in status_filter %}'{{ s }}'{% if not loop.last %}, {% endif %}{% endfor %})
+    {% endif %}
+    {# Filtro de fechas #}
+    {% if date_start and date_end %}
+    AND DATE(o.{{ date_column | default('ADDDATE') }}) BETWEEN '{{ date_start }}' AND '{{ date_end }}'
+    {% endif %}
+    {# Filtro de OC específica #}
+    {% if oc_numero %}
+    AND (o.ORDERKEY = '{{ oc_numero }}' OR o.EXTERNORDERKEY = '{{ oc_numero }}')
+    {% endif %}
+{% if order_by %}
+ORDER BY
+    {% for col in order_by %}
+    {{ col }}{% if not loop.last %},{% endif %}
+
+    {% endfor %}
+{% else %}
+ORDER BY
+    o.ADDDATE DESC
+{% endif %}
+{% if limit %}
+FETCH FIRST {{ limit }} ROWS ONLY
+{% endif %}

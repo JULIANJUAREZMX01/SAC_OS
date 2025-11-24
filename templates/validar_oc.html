@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+{% block title %}Validar OC{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-search text-danger"></i> Validar Orden de Compra</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-input-cursor-text me-2"></i>Ingresar OC</h5>
+            </div>
+            <div class="card-body">
+                <form id="validarOCForm">
+                    <div class="mb-3">
+                        <label for="ocNumero" class="form-label">Número de OC</label>
+                        <input type="text" class="form-control form-control-lg" id="ocNumero"
+                               placeholder="Ej: C7503840001234" required autofocus>
+                        <div class="form-text">
+                            Ingresa el número de la orden de compra a validar.
+                            <br>Formatos válidos: 750384XXXXXX, 811117XXXXXX, 40XXXXXXXXXXX
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-chedraui btn-lg">
+                            <i class="bi bi-search me-2"></i>Validar OC
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quick OC List -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Validaciones Recientes</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for v in ultimas_ocs %}
+                    <a href="#" class="list-group-item list-group-item-action oc-link" data-oc="{{ v.oc_numero }}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ v.oc_numero }}</strong>
+                                <small class="text-muted d-block">{{ v.fecha_validacion }}</small>
+                            </div>
+                            {% if v.resultado == 'exitoso' %}
+                                <span class="badge bg-success">OK</span>
+                            {% elif v.resultado == 'critico' %}
+                                <span class="badge bg-danger">!</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">{{ v.num_errores }}</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                    {% else %}
+                    <div class="list-group-item text-muted text-center py-3">
+                        No hay validaciones recientes
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <!-- Results Panel -->
+        <div class="card" id="resultadoPanel" style="display: none;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Resultado de Validación</h5>
+                <span class="badge" id="resultadoBadge">-</span>
+            </div>
+            <div class="card-body">
+                <div id="resultadoContent">
+                    <!-- Content will be inserted here -->
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex gap-2">
+                    <button class="btn btn-success" id="btnDescargarReporte" style="display: none;">
+                        <i class="bi bi-download me-1"></i>Descargar Reporte
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="limpiarResultado()">
+                        <i class="bi bi-x-lg me-1"></i>Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Placeholder when no results -->
+        <div class="card" id="placeholderPanel">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-arrow-left-circle display-1 text-muted"></i>
+                <h5 class="mt-3 text-muted">Ingresa un número de OC</h5>
+                <p class="text-muted">El resultado de la validación se mostrará aquí</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Validation Progress Modal -->
+<div class="modal fade" id="progressModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center py-5">
+                <div class="spinner-border text-danger mb-3" style="width: 3rem; height: 3rem;"></div>
+                <h5>Validando OC...</h5>
+                <p class="text-muted mb-0" id="progressMessage">Conectando a la base de datos...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
+    let currentReportUrl = null;
+
+    // Form submit
+    document.getElementById('validarOCForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const ocNumero = document.getElementById('ocNumero').value.trim();
+        if (!ocNumero) return;
+
+        await validarOC(ocNumero);
+    });
+
+    // Quick OC links
+    document.querySelectorAll('.oc-link').forEach(link => {
+        link.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const oc = this.dataset.oc;
+            document.getElementById('ocNumero').value = oc;
+            await validarOC(oc);
+        });
+    });
+
+    // Validate OC
+    async function validarOC(ocNumero) {
+        progressModal.show();
+        document.getElementById('progressMessage').textContent = 'Conectando a la base de datos...';
+
+        try {
+            const response = await fetch('/api/validar-oc', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ oc_numero: ocNumero })
+            });
+
+            document.getElementById('progressMessage').textContent = 'Procesando validación...';
+
+            const data = await response.json();
+            progressModal.hide();
+
+            if (data.success) {
+                mostrarResultado(data);
+            } else {
+                showToast('Error: ' + data.error, 'error');
+            }
+        } catch (error) {
+            progressModal.hide();
+            showToast('Error de conexión: ' + error.message, 'error');
+        }
+    }
+
+    // Show results
+    function mostrarResultado(data) {
+        document.getElementById('placeholderPanel').style.display = 'none';
+        document.getElementById('resultadoPanel').style.display = 'block';
+
+        const badge = document.getElementById('resultadoBadge');
+        if (data.resultado === 'exitoso') {
+            badge.className = 'badge bg-success';
+            badge.textContent = 'EXITOSO';
+        } else if (data.resultado === 'critico') {
+            badge.className = 'badge bg-danger';
+            badge.textContent = 'CRÍTICO';
+        } else {
+            badge.className = 'badge bg-warning text-dark';
+            badge.textContent = 'CON ERRORES';
+        }
+
+        let html = `
+            <div class="row mb-3">
+                <div class="col-6">
+                    <div class="border rounded p-3 text-center">
+                        <small class="text-muted d-block">OC Número</small>
+                        <strong class="h5">${data.oc_numero}</strong>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="border rounded p-3 text-center">
+                        <small class="text-muted d-block">Tiempo</small>
+                        <strong class="h5">${data.tiempo.toFixed(2)}s</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-4">
+                    <div class="border rounded p-2 text-center">
+                        <small class="text-muted d-block">Total OC</small>
+                        <strong>${data.total_oc.toLocaleString()}</strong>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="border rounded p-2 text-center">
+                        <small class="text-muted d-block">Total Distro</small>
+                        <strong>${data.total_distro.toLocaleString()}</strong>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="border rounded p-2 text-center ${data.diferencia !== 0 ? 'border-danger' : 'border-success'}">
+                        <small class="text-muted d-block">Diferencia</small>
+                        <strong class="${data.diferencia !== 0 ? 'text-danger' : 'text-success'}">${data.diferencia.toLocaleString()}</strong>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        if (data.errores && data.errores.length > 0) {
+            html += `<h6 class="mb-2"><i class="bi bi-exclamation-triangle text-warning me-1"></i>Errores Detectados (${data.errores.length})</h6>`;
+            html += '<div class="list-group list-group-flush">';
+            data.errores.forEach(err => {
+                let badgeClass = 'bg-secondary';
+                if (err.severidad.includes('CRÍTICO')) badgeClass = 'bg-danger';
+                else if (err.severidad.includes('ALTO')) badgeClass = 'bg-warning text-dark';
+
+                html += `
+                    <div class="list-group-item px-0">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>${err.tipo}</strong>
+                                <span class="badge ${badgeClass} ms-2">${err.severidad}</span>
+                                <p class="mb-1 small">${err.mensaje}</p>
+                                <small class="text-muted">${err.solucion}</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        } else {
+            html += `
+                <div class="alert alert-success mb-0">
+                    <i class="bi bi-check-circle me-2"></i>
+                    No se detectaron errores. La OC está correctamente distribuida.
+                </div>
+            `;
+        }
+
+        document.getElementById('resultadoContent').innerHTML = html;
+
+        // Show download button if report was generated
+        if (data.archivo_reporte) {
+            currentReportUrl = data.archivo_reporte;
+            document.getElementById('btnDescargarReporte').style.display = 'inline-block';
+        } else {
+            document.getElementById('btnDescargarReporte').style.display = 'none';
+        }
+    }
+
+    // Clear results
+    function limpiarResultado() {
+        document.getElementById('placeholderPanel').style.display = 'block';
+        document.getElementById('resultadoPanel').style.display = 'none';
+        document.getElementById('ocNumero').value = '';
+        currentReportUrl = null;
+    }
+
+    // Download report
+    document.getElementById('btnDescargarReporte').addEventListener('click', function() {
+        if (currentReportUrl) {
+            window.open(currentReportUrl, '_blank');
+        }
+    });
+</script>
+{% endblock %}

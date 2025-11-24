@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Principal{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-speedometer2 text-danger"></i> Dashboard Principal</h2>
+
+<!-- Quick Actions -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card quick-action-card border h-100" onclick="window.location='/validar'">
+            <div class="card-body text-center py-4">
+                <i class="bi bi-search display-4 text-danger"></i>
+                <h6 class="mt-2 mb-0">Validar OC</h6>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card quick-action-card border h-100" onclick="generarReporteDiario()">
+            <div class="card-body text-center py-4">
+                <i class="bi bi-file-earmark-excel display-4 text-success"></i>
+                <h6 class="mt-2 mb-0">Reporte Diario</h6>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card quick-action-card border h-100" onclick="window.location='/errores?pendientes=1'">
+            <div class="card-body text-center py-4">
+                <i class="bi bi-exclamation-triangle display-4 text-warning"></i>
+                <h6 class="mt-2 mb-0">Ver Errores</h6>
+                {% if stats.errores_criticos > 0 %}
+                <span class="badge bg-danger">{{ stats.errores_criticos }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card quick-action-card border h-100" onclick="window.location='/metricas'">
+            <div class="card-body text-center py-4">
+                <i class="bi bi-graph-up display-4 text-info"></i>
+                <h6 class="mt-2 mb-0">Métricas</h6>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted mb-1">Validaciones Hoy</h6>
+                        <h2 class="mb-0" id="statValidacionesHoy">{{ stats.validaciones_hoy }}</h2>
+                        <small class="text-success"><i class="bi bi-arrow-up"></i> {{ stats.tasa_exito }}% éxito</small>
+                    </div>
+                    <div class="stat-icon text-primary"><i class="bi bi-check-circle"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted mb-1">Errores Críticos</h6>
+                        <h2 class="mb-0 text-danger" id="statErroresCriticos">{{ stats.errores_criticos }}</h2>
+                        <small class="text-muted">Sin resolver</small>
+                    </div>
+                    <div class="stat-icon text-danger"><i class="bi bi-exclamation-octagon"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted mb-1">OCs Procesadas</h6>
+                        <h2 class="mb-0" id="statOCs">{{ stats.oc_unicas }}</h2>
+                        <small class="text-muted">Últimos 30 días</small>
+                    </div>
+                    <div class="stat-icon text-info"><i class="bi bi-box-seam"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-muted mb-1">Tiempo Promedio</h6>
+                        <h2 class="mb-0" id="statTiempo">{{ "%.2f"|format(stats.tiempo_promedio) }}s</h2>
+                        <small class="text-muted">Por validación</small>
+                    </div>
+                    <div class="stat-icon text-warning"><i class="bi bi-clock-history"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Chart -->
+    <div class="col-md-8">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Tendencia de Validaciones (7 días)</h5>
+                <button class="btn btn-sm btn-outline-secondary" onclick="refreshData()">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <canvas id="trendsChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-hdd-stack me-2"></i>Estado del Sistema</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-database me-2"></i>Base de datos DB2</span>
+                        {% if db_status.conectado %}
+                            <span class="badge bg-success">Conectado</span>
+                        {% else %}
+                            <span class="badge bg-warning">Modo Demo</span>
+                        {% endif %}
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-telegram me-2"></i>Telegram</span>
+                        {% if telegram_status %}
+                            <span class="badge bg-success">Activo</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Inactivo</span>
+                        {% endif %}
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-envelope me-2"></i>Email</span>
+                        {% if email_status %}
+                            <span class="badge bg-success">Configurado</span>
+                        {% else %}
+                            <span class="badge bg-secondary">No configurado</span>
+                        {% endif %}
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-hdd me-2"></i>DB Local</span>
+                        <span class="badge bg-success">{{ db_local_info.tamanio_mb }} MB</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Validations -->
+<div class="row g-3 mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Últimas Validaciones</h5>
+                <a href="/validaciones" class="btn btn-sm btn-outline-danger">Ver todas</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>OC</th>
+                                <th>Fecha</th>
+                                <th>Resultado</th>
+                                <th>Total OC</th>
+                                <th>Total Distro</th>
+                                <th>Errores</th>
+                                <th>Tiempo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="validacionesTable">
+                            {% for v in ultimas_validaciones %}
+                            <tr>
+                                <td><strong>{{ v.oc_numero }}</strong></td>
+                                <td>{{ v.fecha_validacion }}</td>
+                                <td>
+                                    {% if v.resultado == 'exitoso' %}
+                                        <span class="badge bg-success">Exitoso</span>
+                                    {% elif v.resultado == 'critico' %}
+                                        <span class="badge bg-danger">Crítico</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Con errores</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ "{:,.0f}".format(v.total_oc) }}</td>
+                                <td>{{ "{:,.0f}".format(v.total_distro) }}</td>
+                                <td>
+                                    {% if v.num_criticos > 0 %}
+                                        <span class="badge bg-danger">{{ v.num_criticos }} críticos</span>
+                                    {% endif %}
+                                    {% if v.num_errores > 0 and v.num_errores != v.num_criticos %}
+                                        <span class="badge bg-secondary">{{ v.num_errores }} total</span>
+                                    {% elif v.num_errores == 0 %}
+                                        <span class="text-success"><i class="bi bi-check"></i></span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ "%.2f"|format(v.tiempo_ejecucion) }}s</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox display-6 d-block mb-2"></i>
+                                    No hay validaciones recientes
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Chart data
+    const metricas = {{ metricas_json|safe }};
+    let trendsChart;
+
+    // Initialize chart
+    function initChart() {
+        const ctx = document.getElementById('trendsChart').getContext('2d');
+        trendsChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: metricas.map(m => m.fecha),
+                datasets: [{
+                    label: 'Validaciones',
+                    data: metricas.map(m => m.total_validaciones),
+                    borderColor: '#E31837',
+                    backgroundColor: 'rgba(227, 24, 55, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'Errores',
+                    data: metricas.map(m => m.total_errores),
+                    borderColor: '#ffc107',
+                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    // Refresh data via API
+    async function refreshData() {
+        try {
+            // Obtener estadísticas
+            const statsResponse = await fetch('/api/stats?dias=30');
+            const stats = await statsResponse.json();
+
+            // Actualizar estadísticas en el DOM
+            const validaciones = stats.validaciones || {};
+            const errores = stats.errores || {};
+
+            if (document.getElementById('statValidacionesHoy')) {
+                document.getElementById('statValidacionesHoy').textContent = validaciones.total_validaciones || 0;
+            }
+            if (document.getElementById('statErroresCriticos')) {
+                document.getElementById('statErroresCriticos').textContent = errores.no_resueltos || 0;
+            }
+            if (document.getElementById('statOCs')) {
+                document.getElementById('statOCs').textContent = validaciones.oc_unicas || 0;
+            }
+            if (document.getElementById('statTiempo')) {
+                const tiempo = validaciones.tiempo_promedio || 0;
+                document.getElementById('statTiempo').textContent = tiempo.toFixed(2) + 's';
+            }
+
+            // Actualizar gráfico si existe
+            if (typeof trendsChart !== 'undefined' && trendsChart) {
+                const metricasResponse = await fetch('/api/metricas?dias=7');
+                const metricas = await metricasResponse.json();
+
+                trendsChart.data.labels = metricas.map(m => m.fecha);
+                trendsChart.data.datasets[0].data = metricas.map(m => m.total_validaciones);
+                trendsChart.data.datasets[1].data = metricas.map(m => m.total_errores);
+                trendsChart.update('none');
+            }
+
+            console.log('Datos actualizados:', new Date().toLocaleTimeString());
+        } catch (error) {
+            console.error('Error al actualizar datos:', error);
+        }
+    }
+
+    // Generate daily report
+    async function generarReporteDiario() {
+        showLoading();
+        try {
+            const response = await fetch('/api/generar-reporte', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tipo: 'diario' })
+            });
+            const data = await response.json();
+            hideLoading();
+
+            if (data.success) {
+                showToast('Reporte generado: ' + data.archivo, 'success');
+                if (data.url) {
+                    window.open(data.url, '_blank');
+                }
+            } else {
+                showToast('Error: ' + data.error, 'error');
+            }
+        } catch (error) {
+            hideLoading();
+            showToast('Error al generar reporte', 'error');
+        }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        initChart();
+        startAutoRefresh(60);
+    });
+</script>
+{% endblock %}

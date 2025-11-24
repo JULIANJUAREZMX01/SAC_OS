@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}Historial de Validaciones{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-check-circle text-danger"></i> Historial de Validaciones</h2>
+    <a href="/validar" class="btn btn-chedraui">
+        <i class="bi bi-plus-lg me-1"></i>Nueva Validación
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Buscar OC</label>
+                <input type="text" name="oc" class="form-control" placeholder="Número de OC..." value="{{ filtro_oc }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Período</label>
+                <select name="dias" class="form-select">
+                    <option value="7" {% if filtro_dias == 7 %}selected{% endif %}>Últimos 7 días</option>
+                    <option value="30" {% if filtro_dias == 30 %}selected{% endif %}>Últimos 30 días</option>
+                    <option value="90" {% if filtro_dias == 90 %}selected{% endif %}>Últimos 90 días</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Resultado</label>
+                <select name="resultado" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="exitoso" {% if filtro_resultado == 'exitoso' %}selected{% endif %}>Exitoso</option>
+                    <option value="con_errores" {% if filtro_resultado == 'con_errores' %}selected{% endif %}>Con errores</option>
+                    <option value="critico" {% if filtro_resultado == 'critico' %}selected{% endif %}>Crítico</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-danger w-100">
+                    <i class="bi bi-search me-1"></i>Filtrar
+                </button>
+            </div>
+            <div class="col-md-3 text-end">
+                <button type="button" class="btn btn-outline-success" onclick="exportarCSV()">
+                    <i class="bi bi-download me-1"></i>Exportar CSV
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Stats Summary -->
+<div class="row g-3 mb-3">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body py-2 text-center">
+                <h4 class="mb-0">{{ validaciones|length }}</h4>
+                <small>Total Validaciones</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body py-2 text-center">
+                <h4 class="mb-0">{{ validaciones|selectattr('resultado', 'equalto', 'exitoso')|list|length }}</h4>
+                <small>Exitosas</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning">
+            <div class="card-body py-2 text-center">
+                <h4 class="mb-0">{{ validaciones|selectattr('resultado', 'equalto', 'con_errores')|list|length }}</h4>
+                <small>Con Errores</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body py-2 text-center">
+                <h4 class="mb-0">{{ validaciones|selectattr('resultado', 'equalto', 'critico')|list|length }}</h4>
+                <small>Críticas</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0" id="validacionesTable">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>OC</th>
+                    <th>Fecha</th>
+                    <th>Resultado</th>
+                    <th>Total OC</th>
+                    <th>Total Distro</th>
+                    <th>Diferencia</th>
+                    <th>Errores</th>
+                    <th>Tiempo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in validaciones %}
+                <tr>
+                    <td>{{ v.id }}</td>
+                    <td><strong>{{ v.oc_numero }}</strong></td>
+                    <td>{{ v.fecha_validacion }}</td>
+                    <td>
+                        {% if v.resultado == 'exitoso' %}
+                            <span class="badge bg-success">Exitoso</span>
+                        {% elif v.resultado == 'critico' %}
+                            <span class="badge bg-danger">Crítico</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">{{ v.resultado|replace('_', ' ')|title }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">{{ "{:,.0f}".format(v.total_oc) }}</td>
+                    <td class="text-end">{{ "{:,.0f}".format(v.total_distro) }}</td>
+                    <td class="text-end">
+                        {% if v.diferencia != 0 %}
+                            <span class="text-danger fw-bold">{{ "{:,.0f}".format(v.diferencia) }}</span>
+                        {% else %}
+                            <span class="text-success">0</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if v.num_criticos > 0 %}
+                            <span class="badge bg-danger">{{ v.num_criticos }}</span>
+                        {% endif %}
+                        {% if v.num_errores > 0 %}
+                            <span class="badge bg-secondary">{{ v.num_errores }}</span>
+                        {% endif %}
+                        {% if v.num_errores == 0 %}
+                            <span class="text-success"><i class="bi bi-check-lg"></i></span>
+                        {% endif %}
+                    </td>
+                    <td>{{ "%.2f"|format(v.tiempo_ejecucion) }}s</td>
+                    <td>
+                        <a href="/validar?oc={{ v.oc_numero }}" class="btn btn-sm btn-outline-primary" title="Re-validar">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="10" class="text-center text-muted py-5">
+                        <i class="bi bi-inbox display-4 d-block mb-3"></i>
+                        No hay validaciones que coincidan con los filtros
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function exportarCSV() {
+        const table = document.getElementById('validacionesTable');
+        const rows = table.querySelectorAll('tr');
+        let csv = [];
+
+        rows.forEach(row => {
+            const cols = row.querySelectorAll('th, td');
+            const rowData = [];
+            cols.forEach((col, index) => {
+                if (index < cols.length - 1) { // Skip actions column
+                    rowData.push('"' + col.textContent.trim().replace(/"/g, '""') + '"');
+                }
+            });
+            csv.push(rowData.join(','));
+        });
+
+        const csvContent = csv.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'validaciones_' + new Date().toISOString().slice(0,10) + '.csv';
+        link.click();
+
+        showToast('CSV exportado correctamente', 'success');
+    }
+</script>
+{% endblock %}

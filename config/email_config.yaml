@@ -1,0 +1,235 @@
+# ═══════════════════════════════════════════════════════════════
+# CONFIGURACIÓN DE EMAIL - SISTEMA SAC
+# CEDIS Cancún 427 - Tiendas Chedraui S.A. de C.V.
+# ═══════════════════════════════════════════════════════════════
+#
+# Este archivo contiene la configuración del sistema de email.
+# IMPORTANTE: No incluir credenciales aquí. Usar variables de entorno.
+#
+# Desarrollado por: Julián Alexander Juárez Alvarado (ADMJAJA)
+# ═══════════════════════════════════════════════════════════════
+
+# ═══════════════════════════════════════════════════════════════
+# CONFIGURACIÓN SMTP
+# ═══════════════════════════════════════════════════════════════
+smtp:
+  # Servidor Office 365
+  server: "smtp.office365.com"
+  port: 587
+  use_tls: true
+  timeout: 30
+
+  # Credenciales (usar variables de entorno)
+  # user: ${EMAIL_USER}
+  # password: ${EMAIL_PASSWORD}
+
+  # Nombre del remitente
+  from_name: "Sistema SAC - CEDIS 427"
+
+# ═══════════════════════════════════════════════════════════════
+# CONFIGURACIÓN DE COLA DE EMAILS
+# ═══════════════════════════════════════════════════════════════
+queue:
+  # Tamaño máximo de la cola
+  max_size: 1000
+
+  # Reintentos
+  max_retries: 3
+  retry_delay_seconds: 30
+
+  # Procesamiento en lote
+  batch_size: 10
+  delay_between_sends: 0.5
+
+  # Persistencia
+  persistence_enabled: true
+  persistence_file: "output/email_queue.json"
+
+# ═══════════════════════════════════════════════════════════════
+# CONFIGURACIÓN DE TEMPLATES
+# ═══════════════════════════════════════════════════════════════
+templates:
+  # Directorio de templates
+  directory: "modules/email/templates"
+
+  # Templates disponibles
+  available:
+    - name: "base"
+      description: "Template base con estilos corporativos"
+    - name: "daily_report"
+      description: "Reporte diario de Planning"
+    - name: "critical_alert"
+      description: "Alertas críticas del sistema"
+    - name: "oc_validation"
+      description: "Validación de órdenes de compra"
+    - name: "reception_program"
+      description: "Programa de recibo diario"
+    - name: "weekly_summary"
+      description: "Resumen semanal de operaciones"
+    - name: "error_notification"
+      description: "Notificaciones de errores"
+    - name: "reminder"
+      description: "Recordatorios de tareas"
+    - name: "confirmation"
+      description: "Confirmación de procesos"
+
+  # Variables por defecto
+  default_variables:
+    sistema_nombre: "Sistema SAC"
+    cedis_nombre: "CEDIS Cancún 427"
+    cedis_codigo: "427"
+    empresa: "Tiendas Chedraui S.A. de C.V."
+    region: "Sureste"
+    desarrollador: "Julián Alexander Juárez Alvarado"
+    desarrollador_cargo: "Jefe de Sistemas"
+    color_primario: "#E31837"
+    color_secundario: "#003DA5"
+    lema: "Las máquinas y los sistemas al servicio de los analistas"
+
+# ═══════════════════════════════════════════════════════════════
+# CATEGORÍAS DE DESTINATARIOS
+# ═══════════════════════════════════════════════════════════════
+recipients:
+  categories:
+    - name: "CRITICO"
+      description: "Alertas críticas - alta prioridad"
+      priority: 1
+
+    - name: "OPERACIONES"
+      description: "Operaciones diarias del CEDIS"
+      priority: 2
+
+    - name: "PLANNING"
+      description: "Equipo de Planning"
+      priority: 2
+
+    - name: "GERENCIA"
+      description: "Gerencia y supervisión"
+      priority: 3
+
+    - name: "SISTEMAS"
+      description: "Equipo de sistemas"
+      priority: 2
+
+    - name: "REPORTE_DIARIO"
+      description: "Destinatarios de reportes diarios"
+      priority: 3
+
+    - name: "REPORTE_SEMANAL"
+      description: "Destinatarios de reportes semanales"
+      priority: 4
+
+    - name: "ALERTAS"
+      description: "Alertas generales"
+      priority: 2
+
+    - name: "NOTIFICACIONES"
+      description: "Notificaciones informativas"
+      priority: 4
+
+# ═══════════════════════════════════════════════════════════════
+# PROGRAMACIÓN DE NOTIFICACIONES
+# ═══════════════════════════════════════════════════════════════
+scheduling:
+  # Intervalo de verificación (segundos)
+  check_interval: 60
+
+  # Tareas programadas por defecto
+  default_tasks:
+    - name: "reporte_diario"
+      type: "daily"
+      time: "08:00"
+      enabled: true
+
+    - name: "resumen_semanal"
+      type: "weekly"
+      day: "monday"
+      time: "09:00"
+      enabled: true
+
+    - name: "limpieza_cola"
+      type: "daily"
+      time: "23:00"
+      enabled: true
+
+# ═══════════════════════════════════════════════════════════════
+# TIPOS DE CORREO
+# ═══════════════════════════════════════════════════════════════
+email_types:
+  - type: "reporte_planning_diario"
+    template: "daily_report"
+    priority: "normal"
+    category: "REPORTE_DIARIO"
+    subject_prefix: "📊"
+
+  - type: "alerta_critica"
+    template: "critical_alert"
+    priority: "urgent"
+    category: "CRITICO"
+    subject_prefix: "🚨"
+
+  - type: "validacion_oc"
+    template: "oc_validation"
+    priority: "high"
+    category: "PLANNING"
+    subject_prefix: ""
+
+  - type: "programa_recibo"
+    template: "reception_program"
+    priority: "normal"
+    category: "OPERACIONES"
+    subject_prefix: "📦"
+
+  - type: "resumen_semanal"
+    template: "weekly_summary"
+    priority: "normal"
+    category: "REPORTE_SEMANAL"
+    subject_prefix: "📈"
+
+  - type: "notificacion_error"
+    template: "error_notification"
+    priority: "high"
+    category: "SISTEMAS"
+    subject_prefix: "⚠️"
+
+  - type: "recordatorio"
+    template: "reminder"
+    priority: "normal"
+    category: "NOTIFICACIONES"
+    subject_prefix: "🔔"
+
+  - type: "confirmacion_proceso"
+    template: "confirmation"
+    priority: "normal"
+    category: "NOTIFICACIONES"
+    subject_prefix: "✅"
+
+# ═══════════════════════════════════════════════════════════════
+# LÍMITES Y RESTRICCIONES
+# ═══════════════════════════════════════════════════════════════
+limits:
+  # Tamaño máximo de adjuntos (bytes)
+  max_attachment_size: 26214400  # 25MB
+
+  # Número máximo de destinatarios por correo
+  max_recipients: 50
+
+  # Número máximo de adjuntos por correo
+  max_attachments: 10
+
+  # Rate limiting (correos por minuto)
+  rate_limit: 30
+
+# ═══════════════════════════════════════════════════════════════
+# LOGGING DE EMAILS
+# ═══════════════════════════════════════════════════════════════
+logging:
+  # Nivel de log para emails
+  level: "INFO"
+
+  # Guardar historial de envíos
+  save_history: true
+  history_file: "output/logs/email_history.json"
+
+  # Retención de historial (días)
+  history_retention_days: 30

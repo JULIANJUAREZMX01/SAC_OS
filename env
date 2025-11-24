@@ -1,0 +1,725 @@
+# ============================================
+# SAC v1.0 - Variables de Entorno
+# Sistema de Automatización de Consultas
+# CEDIS Cancún 427 - Tiendas Chedraui
+# ============================================
+#
+# ✅ ESTE ARCHIVO ESTÁ PRE-CONFIGURADO
+# 
+# SOLO DEBES COMPLETAR:
+# 1. DB_USER (tu usuario de DB2)
+# 2. DB_PASSWORD (tu contraseña de DB2)  
+# 3. EMAIL_USER (tu correo corporativo)
+# 4. EMAIL_PASSWORD (tu contraseña de correo)
+#
+# INSTRUCCIONES:
+# 1. Copia este archivo a la raíz como .env
+#    Comando: copy config\.env.example .env
+# 2. Edita el archivo .env con tus credenciales
+#    Comando: notepad .env
+# 3. Guarda y cierra
+# 4. NUNCA subas el archivo .env a Git
+#
+# ============================================
+
+# ============================================
+# 🔒 CREDENCIALES - COMPLETAR OBLIGATORIO
+# ============================================
+
+# Base de Datos DB2
+DB_USER=your_db_user                                    # ← TU USUARIO DB2 AQUÍ
+DB_PASSWORD=your_db_password                                # ← TU CONTRASEÑA DB2 AQUÍ
+
+# Email Corporativo
+EMAIL_USER=your_email@chedraui.com.mx                                 # ← TU CORREO @chedraui.com.mx AQUÍ
+EMAIL_PASSWORD=your_email_password                            # ← TU CONTRASEÑA DE CORREO AQUÍ
+
+# ============================================
+# ✅ BASE DE DATOS DB2 - MANHATTAN WMS
+# ============================================
+# Configuración completa del servidor DB2
+# Puerto estándar: 50000
+# Timeout de conexión: 30 segundos
+
+# Conexión directa al servidor DB2 Manhattan WMS
+DB_HOST=lg00bk.chedraui.com
+DB_PORT=50000
+DB_DATABASE=WM260BASD
+DB_SCHEMA=WMWHSE1
+DB_DRIVER={IBM DB2 ODBC DRIVER}
+DB_TIMEOUT=30
+DB_POOL_SIZE=5
+
+# ============================================
+# ✅ CONFIGURACIÓN DE CEDIS CANCÚN
+# ============================================
+# Información del Centro de Distribución
+# Código oficial: 427
+# Almacén Manhattan: C22
+# Región: Sureste
+
+CEDIS_CODE=427
+CEDIS_NAME=CEDIS Cancún
+CEDIS_REGION=Sureste
+CEDIS_ALMACEN=C22
+CEDIS_WAREHOUSE=WM260BASD
+CEDIS_LOCATION=Cancún, Quintana Roo
+
+# ============================================
+# ✅ CONFIGURACIÓN DE EMAIL - OFFICE 365
+# ============================================
+# Servidor SMTP: Office 365 corporativo
+# Puerto TLS: 587 (estándar seguro)
+# Autenticación: OAuth2 / Credenciales
+
+EMAIL_HOST=smtp.office365.com
+EMAIL_PORT=587
+EMAIL_PROTOCOL=TLS
+EMAIL_FROM=u427jd15@chedraui.com.mx
+EMAIL_FROM_NAME=Sistema SAC - CEDIS Cancún 427 - Equipo de Sistemas
+
+# Destinatarios por prioridad
+# CRÍTICO: Planning y Jefatura
+EMAIL_TO_CRITICAL="JERONIMO GARCIA,JUAN" <jgarciaj@chedraui.com.mx>, "JERONIMO GARCIA,JUAN" <jgarciaj@chedraui.com.mx>
+
+
+# NORMAL: Operaciones y Sistemas
+EMAIL_TO_NORMAL="JERONIMO GARCIA,JUAN" <jgarciaj@chedraui.com.mx>, "JERONIMO GARCIA,JUAN" <jgarciaj@chedraui.com.mx>
+
+# Copia (CC)
+EMAIL_CC="VERA REYES,ITZA RUBY" <ivreyes@chedraui.com.mx>, "SUAREZ PACHECO,ISRAEL" <isuarez@chedraui.com.mx>, "Control de Inventario, Cedis 427" <cedis427ci@chedraui.com.mx>, "Auditor calidad 427" <auditorcalidad427@chedraui.com.mx>, "MESA DE EXPEDICION, CEDIS CANCUN" <mexpedicion427ced@chedraui.com.mx>, "MESA DE PREPARACION, CEDIS CANCUN" <mpreparacion427ced@chedraui.com.mx>, "MESA DE EXPEDICION, CEDIS CANCUN" <mexpedicion427ced@chedraui.com.mx>, "MESA DE PREPARACION, CEDIS CANCUN" <mpreparacion427ced@chedraui.com.mx>, "MESA DE RECIBO, CEDIS CANCUN" <mrecibo427ced@chedraui.com.mx>
+
+# Configuración adicional
+EMAIL_SSL=true
+EMAIL_ENABLE=true
+EMAIL_RETRY_ATTEMPTS=3
+EMAIL_RETRY_DELAY=5
+
+# ============================================
+# ✅ CONFIGURACIÓN DE RUTAS Y DIRECTORIOS
+# ============================================
+# Estructura de carpetas del proyecto
+# Automáticamente se crean si no existen
+
+OUTPUT_DIR=./output
+LOGS_DIR=./output/logs
+RESULTADOS_DIR=./output/resultados
+REPORTES_DIR=./output/reportes
+TEMP_DIR=./output/temp
+QUERIES_DIR=./queries
+
+# ============================================
+# ✅ CONFIGURACIÓN DE LOGGING
+# ============================================
+# Nivel de detalle de logs
+# DEBUG: Máximo detalle (desarrollo)
+# INFO: Información general (producción)
+# WARNING: Solo advertencias
+# ERROR: Solo errores
+
+LOG_LEVEL=INFO
+LOG_FORMAT=%(asctime)s - %(name)s - %(levelname)s - %(message)s
+LOG_DATE_FORMAT=%Y-%m-%d %H:%M:%S
+LOG_MAX_BYTES=10485760
+LOG_BACKUP_COUNT=5
+LOG_TO_FILE=true
+LOG_TO_CONSOLE=true
+
+# ============================================
+# ✅ CONFIGURACIÓN DEL SISTEMA
+# ============================================
+# Parámetros generales de operación
+
+SYSTEM_VERSION=1.0.0
+ENVIRONMENT=production
+DEBUG=false
+ENABLE_ALERTS=true
+ENABLE_EMAIL=true
+ENABLE_SCHEDULER=true
+
+# Zona horaria (CRÍTICO para programación)
+TIMEZONE=America/Cancun
+
+# ============================================
+# ✅ CONFIGURACIÓN DE REPORTES EXCEL
+# ============================================
+# Formato y estilo de reportes
+
+EXCEL_ENGINE=openpyxl
+EXCEL_MAX_ROWS=1000000
+EXCEL_AUTOFIT_COLUMNS=true
+EXCEL_FREEZE_PANES=true
+EXCEL_ADD_FILTERS=true
+EXCEL_ALTERNATING_ROWS=true
+
+# Colores corporativos Chedraui (HEX)
+COLOR_HEADER=E31837
+COLOR_SUBHEADER=F8CBAD
+COLOR_OK=92D050
+COLOR_WARNING=FFC000
+COLOR_ERROR=FF0000
+COLOR_INFO=B4C7E7
+
+# ============================================
+# ✅ CONFIGURACIÓN DE QUERIES SQL
+# ============================================
+# Timeouts y límites de ejecución
+
+QUERY_TIMEOUT=300
+QUERY_MAX_RETRIES=3
+QUERY_FETCH_SIZE=1000
+QUERY_ENABLE_CACHE=false
+
+# ============================================
+# ✅ CONFIGURACIÓN DE AUTOMATIZACIÓN
+# ============================================
+# Horarios de ejecución automática
+# Formato: HH:MM (24 horas)
+
+SCHEDULE_PLANNING_AVANCE=09:00
+SCHEDULE_PLANNING_FINAL=17:00
+SCHEDULE_PROGRAMA_RECIBO=18:00
+SCHEDULE_VALIDACION_NOCTURNA=22:00
+
+# Frecuencia de monitoreo de email (segundos)
+EMAIL_CHECK_INTERVAL=60
+
+# ============================================
+# ✅ CONFIGURACIÓN DE VALIDACIONES
+# ============================================
+# Tipos de órdenes de compra a validar
+
+# Patrones de OC Chedraui (Regex)
+OC_PATTERN_1=750384\d{6}
+OC_PATTERN_2=811117\d{6}
+OC_PATTERN_3=40[0-9]{11}
+
+# Patrones de LPN (Regex)
+LPN_PATTERN=LPN[0-9]{7,10}
+
+# Patrones de ASN (Regex)
+ASN_PATTERN=ASN[0-9]{8,12}
+
+# ============================================
+# ✅ CONFIGURACIÓN DE SEGURIDAD
+# ============================================
+# Parámetros de seguridad y encriptación
+
+SECURITY_ENCRYPT_PASSWORDS=true
+SECURITY_MIN_PASSWORD_LENGTH=8
+SECURITY_SESSION_TIMEOUT=3600
+SECURITY_MAX_LOGIN_ATTEMPTS=3
+
+# ============================================
+# ✅ CONFIGURACIÓN DE PERFORMANCE
+# ============================================
+# Optimización y rendimiento
+
+CACHE_ENABLED=false
+CACHE_TTL=3600
+MAX_WORKERS=4
+ASYNC_ENABLED=true
+BATCH_SIZE=100
+
+# ============================================
+# ✅ CONFIGURACIÓN DE NOTIFICACIONES
+# ============================================
+# Alertas y notificaciones automáticas
+
+ALERT_CRITICAL_ENABLED=true
+ALERT_CRITICAL_EMAIL=true
+ALERT_CRITICAL_SMS=false
+ALERT_WARNING_ENABLED=true
+ALERT_INFO_ENABLED=false
+
+# ============================================
+# 📱 CONFIGURACIÓN DE WHATSAPP - TWILIO (OPCIONAL)
+# ============================================
+# Notificaciones vía WhatsApp usando Twilio
+#
+# INSTRUCCIONES PARA CONFIGURAR:
+# 1. Crea cuenta en https://www.twilio.com
+# 2. Obtén tu Account SID y Auth Token
+# 3. Configura WhatsApp Sandbox o número dedicado
+# 4. Agrega los números de destino (con código de país)
+#
+# NOTA: Requiere instalar twilio: pip install twilio
+
+# Credenciales Twilio
+TWILIO_ACCOUNT_SID=                             # ← TU ACCOUNT SID AQUÍ
+TWILIO_AUTH_TOKEN=                              # ← TU AUTH TOKEN AQUÍ
+
+# Número de WhatsApp (Sandbox: +14155238886)
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+
+# Destinatarios (separados por coma, con código de país)
+# Ejemplo: +5219981234567,+5219987654321
+WHATSAPP_DESTINATARIOS=                         # ← NÚMEROS SEPARADOS POR COMA
+
+# Habilitar/Deshabilitar WhatsApp
+WHATSAPP_ENABLED=false
+
+# ============================================
+# 📱 CONFIGURACIÓN DE TELEGRAM (OPCIONAL)
+# ============================================
+# Notificaciones instantáneas vía Telegram Bot
+#
+# INSTRUCCIONES PARA CONFIGURAR:
+# 1. Abre Telegram y busca @BotFather
+# 2. Envía /newbot y sigue las instrucciones
+# 3. Copia el token que te proporciona
+# 4. Para obtener tu Chat ID:
+#    - Busca @userinfobot en Telegram
+#    - Te dará tu ID de usuario
+# 5. Para grupos, añade el bot y usa @RawDataBot
+#    para obtener el ID del grupo (empieza con -)
+#
+# Ejemplo de Chat IDs:
+#    - Usuario individual: 123456789
+#    - Grupo: -1001234567890
+
+# Token del Bot (obtener de @BotFather)
+TELEGRAM_BOT_TOKEN=                                 # ← TU TOKEN DE BOT AQUÍ
+
+# IDs de chat (separados por coma)
+# Puedes incluir usuarios y grupos
+TELEGRAM_CHAT_IDS=                                  # ← IDs SEPARADOS POR COMA
+
+# Habilitar/Deshabilitar Telegram
+TELEGRAM_ENABLED=true
+
+# Tipos de notificaciones
+TELEGRAM_ALERTAS_CRITICAS=true
+TELEGRAM_RESUMEN_DIARIO=true
+TELEGRAM_VALIDACION_OC=true
+TELEGRAM_ESTADO_SISTEMA=false
+
+# ============================================
+# ✅ CONFIGURACIÓN DE INTEGRACIÓN
+# ============================================
+# Servicios externos y APIs
+
+# Service Now (opcional)
+SERVICENOW_URL=https://chedrauisn.service-now.com
+SERVICENOW_ENABLED=false
+
+# SAP (opcional)
+SAP_ENABLED=false
+
+# Manhattan WMS Web Services (opcional)
+WMS_API_ENABLED=false
+
+# ============================================
+# 👤 HABILITACIÓN AUTOMÁTICA DE USUARIOS
+# ============================================
+# Servicio automático que detecta y habilita usuarios
+# que se desconectaron abruptamente con trabajo activo
+#
+# FUNCIONALIDADES:
+# - Monitoreo continuo de usuarios bloqueados (6 AM - 6 PM)
+# - Detección de desconexiones abruptas con tareas activas
+# - Habilitación automática instantánea
+# - Notificaciones a WhatsApp y Telegram
+# - Modo dormitorio fuera de horario (ahorro de recursos)
+#
+# HORARIO: Lunes a Sábado, 6:00 AM - 6:00 PM
+# ZONA HORARIA: America/Cancun
+
+# Habilitar/Deshabilitar el servicio
+HABILITACION_ENABLED=true
+
+# Horario de operación (formato 24 horas)
+HABILITACION_HORA_INICIO=6                          # 6:00 AM
+HABILITACION_HORA_FIN=18                            # 6:00 PM
+
+# Días de operación (0=Lunes, 5=Sábado, 6=Domingo)
+# Default: Lunes a Sábado
+HABILITACION_DIAS=0,1,2,3,4,5
+
+# Zona horaria
+HABILITACION_TIMEZONE=America/Cancun
+
+# Intervalo de chequeo en segundos (modo activo)
+HABILITACION_INTERVALO=30
+
+# Intervalo de chequeo en segundos (modo dormitorio)
+HABILITACION_INTERVALO_DORMIDO=300
+
+# Máximo de habilitaciones por hora (seguridad)
+HABILITACION_MAX_POR_HORA=50
+
+# Notificaciones
+HABILITACION_TELEGRAM=true                          # Enviar a Telegram
+HABILITACION_WHATSAPP=true                          # Enviar a WhatsApp
+
+# ============================================
+# 📱 WHATSAPP API GENÉRICA
+# ============================================
+# Configuración para API de WhatsApp (alternativa a Twilio)
+# Compatible con WhatsApp Business API, Meta Cloud API, etc.
+#
+# NOTA: Configurar según el proveedor de API elegido
+
+# URL de la API (endpoint para enviar mensajes)
+WHATSAPP_API_URL=                                   # ← URL DE TU API AQUÍ
+
+# Token de autenticación
+WHATSAPP_API_TOKEN=                                 # ← TOKEN DE API AQUÍ
+
+# ID del grupo de WhatsApp (opcional)
+WHATSAPP_GROUP_ID=                                  # ← ID DEL GRUPO AQUÍ
+
+# Números de teléfono (separados por coma, con código de país)
+# Ejemplo: +5219981234567,+5219987654321
+WHATSAPP_PHONE_NUMBERS=                             # ← NÚMEROS AQUÍ
+
+# ============================================
+# 🔋 CONFIGURACIÓN DE UPS BACKUP
+# ============================================
+# Sistema de respaldo y continuidad operativa
+# Mantiene operación durante interrupciones de Manhattan WMS
+#
+# FUNCIONALIDADES:
+# - Detección automática de pérdida de conexión
+# - Caché de datos críticos para operación offline
+# - Cola de operaciones pendientes para sincronización
+# - Autorización obligatoria para DMLs en Manhattan
+# - Plantillas predefinidas seguras para operaciones comunes
+
+# Health Check (verificación de conexión)
+UPS_HEALTH_CHECK_ENABLED=true
+UPS_HEALTH_CHECK_INTERVAL=30                    # Segundos entre verificaciones
+UPS_MAX_ERRORES_OFFLINE=3                       # Errores consecutivos para activar modo offline
+
+# Snapshots (caché de datos)
+UPS_SNAPSHOT_TTL=60                             # TTL default en minutos
+UPS_AUTO_SNAPSHOT_CRITICOS=true                 # Actualizar automáticamente snapshots críticos
+
+# Operaciones pendientes
+UPS_MAX_INTENTOS_SYNC=3                         # Intentos máximos por operación
+UPS_EXPIRACION_OPS_DIAS=7                       # Días antes de expirar operaciones pendientes
+
+# Sincronización
+UPS_AUTO_SYNC=false                             # Sincronización automática (requiere autorización)
+UPS_SYNC_BATCH_SIZE=100                         # Operaciones por lote de sincronización
+
+# Modo mantenimiento
+UPS_MANT_DURACION=60                            # Duración default en minutos
+
+# ============================================
+# ✅ CONFIGURACIÓN DE DESARROLLO
+# ============================================
+# Solo para ambiente de desarrollo
+
+DEV_MODE=false
+DEV_MOCK_DB=false
+DEV_MOCK_EMAIL=false
+DEV_VERBOSE=false
+
+# ============================================
+# 📧 CONFIGURACIÓN IMAP - RECEPCIÓN DE CORREOS
+# ============================================
+# Para detección de conflictos reportados por correo
+# Utiliza las mismas credenciales de EMAIL o configura diferentes
+#
+# NOTA: Requiere acceso IMAP habilitado en la cuenta de correo
+
+IMAP_HOST=imap.office365.com
+IMAP_PORT=993
+IMAP_USER=                                          # ← Dejar vacío para usar EMAIL_USER
+IMAP_PASSWORD=                                      # ← Dejar vacío para usar EMAIL_PASSWORD
+IMAP_CARPETA_ADJUNTOS=./output/adjuntos
+
+# ============================================
+# 🔔 CONFIGURACIÓN DE CONFLICTOS EXTERNOS
+# ============================================
+# Sistema de detección de errores no capturados
+# que se manifiestan mediante correos externos
+#
+# Flujo: Detección → Análisis → Alerta → Confirmación → Resolución
+
+# Analista en turno que recibirá alertas de conflictos
+ANALISTA_TURNO_EMAIL=planning@chedraui.com.mx
+
+# Supervisor para escalamiento
+SUPERVISOR_EMAIL=supervisor@chedraui.com.mx
+
+# Días hacia atrás para buscar correos con conflictos
+CONFLICT_DIAS_BUSQUEDA=7
+
+# Análisis automático al detectar conflicto
+CONFLICT_AUTO_ANALIZAR=true
+
+# Notificación automática al analista
+CONFLICT_AUTO_NOTIFICAR=true
+
+# ============================================
+# 🤖 CONFIGURACIÓN DEL AGENTE SAC
+# ============================================
+# Asistente Virtual Inteligente del CEDIS 427
+# Creado por: Julián Alexander Juárez Alvarado (ADMJAJA)
+#
+# NIVELES DE ACCESO:
+# - ADMIN (u427jd15): Acceso completo CLI, ejecución de scripts
+# - SISTEMAS: Configuración, respuestas personalizadas
+# - USUARIO: Respuestas rápidas, recordatorios
+#
+# FUNCIONALIDADES:
+# - Baúl de respuestas rápidas con "/"
+# - Ejecución de comandos (solo admin)
+# - Sistema de aprendizaje por usuario
+# - Recordatorios personalizados
+# - Integración con IA (Ollama)
+
+# Usuario administrador con acceso completo
+AGENTE_ADMIN_USER=u427jd15
+
+# Usuarios del equipo de sistemas (acceso avanzado)
+# Separados por coma, sin espacios
+AGENTE_SISTEMAS_USERS=admjaja,larry,adrian
+
+# Configuración de historial y límites
+AGENTE_MAX_HISTORIAL=100
+AGENTE_MAX_RECORDATORIOS=50
+
+# Sistema de aprendizaje
+AGENTE_APRENDIZAJE=true
+AGENTE_UMBRAL_FAV=3
+
+# Interfaz
+AGENTE_SUGERENCIAS=true
+AGENTE_MAX_SUGERENCIAS=5
+
+# Timeouts de ejecución (segundos)
+AGENTE_TIMEOUT_CMD=30
+AGENTE_TIMEOUT_SCRIPT=120
+
+# ============================================
+# 🧠 CONFIGURACIÓN DE IA - ANTHROPIC CLAUDE
+# ============================================
+# Integración principal con Claude (Anthropic) para SAC VISION 3.0
+# Motor de IA principal con capacidades de computer use
+#
+# OBTENER API KEY:
+# 1. Crear cuenta en https://console.anthropic.com
+# 2. Ir a API Keys
+# 3. Crear nueva API key
+# 4. Copiar y pegar aquí
+#
+# MODELOS DISPONIBLES:
+# - claude-sonnet-4-20250514: Modelo recomendado (balance costo/rendimiento)
+# - claude-3-5-sonnet-20241022: Modelo anterior estable
+# - claude-3-opus-20240229: Máximo rendimiento (más costoso)
+
+# API Key de Anthropic (OBLIGATORIO para SAC VISION 3.0)
+ANTHROPIC_API_KEY=                                      # ← TU API KEY DE ANTHROPIC AQUÍ
+
+# Modelo principal a utilizar
+ANTHROPIC_MODEL=claude-sonnet-4-20250514
+
+# Modelo alternativo (fallback)
+ANTHROPIC_MODEL_FALLBACK=claude-3-5-sonnet-20241022
+
+# Habilitar/Deshabilitar Claude
+ANTHROPIC_ENABLED=true
+
+# Timeout para respuestas (segundos)
+ANTHROPIC_TIMEOUT=120
+
+# Máximo de tokens en respuesta
+ANTHROPIC_MAX_TOKENS=4096
+
+# Temperatura (0.0 = determinista, 1.0 = creativo)
+ANTHROPIC_TEMPERATURE=0.7
+
+# ============================================
+# 🖥️ CONFIGURACIÓN DE COMPUTER USE
+# ============================================
+# Capacidades de control de computadora para el agente
+# Incluye: mouse, teclado, captura de pantalla, aplicaciones
+#
+# IMPORTANTE: Estas capacidades requieren supervisión
+# Solo están disponibles para usuarios con nivel ADMIN o SISTEMAS
+
+# Habilitar control de computadora
+COMPUTER_USE_ENABLED=true
+
+# Resolución de pantalla para capturas (auto-detecta si está vacío)
+SCREEN_WIDTH=
+SCREEN_HEIGHT=
+
+# Intervalo mínimo entre acciones (ms) - seguridad
+COMPUTER_ACTION_DELAY=100
+
+# Tipos de acciones permitidas
+ALLOW_MOUSE_CONTROL=true
+ALLOW_KEYBOARD_CONTROL=true
+ALLOW_SCREEN_CAPTURE=true
+ALLOW_FILE_OPERATIONS=true
+ALLOW_APP_LAUNCH=true
+
+# Timeout para operaciones de computer use (segundos)
+COMPUTER_USE_TIMEOUT=30
+
+# ============================================
+# 🧠 CONFIGURACIÓN DE IA - OLLAMA (FALLBACK)
+# ============================================
+# Ollama como opción de fallback local cuando Claude no está disponible
+#
+# INSTALACIÓN DE OLLAMA:
+# 1. Descargar desde: https://ollama.ai/download
+# 2. Instalar y ejecutar el servicio
+# 3. Descargar modelo: ollama pull llama2
+# 4. Verificar: ollama list
+
+# URL del servidor Ollama (local por defecto)
+OLLAMA_BASE_URL=http://localhost:11434
+
+# API Key de Ollama (dejar vacío si es local sin auth)
+OLLAMA_API_KEY=                                         # ← TU API KEY DE OLLAMA AQUÍ
+
+# Modelo a utilizar
+OLLAMA_MODEL=llama2
+
+# Modelo alternativo (fallback)
+OLLAMA_MODEL_FALLBACK=mistral
+
+# Habilitar/Deshabilitar IA
+OLLAMA_ENABLED=true
+
+# Timeout para respuestas de IA (segundos)
+OLLAMA_TIMEOUT=60
+
+# Máximo de tokens en respuesta
+OLLAMA_MAX_TOKENS=2048
+
+# Temperatura (0.0 = determinista, 1.0 = creativo)
+OLLAMA_TEMPERATURE=0.7
+
+# Contexto del sistema para el agente
+OLLAMA_SYSTEM_PROMPT=Eres el Agente SAC, asistente virtual del CEDIS Cancún 427 de Tiendas Chedraui. Fuiste creado por Julián Alexander Juárez Alvarado (ADMJAJA), Jefe de Sistemas. Ayudas a los colaboradores con soporte técnico, consultas del sistema SAC, y resolución de problemas. Responde de manera profesional, concisa y en español.
+
+# ============================================
+# 🔑 DEVICE KEYS - SISTEMA DE AUTORIZACIÓN
+# ============================================
+# Claves de dispositivo para autorización del Agente SAC
+#
+# IMPORTANTE:
+# - La MASTER KEY es solo para el equipo de Sistemas
+# - Cada dispositivo autorizado debe tener su propia clave
+# - Las claves son generadas y administradas por el admin u427jd15
+# - NUNCA compartir las claves fuera del equipo autorizado
+#
+# ESTRUCTURA DE CLAVES:
+# - Master Key: Clave maestra del sistema (solo sistemas)
+# - Device Keys: Una por cada dispositivo autorizado
+#
+# FORMATO DE DEVICE KEY:
+# SAC-{CEDIS}-{TIPO}-{ID_UNICO}
+# Ejemplo: SAC-427-DEV-A1B2C3D4
+
+# ═══════════════════════════════════════════
+# 🔐 MASTER KEY - SOLO EQUIPO DE SISTEMAS
+# ═══════════════════════════════════════════
+# Esta clave autoriza operaciones críticas del sistema
+# Solo debe estar en dispositivos del equipo de sistemas
+# Cambiar periódicamente por seguridad
+
+SAC_MASTER_KEY=SAC-427-MASTER-ADMJAJA2025-X9K7M2P4Q8R1    # ← CLAVE MAESTRA SAC
+
+# Hash de verificación de la master key (SHA256)
+SAC_MASTER_KEY_HASH=                                      # ← SE GENERA AUTOMÁTICAMENTE
+
+# Fecha de expiración de la master key (YYYY-MM-DD)
+SAC_MASTER_KEY_EXPIRY=2026-01-01
+
+# ═══════════════════════════════════════════
+# 💻 DEVICE KEYS - DISPOSITIVOS AUTORIZADOS
+# ═══════════════════════════════════════════
+# Registra aquí cada dispositivo autorizado
+# Formato: SAC_DEVICE_KEY_{NOMBRE}=SAC-427-{TIPO}-{ID}
+#
+# TIPOS DE DISPOSITIVO:
+# - DEV: Equipo de desarrollo
+# - ADM: Administrador
+# - SYS: Equipo de sistemas
+# - USR: Usuario estándar
+# - SRV: Servidor
+#
+# Para generar una nueva device key:
+# python -c "import secrets; print(f'SAC-427-DEV-{secrets.token_hex(8).upper()}')"
+
+# Dispositivo principal - Desarrollo ADMJAJA
+SAC_DEVICE_KEY_ADMJAJA=SAC-427-DEV-7F3A9B2C8E1D4F6A
+
+# Dispositivo administrador de red
+SAC_DEVICE_KEY_ADMIN=SAC-427-ADM-B4D8E2F6A1C9E3B7
+
+# Equipo de Larry - Sistemas
+SAC_DEVICE_KEY_LARRY=SAC-427-SYS-C2E7F9A4B8D1E5C3
+
+# Equipo de Adrian - Sistemas
+SAC_DEVICE_KEY_ADRIAN=SAC-427-SYS-D5F8A3C7E2B9D4F1
+
+# Servidor SAC principal
+SAC_DEVICE_KEY_SERVER=SAC-427-SRV-E9A2B6D4C8F1E7A3
+
+# ═══════════════════════════════════════════
+# 📋 REGISTRO DE DISPOSITIVOS ADICIONALES
+# ═══════════════════════════════════════════
+# Agregar nuevos dispositivos según sea necesario
+# Seguir el formato: SAC_DEVICE_KEY_{NOMBRE}=SAC-427-{TIPO}-{ID}
+
+# SAC_DEVICE_KEY_EQUIPO1=
+# SAC_DEVICE_KEY_EQUIPO2=
+# SAC_DEVICE_KEY_EQUIPO3=
+
+# Lista de device keys activas (separadas por coma)
+SAC_ACTIVE_DEVICE_KEYS=SAC_DEVICE_KEY_ADMJAJA,SAC_DEVICE_KEY_ADMIN,SAC_DEVICE_KEY_LARRY,SAC_DEVICE_KEY_ADRIAN,SAC_DEVICE_KEY_SERVER
+
+# Validación de device key requerida para ejecución
+SAC_REQUIRE_DEVICE_KEY=true
+
+# Permitir nuevos dispositivos sin key (solo en modo desarrollo)
+SAC_ALLOW_UNKNOWN_DEVICES=false
+
+# ============================================
+# NOTAS IMPORTANTES
+# ============================================
+#
+# 📌 CREDENCIALES OBLIGATORIAS:
+#    - DB_USER
+#    - DB_PASSWORD
+#    - EMAIL_USER
+#    - EMAIL_PASSWORD
+#
+# 📌 SERVIDOR DB2:
+#    - Host: lg00bk.chedraui.com (servidor directo DB2)
+#    - Puerto: 50000 (estándar DB2)
+#    - Database: WM260BASD
+#    - Schema: WMWHSE1 (Manhattan WMS)
+#
+# 📌 EMAIL OFFICE 365:
+#    - SMTP: smtp.office365.com
+#    - Puerto: 587 (TLS)
+#    - Autenticación: requerida
+#
+# 📌 ZONA HORARIA:
+#    - America/Cancun (UTC-5)
+#    - Crítico para programación correcta
+#
+# 📌 SEGURIDAD:
+#    - NUNCA subir .env a Git
+#    - NUNCA compartir credenciales
+#    - Rotar contraseñas periódicamente
+#
+# 📌 SOPORTE:
+#    - Sistemas CEDIS 427
+#    - Ext: 4336
+#    - Email: siterfvh@chedraui.com.mx
+#
+# ============================================
+# Versión del archivo: 1.0
+# Última actualización: Noviembre 2025
+# Responsable: ADMJAJA - Sistemas CEDIS 427
+# ============================================

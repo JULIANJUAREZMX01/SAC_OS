@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SAC Dashboard{% endblock %} - CEDIS 427</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --chedraui-red: #E31837;
+            --chedraui-dark: #1a1a2e;
+            --chedraui-light: #f4f6f9;
+        }
+        body {
+            background-color: var(--chedraui-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background: linear-gradient(135deg, var(--chedraui-red) 0%, #b01030 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .sidebar {
+            background: var(--chedraui-dark);
+            min-height: calc(100vh - 56px);
+            position: fixed;
+            top: 56px;
+            left: 0;
+            width: 220px;
+            overflow-y: auto;
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: rgba(227, 24, 55, 0.8);
+            color: white;
+            border-left-color: white;
+        }
+        .sidebar .nav-link i {
+            width: 24px;
+        }
+        .main-content {
+            margin-left: 220px;
+            padding: 20px;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-radius: 10px;
+        }
+        .card-header {
+            background: white;
+            border-bottom: 2px solid var(--chedraui-red);
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: 600;
+        }
+        .stat-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        .stat-icon {
+            font-size: 2.5rem;
+            opacity: 0.3;
+        }
+        .badge-critico { background-color: #dc3545; }
+        .badge-alto { background-color: #fd7e14; }
+        .badge-medio { background-color: #ffc107; color: #000; }
+        .badge-bajo { background-color: #28a745; }
+        .table-hover tbody tr:hover {
+            background-color: rgba(227,24,55,0.05);
+        }
+        .progress-bar {
+            background-color: var(--chedraui-red);
+        }
+        .btn-chedraui {
+            background: var(--chedraui-red);
+            border: none;
+            color: white;
+        }
+        .btn-chedraui:hover {
+            background: #b01030;
+            color: white;
+        }
+        .quick-action-card {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .quick-action-card:hover {
+            background: rgba(227, 24, 55, 0.05);
+            border-color: var(--chedraui-red) !important;
+        }
+        .toast-container {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 1050;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .loading-overlay.show {
+            display: flex;
+        }
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-ok { background: #28a745; }
+        .status-warning { background: #ffc107; }
+        .status-error { background: #dc3545; }
+        .status-inactive { background: #6c757d; }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-box-seam"></i> SAC Dashboard
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <span class="nav-link text-white-50">
+                            <i class="bi bi-building"></i> {{ cedis_name }} ({{ cedis_code }})
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link text-white-50" id="currentTime">
+                            <i class="bi bi-clock"></i> {{ current_time }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="location.reload()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </a>
+                    </li>
+                    {% if auth_enabled and logged_in %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ current_user }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/configuracion"><i class="bi bi-gear me-2"></i>Configuración</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="/logout"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid" style="margin-top: 56px;">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-2 d-none d-md-block sidebar py-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="/">
+                            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'validar' %}active{% endif %}" href="/validar">
+                            <i class="bi bi-search me-2"></i> Validar OC
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'validaciones' %}active{% endif %}" href="/validaciones">
+                            <i class="bi bi-check-circle me-2"></i> Historial
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'errores' %}active{% endif %}" href="/errores">
+                            <i class="bi bi-exclamation-triangle me-2"></i> Errores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'metricas' %}active{% endif %}" href="/metricas">
+                            <i class="bi bi-graph-up me-2"></i> Métricas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'reportes' %}active{% endif %}" href="/reportes">
+                            <i class="bi bi-file-earmark-excel me-2"></i> Reportes
+                        </a>
+                    </li>
+                    <hr class="text-white-50 my-2">
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'config' %}active{% endif %}" href="/configuracion">
+                            <i class="bi bi-gear me-2"></i> Configuración
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Auto Refresh Control -->
+                <div class="mt-4 px-3">
+                    <small class="text-white-50 d-block mb-2">Auto-Refresh</small>
+                    <select id="autoRefreshSelect" class="form-select form-select-sm bg-dark text-white border-secondary" onchange="changeAutoRefresh(this.value)">
+                        <option value="0">Desactivado</option>
+                        <option value="30">30 segundos</option>
+                        <option value="60" selected>1 minuto</option>
+                        <option value="120">2 minutos</option>
+                        <option value="300">5 minutos</option>
+                    </select>
+                </div>
+
+                <!-- System Status -->
+                <div class="mt-4 px-3">
+                    <small class="text-white-50 d-block mb-2">Estado del Sistema</small>
+                    <div class="text-white-50 small">
+                        <span class="status-indicator {{ 'status-ok' if db_status else 'status-warning' }}"></span>
+                        DB2: {{ 'Conectado' if db_status else 'Demo' }}
+                    </div>
+                    <div class="text-white-50 small mt-1">
+                        <span class="status-indicator status-ok"></span>
+                        SAC v{{ version }}
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="main-content col-md-10 ms-sm-auto">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Update clock
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleString('es-MX', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('currentTime').innerHTML = '<i class="bi bi-clock"></i> ' + timeStr;
+        }
+        setInterval(updateClock, 60000);
+
+        // Show loading overlay
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('show');
+        }
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('show');
+        }
+
+        // Toast notifications
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toastId = 'toast-' + Date.now();
+            const bgClass = {
+                'success': 'bg-success',
+                'error': 'bg-danger',
+                'warning': 'bg-warning text-dark',
+                'info': 'bg-info'
+            }[type] || 'bg-secondary';
+
+            const toastHtml = `
+                <div id="${toastId}" class="toast ${bgClass} text-white" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">${message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', toastHtml);
+            const toastEl = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+            toast.show();
+            toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+        }
+
+        // Auto-refresh functionality
+        let autoRefreshInterval = null;
+
+        function startAutoRefresh(seconds = 60) {
+            stopAutoRefresh();
+            if (seconds > 0) {
+                autoRefreshInterval = setInterval(() => {
+                    if (typeof refreshData === 'function') {
+                        refreshData();
+                    }
+                }, seconds * 1000);
+                console.log(`Auto-refresh iniciado: cada ${seconds} segundos`);
+            }
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+
+        function changeAutoRefresh(value) {
+            const seconds = parseInt(value);
+            if (seconds === 0) {
+                stopAutoRefresh();
+                showToast('Auto-refresh desactivado', 'info');
+            } else {
+                startAutoRefresh(seconds);
+                showToast(`Auto-refresh: cada ${seconds} segundos`, 'success');
+            }
+            // Guardar preferencia
+            localStorage.setItem('autoRefreshInterval', seconds);
+        }
+
+        // Restaurar preferencia de auto-refresh
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedInterval = localStorage.getItem('autoRefreshInterval');
+            const select = document.getElementById('autoRefreshSelect');
+            if (savedInterval !== null && select) {
+                select.value = savedInterval;
+                if (parseInt(savedInterval) > 0) {
+                    startAutoRefresh(parseInt(savedInterval));
+                }
+            } else {
+                startAutoRefresh(60); // Default: 1 minuto
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

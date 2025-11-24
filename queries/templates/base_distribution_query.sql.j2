@@ -1,0 +1,125 @@
+{#
+═══════════════════════════════════════════════════════════════
+TEMPLATE: Base Query para Distribuciones
+Sistema SAC - CEDIS Chedraui Cancún 427
+═══════════════════════════════════════════════════════════════
+
+Template Jinja2 para generar queries de distribuciones.
+Soporta agrupación por tienda, comparación con OC y métricas.
+
+Variables disponibles:
+- schema: Schema de BD (default: WMWHSE1)
+- storerkey: Código de almacén
+- oc_referencia: OC original para filtrar distribuciones
+- tienda_destino: Filtrar por tienda específica
+- include_totals: Incluir totales agregados
+- include_store_info: Incluir información de tienda
+- group_by_store: Agrupar resultados por tienda
+- status_filter: Lista de status a filtrar
+- date_start: Fecha inicio
+- date_end: Fecha fin
+═══════════════════════════════════════════════════════════════
+#}
+
+{% if group_by_store %}
+{# Modo agrupado por tienda #}
+SELECT
+    o.CONSIGNEEKEY AS codigo_tienda,
+    {% if include_store_info %}
+    st.COMPANY AS nombre_tienda,
+    st.CITY AS ciudad,
+    {% endif %}
+    COUNT(DISTINCT o.ORDERKEY) AS total_distribuciones,
+    COUNT(DISTINCT od.SKU) AS total_skus,
+    SUM(od.ORIGINALQTY) AS qty_total_asignada,
+    SUM(od.SHIPPEDQTY) AS qty_total_enviada,
+    SUM(od.OPENQTY) AS qty_total_pendiente,
+    ROUND((SUM(od.SHIPPEDQTY) / NULLIF(SUM(od.ORIGINALQTY), 0)) * 100, 2) AS porcentaje_completado
+FROM
+    {{ schema | default('WMWHSE1') }}.ORDERS o
+    INNER JOIN {{ schema | default('WMWHSE1') }}.ORDERDETAIL od ON o.ORDERKEY = od.ORDERKEY
+    {% if include_store_info %}
+    LEFT JOIN {{ schema | default('WMWHSE1') }}.STORER st ON o.CONSIGNEEKEY = st.STORERKEY
+    {% endif %}
+WHERE
+    o.STORERKEY = '{{ storerkey | default('C22') }}'
+    AND o.ORDERTYPE IN ('DISTRO', 'SO', 'XD')
+    {% if oc_referencia %}
+    AND o.EXTERNALORDERKEY2 = '{{ oc_referencia }}'
+    {% endif %}
+    {% if tienda_destino %}
+    AND o.CONSIGNEEKEY = '{{ tienda_destino }}'
+    {% endif %}
+    {% if status_filter %}
+    AND o.STATUS IN ({% for s in status_filter %}'{{ s }}'{% if not loop.last %}, {% endif %}{% endfor %})
+    {% endif %}
+    {% if date_start and date_end %}
+    AND DATE(o.ADDDATE) BETWEEN '{{ date_start }}' AND '{{ date_end }}'
+    {% endif %}
+GROUP BY
+    o.CONSIGNEEKEY
+    {% if include_store_info %}
+    , st.COMPANY, st.CITY
+    {% endif %}
+ORDER BY
+    qty_total_asignada DESC
+
+{% else %}
+{# Modo detallado #}
+SELECT
+    o.CONSIGNEEKEY AS codigo_tienda,
+    {% if include_store_info %}
+    st.COMPANY AS nombre_tienda,
+    {% endif %}
+    o.ORDERKEY AS numero_distro,
+    o.EXTERNORDERKEY AS distro_externa,
+    o.EXTERNALORDERKEY2 AS oc_referencia,
+    o.ORDERDATE AS fecha_distro,
+    o.DELIVERYDATE AS fecha_entrega,
+    o.STATUS AS status,
+    CASE o.STATUS
+        WHEN '0' THEN 'Abierta'
+        WHEN '1' THEN 'En Proceso'
+        WHEN '2' THEN 'Parcial'
+        WHEN '5' THEN 'Cerrada'
+        WHEN '9' THEN 'Completada'
+        WHEN '95' THEN 'Cancelada'
+        ELSE 'Desconocido'
+    END AS status_descripcion,
+    od.SKU AS sku,
+    sk.DESCR AS descripcion_sku,
+    od.ORIGINALQTY AS qty_asignada,
+    od.SHIPPEDQTY AS qty_enviada,
+    od.OPENQTY AS qty_pendiente,
+    sk.INNERPACK AS inner_pack,
+    CASE
+        WHEN sk.INNERPACK > 0 THEN ROUND(od.ORIGINALQTY / sk.INNERPACK, 2)
+        ELSE od.ORIGINALQTY
+    END AS cajas_asignadas
+FROM
+    {{ schema | default('WMWHSE1') }}.ORDERS o
+    INNER JOIN {{ schema | default('WMWHSE1') }}.ORDERDETAIL od ON o.ORDERKEY = od.ORDERKEY
+    LEFT JOIN {{ schema | default('WMWHSE1') }}.SKU sk ON od.SKU = sk.SKU AND o.STORERKEY = sk.STORERKEY
+    {% if include_store_info %}
+    LEFT JOIN {{ schema | default('WMWHSE1') }}.STORER st ON o.CONSIGNEEKEY = st.STORERKEY
+    {% endif %}
+WHERE
+    o.STORERKEY = '{{ storerkey | default('C22') }}'
+    AND o.ORDERTYPE IN ('DISTRO', 'SO', 'XD')
+    {% if oc_referencia %}
+    AND o.EXTERNALORDERKEY2 = '{{ oc_referencia }}'
+    {% endif %}
+    {% if tienda_destino %}
+    AND o.CONSIGNEEKEY = '{{ tienda_destino }}'
+    {% endif %}
+    {% if status_filter %}
+    AND o.STATUS IN ({% for s in status_filter %}'{{ s }}'{% if not loop.last %}, {% endif %}{% endfor %})
+    {% endif %}
+    {% if date_start and date_end %}
+    AND DATE(o.ADDDATE) BETWEEN '{{ date_start }}' AND '{{ date_end }}'
+    {% endif %}
+ORDER BY
+    o.CONSIGNEEKEY,
+    o.ORDERKEY,
+    od.SKU
+{% endif %}

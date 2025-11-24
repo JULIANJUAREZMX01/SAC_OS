@@ -1,0 +1,16 @@
+ID,Archivo,Línea(s),Tipo,Severidad,Problema,Solución
+1,main.py,564;635;636;686;810;813;825;826;827;843;876;937;953,Manejo de errores,CRÍTICO,input() sin try-except para EOFError - falla en modo no interactivo,Envolver en try-except EOFError
+2,main.py,851-852,Función stub,CRÍTICO,"Opción 5 ('Programa de Recibo') solo imprime texto, sin lógica",Implementar funcionalidad o remover del menú
+3,monitor.py,199;379,Manejo de errores,ALTO,bare except: pass captura TODAS excepciones incluyendo SystemExit,Cambiar a except (ValueError;TypeError): pass
+4,main.py,510-526;598-602;608-611,Validación incompleta,ALTO,Renombrado de columnas sin verificar si existen primero,Validar columnas antes de rename() - except KeyError
+5,monitor.py,345;365,Validación incompleta,ALTO,Acceso iloc[0] sin verificar si DataFrame está vacío,Agregar if not df_asn.empty: antes de iloc[0]
+6,main.py,560;631,Validación incompleta,MEDIO,Métodos generador sin validar resultado exitoso,Capturar y validar resultado de crear_reporte_*()
+7,monitor.py,85,Validación incompleta,MEDIO,Acceso a db_connection.connection sin validar atributo,Usar hasattr() antes de acceder
+8,main.py,249;292;339;384;878,Inconsistencia,BAJO,Acceso mixto a CEDIS (algunos .get(); otros directo),Estandarizar uso de .get() para todas claves
+9,monitor.py,588,Mala práctica,BAJO,Importa módulo dentro de función validacion_completa_oc(),Mover import al inicio del archivo
+10,monitor.py,592;624 vs main 245,Inconsistencia,BAJO,monitor.py usa QueryCategory.BAJO_DEMANDA; main.py usa "bajo_demanda",Estandarizar a Enum O String
+11,main.py,983-993,Inconsistencia,BAJO,--oc no conecta DB; --reporte-diario sí - comportamiento inconsistente,Estandarizar manejo de conexión
+12,main.py,36,Import no utilizado,BAJO,TELEGRAM_CONFIG importado pero nunca usado directamente,Remover o documentar propósito
+13,monitor.py,728;731,Código comentado,BAJO,Líneas de ejemplo comentadas en __main__ (validaciones),Descomentar para ejemplos activos o remover
+14,monitor.py,104-105,Validación incompleta,BAJO,Query de prueba SELECT 1 ejecutada sin validar resultado,Validar que execute_query() retorne datos
+15,monitor.py,470-471,Validación incompleta,BAJO,Acceso a email_config.get() sin verificar que config exista,Validar if email_config before .get()

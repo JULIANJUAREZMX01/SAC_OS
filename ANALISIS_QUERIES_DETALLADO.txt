@@ -1,0 +1,552 @@
+═══════════════════════════════════════════════════════════════════════════════
+ANÁLISIS EXHAUSTIVO DEL DIRECTORIO QUERIES/
+SAC - Sistema de Automatización de Consultas
+═══════════════════════════════════════════════════════════════════════════════
+
+RESUMEN EJECUTIVO
+─────────────────────────────────────────────────────────────────────────────
+
+Total de archivos SQL analizados: 31
+Total de líneas de código SQL: 2,101
+
+Distribución:
+  • Obligatorias:  8 queries
+  • Preventivas:   7 queries
+  • Bajo Demanda:  8 queries
+  • DDL (Views):   3 queries
+  • DDL (Procedures): 2 queries
+  • Soporte:       1 archivo Python (query_loader.py)
+
+═══════════════════════════════════════════════════════════════════════════════
+CATEGORÍA 1: ERRORES CRÍTICOS DE SYNTAXIS
+═══════════════════════════════════════════════════════════════════════════════
+
+SEVERITY: CRÍTICO | IMPACT: ALTA | COUNT: 3
+
+┌─ PROBLEMA 1.1: SINTAXIS DB2 INCOMPATIBLE
+├─ UBICACIÓN: queries/preventivas/ubicaciones_llenas.sql (líneas 104-105)
+├─ TIPO: Sintaxis de ordenamiento
+├─ DESCRIPCIÓN:
+│  Uso de "NULLS LAST" en ORDER BY, que es sintaxis específica de Oracle/PostgreSQL
+│  pero podría no ser soportada en IBM DB2.
+├─ CÓDIGO AFECTADO:
+│   ORDER BY
+│       nivel_alerta,
+│       porcentaje_cubicaje DESC NULLS LAST,
+│       porcentaje_peso DESC NULLS LAST;
+├─ SOLUCIÓN SUGERIDA:
+│   Reemplazar con sintaxis compatible de DB2:
+│   ORDER BY
+│       nivel_alerta,
+│       CASE WHEN porcentaje_cubicaje IS NULL THEN 1 ELSE 0 END,
+│       porcentaje_cubicaje DESC,
+│       CASE WHEN porcentaje_peso IS NULL THEN 1 ELSE 0 END,
+│       porcentaje_peso DESC;
+└─ RIESGO: Query fallará en ejecución
+
+┌─ PROBLEMA 1.2: NULLS LAST EN MÚLTIPLES ARCHIVOS
+├─ UBICACIÓN: 
+│   • queries/obligatorias/recibo_programado.sql (línea 90)
+│   • queries/bajo_demanda/auditoria_usuario.sql (línea 126)
+│   • queries/bajo_demanda/movimientos_lpn.sql (línea 104)
+├─ TIPO: Sintaxis de ordenamiento
+├─ DESCRIPCIÓN: 
+│   Mismo problema de "NULLS LAST" en 3 archivos adicionales
+├─ CANTIDAD: 3 queries afectadas
+├─ SOLUCIÓN: Aplicar mismo patrón que problema 1.1
+└─ RIESGO: Crítico - Fallos de ejecución
+
+┌─ PROBLEMA 1.3: CAMPO POTENCIALMENTE NO EXISTENTE
+├─ UBICACIÓN: queries/obligatorias/recibo_programado.sql (línea 65)
+├─ TIPO: Referencia a columna problemática
+├─ DESCRIPCIÓN:
+│   LEFT JOIN WMWHSE1.STORER sup ON r.SUSR1 = sup.STORERKEY
+│   El campo SUSR1 podría no existir o tener nombre diferente en el schema real
+│   Comentario mismo indica incertidumbre: "-- Campo proveedor puede variar"
+├─ CÓDIGO:
+│   LEFT JOIN WMWHSE1.STORER sup ON r.SUSR1 = sup.STORERKEY
+├─ VERIFICACIÓN NECESARIA:
+│   SELECT COLNAME FROM SYSCAT.COLUMNS 
+│   WHERE TABNAME='RECEIPT' AND COLNAME LIKE '%USR%'
+├─ IMPACTO:
+│   - Si SUSR1 no existe: ORA-00904 "invalid column name"
+│   - Si join es incorrecto: resultados NULL para proveedor
+└─ RIESGO: Alto - Requiere validación en DB2
+
+═══════════════════════════════════════════════════════════════════════════════
+CATEGORÍA 2: VULNERABILIDADES DE SEGURIDAD SQL
+═══════════════════════════════════════════════════════════════════════════════
+
+SEVERITY: ALTO | IMPACT: ALTA | COUNT: 4
+
+┌─ PROBLEMA 2.1: SQL INJECTION CON LIKE (Bajo riesgo con parametrización)
+├─ UBICACIÓN: 
+│   • queries/bajo_demanda/buscar_asn.sql (líneas 89-90)
+│   • queries/bajo_demanda/buscar_lpn.sql (líneas 61-62, 99-100)
+│   • queries/bajo_demanda/buscar_oc.sql (línea 79)
+├─ TIPO: Patrón de búsqueda sin escape de wildcards
+├─ DESCRIPCIÓN:
+│   Uso de LIKE con parámetro sin escape de caracteres % y _
+│   Aunque uses placeholders {{...}}, si se sustituye mal el valor, podría permitir
+│   búsquedas no intencionadas.
+├─ CÓDIGO EJEMPLO:
+│   OR r.RECEIPTKEY LIKE '%{{asn_numero}}%'
+│   OR r.EXTERNRECEIPTKEY LIKE '%{{asn_numero}}%'
+├─ ESCENARIO DE ATAQUE:
+│   Valor: "%' OR '1'='1" -> Resulta en: LIKE '%' OR '1'='1%'
+├─ MITIGATION:
+│   1. Usar ESCAPE clause: LIKE '{{asn_numero}}' ESCAPE '\'
+│   2. O limitar búsqueda exacta sin wildcard
+│   3. Validar en aplicación antes de ejecutar
+└─ RIESGO: Medio (mitigado por framework de parametrización)
+
+┌─ PROBLEMA 2.2: CONCATENACIÓN DIRECTA CON VALORES
+├─ UBICACIÓN: queries/bajo_demanda/buscar_oc.sql (línea 78)
+├─ TIPO: Posible manipulación de construcción de SQL
+├─ DESCRIPCIÓN:
+│   OR o.ORDERKEY = 'C{{oc_numero}}'  -- Concatenación de prefijo
+│   Si {{oc_numero}} es "750384123456' OR '1'='1", resultaría en
+│   ORDERKEY = 'C750384123456' OR '1'='1'
+├─ CÓDIGO:
+│   OR o.ORDERKEY = 'C{{oc_numero}}'
+├─ PROBLEMA:
+│   La concatenación manual del prefijo C podría crear vulnerabilidad
+├─ SOLUCIÓN:
+│   Verificar que {{oc_numero}} se parametriza correctamente antes de concat
+│   O mejor aún: usar CONCAT() function con parámetros por separado
+└─ RIESGO: Bajo a Medio (depende de implementación de reemplazo)
+
+┌─ PROBLEMA 2.3: SESSION TEMPORARY TABLES EN PROCEDURES
+├─ UBICACIÓN: 
+│   • queries/ddl/procedures/sp_get_daily_report.sql (múltiples líneas)
+│   • queries/ddl/procedures/sp_validate_oc.sql (línea 50)
+├─ TIPO: Objeto de base de datos temporal
+├─ DESCRIPCIÓN:
+│   Uso de SESSION.VALIDATION_RESULTS y SESSION.REPORT_* tables
+│   Estas tablas son temporales por sesión, lo que podría causar conflictos
+│   si múltiples usuarios ejecutan simultáneamente
+├─ CÓDIGO:
+│   DECLARE GLOBAL TEMPORARY TABLE SESSION.VALIDATION_RESULTS (
+│       TIPO_ERROR VARCHAR(50),
+│       SEVERIDAD VARCHAR(20),
+│       ...
+│   ) ON COMMIT DROP TABLE;
+├─ PROBLEMA:
+│   - Múltiples usuarios ejecutando simultáneamente podrían pisar datos
+│   - Temporales globales pueden tener problemas de scope
+├─ SOLUCIÓN:
+│   Usar tablas PRIVATE TEMPORARY o refactorizar stored procedures
+│   para retornar resultados directamente sin tabla intermedia
+└─ RIESGO: Medio - Problemas potenciales en concurrencia
+
+═══════════════════════════════════════════════════════════════════════════════
+CATEGORÍA 3: INCONSISTENCIAS EN NOMBRES DE TABLAS/COLUMNAS
+═══════════════════════════════════════════════════════════════════════════════
+
+SEVERITY: ALTO | IMPACT: MEDIA | COUNT: 5
+
+┌─ PROBLEMA 3.1: TABLAS CON NOMBRES POSIBLEMENTE INCORRECTOS
+├─ UBICACIÓN: Múltiples archivos
+├─ TABLAS POTENCIALMENTE PROBLEMÁTICAS:
+│
+│   1. USERPROFILE (vs USER_PROFILE)
+│      - Archivos: auditoria_usuario.sql, usuarios_inactivos.sql
+│      - Verificación: SELECT * FROM SYSCAT.TABLES WHERE TABNAME LIKE 'USER%'
+│
+│   2. TASKDETAIL (vs TASK_DETAIL o TASKINSTANCE)
+│      - Archivos: auditoria_usuario.sql, historial_oc.sql, movimientos_lpn.sql
+│      - Verificación: SELECT * FROM SYSCAT.TABLES WHERE TABNAME LIKE 'TASK%'
+│
+│   3. PUTAWAYZONE (vs PUTAWAY_ZONE)
+│      - Archivos: inventario_resumen.sql, ubicaciones_llenas.sql, etc.
+│      - Verificación: SELECT * FROM SYSCAT.TABLES WHERE TABNAME LIKE 'PUTAWAY%'
+│
+│   4. RECEIPTDETAIL (vs RECEIPT_DETAIL)
+│      - Archivos: Múltiples
+│      - Verificación: SELECT * FROM SYSCAT.TABLES WHERE TABNAME LIKE 'RECEIPT%'
+│
+│   5. ORDERDETAIL (vs ORDER_DETAIL)
+│      - Archivos: Múltiples
+│      - Verificación: SELECT * FROM SYSCAT.TABLES WHERE TABNAME LIKE 'ORDER%'
+│
+│   6. LOTXLOCXID (vs similar con underscores)
+│      - Archivos: Múltiples
+│      - Este nombre es muy inusual, verificar exactitud
+│
+│   7. ITRN (posible abbreviation incorrecta)
+│      - Archivos: movimientos_lpn.sql, historial_oc.sql
+│      - Debería ser: INVENTORY_TRANSACTION o similar
+│
+├─ TIPO: Referencias a objetos de base de datos
+├─ RIESGO: Crítico - Si los nombres son incorrectos, TODAS las queries fallarán
+├─ ACCIÓN RECOMENDADA:
+│   Validar nombres exactos en DB2 ejecutando:
+│   SELECT TABNAME FROM SYSCAT.TABLES 
+│   WHERE TABSCHEMA = 'WMWHSE1' 
+│   ORDER BY TABNAME;
+└─ PRIORIDAD: MÁXIMA - Hacer inmediatamente
+
+┌─ PROBLEMA 3.2: INCONSISTENCIA ORDERKEY vs EXTERNORDERKEY
+├─ UBICACIÓN: Múltiples queries
+├─ DESCRIPCIÓN:
+│   Algunas queries buscan por ORDERKEY, otras por EXTERNORDERKEY
+│   Ambas están correctas pero la decisión de cuál usar podría causar confusión
+├─ EJEMPLO:
+│   buscar_oc.sql busca tanto por ORDERKEY como EXTERNORDERKEY
+│   Pero la lógica con 'C{{oc_numero}}' concaten only ORDERKEY
+├─ INCONSISTENCIA:
+│   OR o.ORDERKEY = '{{oc_numero}}'
+│   OR o.EXTERNORDERKEY = '{{oc_numero}}'
+│   OR o.ORDERKEY = 'C{{oc_numero}}'  <- No aplica a EXTERNORDERKEY
+├─ SOLUCIÓN:
+│   Clarificar si EXTERNORDERKEY también podría tener prefijo C
+│   O aplicar concatenación a ambos campos
+└─ RIESGO: Bajo a Medio - Resultados incompletos posibles
+
+═══════════════════════════════════════════════════════════════════════════════
+CATEGORÍA 4: PROBLEMAS DE PARAMETRIZACIÓN
+═══════════════════════════════════════════════════════════════════════════════
+
+SEVERITY: MEDIO | IMPACT: MEDIA | COUNT: 3
+
+┌─ PROBLEMA 4.1: USUARIO COMO STRING EN QUERIES CON USERKEY
+├─ UBICACIÓN: queries/bajo_demanda/auditoria_usuario.sql
+├─ TIPO: Mismatch de tipos de datos
+├─ DESCRIPCIÓN:
+│   El parámetro {{usuario}} es un string (username)
+│   Pero en PARTE 2 se usa: td.USERKEY = '{{usuario}}'
+│   USERKEY probablemente sea un INT/BIGINT, no VARCHAR
+├─ CÓDIGO PROBLEMÁTICO:
+│   -- Línea 69:
+│   WHERE td.USERKEY = '{{usuario}}'  <- Comparación incorrecta
+│   -- Línea 95:
+│   WHERE td.USERKEY = '{{usuario}}'  <- Mismo problema
+├─ SOLUCIÓN:
+│   Cambiar a:
+│   WHERE td.ADDWHO = '{{usuario}}'  (si ADDWHO es username)
+│   O si necesita USERKEY, cambiar parámetro a int
+├─ VERIFICACIÓN:
+│   Revisar schema de TASKDETAIL para ver campos de usuario
+└─ RIESGO: Alto - Query devolverá 0 filas o error
+
+┌─ PROBLEMA 4.2: PARÁMETRO OPCIONAL SIN VALOR POR DEFECTO
+├─ UBICACIÓN: 
+│   • queries/bajo_demanda/detalle_distribucion.sql (parámetro {{tienda_destino}})
+├─ TIPO: Parámetro sin defecto
+├─ DESCRIPCIÓN:
+│   El parámetro {{tienda_destino}} se usa en líneas 80-84 con lógica complicada:
+│   AND ('{{tienda_destino}}' = '%' OR o.CONSIGNEEKEY = '{{tienda_destino}}' ...)
+├─ CÓDIGO:
+│   WHERE (
+│       '{{tienda_destino}}' = '%'  <- Si es '%', retorna todos
+│       OR o.CONSIGNEEKEY = '{{tienda_destino}}'
+│       OR o.CONSIGNEEKEY LIKE '{{tienda_destino}}'
+│   )
+├─ PROBLEMA:
+│   Lógica confusa: si {{tienda_destino}} = '%', la condición siempre es true
+│   No es claro si esto es intencional o si debería ser NULL
+├─ SOLUCIÓN:
+│   Si todos es default: usar NULL en lugar de '%'
+│   O cambiar a: WHERE ({{tienda_destino}} IS NULL OR o.CONSIGNEEKEY = ...)
+└─ RIESGO: Bajo - Funciona pero poco claro
+
+┌─ PROBLEMA 4.3: PARÁMETRO {{umbral_capacidad}} REPETIDO EN COMPARACIÓN
+├─ UBICACIÓN: queries/preventivas/ubicaciones_llenas.sql (líneas 85-86, 97-100)
+├─ TIPO: Parámetro usado en múltiples operaciones
+├─ DESCRIPCIÓN:
+│   El valor {{umbral_capacidad}} se usa 4 veces en la misma query
+│   Si cambio en un lugar, podría causar inconsistencia
+├─ CÓDIGO:
+│   CASE WHEN ... >= {{umbral_capacidad}} THEN 'MEDIO'  (línea 85)
+│   AND (... >= {{umbral_capacidad}}) (línea 97)
+│   OR (... >= {{umbral_capacidad}}) (línea 100)
+├─ SOLUCIÓN:
+│   Definir como variable local en SP o documentar que debe ser consistente
+└─ RIESGO: Bajo - Si parámetro se sustituye correctamente, no hay problema
+
+═══════════════════════════════════════════════════════════════════════════════
+CATEGORÍA 5: PROBLEMAS CON VISTAS Y PROCEDIMIENTOS DDL
+═══════════════════════════════════════════════════════════════════════════════
+
+SEVERITY: MEDIO | IMPACT: MEDIA | COUNT: 4
+
+┌─ PROBLEMA 5.1: VISTA REFERENCIA A SÍ MISMA EN MISMO SCRIPT
+├─ UBICACIÓN: queries/ddl/views/v_distribution_totals.sql
+├─ TIPO: Dependencia circular
+├─ DESCRIPCIÓN:
+│   Script crea V_DISTRIBUTION_TOTALS luego crea V_DISTRIBUTION_SUMMARY
+│   que referencia a V_DISTRIBUTION_TOTALS en el FROM
+├─ CÓDIGO (líneas 122-123):
+│   CREATE VIEW WMWHSE1.V_DISTRIBUTION_SUMMARY AS
+│   SELECT ... FROM WMWHSE1.V_DISTRIBUTION_TOTALS ...
+├─ PROBLEMA:
+│   Si se ejecuta el script completo de una vez, podría fallar el CREATE
+│   porque V_DISTRIBUTION_TOTALS podría aún no estar creada
+├─ SOLUCIÓN:
+│   Ejecutar en dos transacciones separadas o verificar orden
+└─ RIESGO: Medio - Depende de cómo se ejecute el script
+
+┌─ PROBLEMA 5.2: VARIABLES LOCALES NO INICIALIZADAS EN PROCEDURES
+├─ UBICACIÓN: queries/ddl/procedures/sp_validate_oc.sql (línea 42)
+├─ TIPO: Variables sin inicialización explícita
+├─ DESCRIPCIÓN:
+│   Variables como v_oc_exists se inicializan pero luego se usan en lógica
+│   que podría no ser evaluada si SELECT no retorna fila
+├─ CÓDIGO:
+│   DECLARE v_oc_exists INTEGER DEFAULT 0;
+│   ...
+│   SELECT COUNT(*) INTO v_oc_exists FROM ...
+│   IF v_oc_exists = 0 THEN  <- Seguro por DEFAULT 0
+│   ELSE
+│       SELECT STATUS INTO v_oc_status FROM ... FETCH FIRST 1 ROW ONLY;
+│       <- Si no hay fila, v_oc_status queda undefined
+├─ PROBLEMA:
+│   v_oc_status podría no tener valor si la query SELECT no retorna fila
+├─ SOLUCIÓN:
+│   Inicializar: DECLARE v_oc_status VARCHAR(10) DEFAULT NULL;
+│   Y manejar NULL explícitamente
+└─ RIESGO: Medio - Comportamiento undefined
+
+┌─ PROBLEMA 5.3: INSERT/SELECT SIN VALIDACIÓN EN PROCEDURE
+├─ UBICACIÓN: queries/ddl/procedures/sp_get_daily_report.sql (múltiples)
+├─ TIPO: Operaciones múltiples en una transacción
+├─ DESCRIPCIÓN:
+│   Múltiples INSERT INTO SELECT sin verificación de éxito
+│   Una tabla temporal podría estar vacía sin que se detecte
+├─ CÓDIGO EJEMPLO (línea 100-111):
+│   -- Distribuciones del día
+│   SELECT 'Distribuciones Creadas Hoy', COUNT(*), NULL, NULL
+│   FROM WMWHSE1.ORDERS
+│   WHERE ... -- Sin verificación de si retorna fila
+├─ PROBLEMA:
+│   Si COUNT(*) retorna 0, se inserta fila vacía
+│   Reportes podrían parecer vacíos sin razón aparente
+├─ SOLUCIÓN:
+│   Agregar HAVING COUNT(*) > 0 a los SELECT
+│   O validar resultado del cursor después de OPEN
+└─ RIESGO: Medio - Resultados potencialmente vacíos
+
+┌─ PROBLEMA 5.4: HARDCODED STATUS CODES EN MULTIPLE PLACES
+├─ UBICACIÓN: Todas las queries
+├─ TIPO: Magic numbers/strings
+├─ DESCRIPCIÓN:
+│   Status codes como '0', '5', '9', '10', '80', '95' están hardcoded
+│   en muchos lugares sin constantes centralizadas
+├─ EJEMPLOS:
+│   WHEN '0' THEN 'Creado'
+│   WHEN '5' THEN 'En Tránsito'
+│   WHEN '9' THEN 'Recibido Parcial'
+│   WHEN '10' THEN 'Recibido'
+│   WHEN '80' THEN 'Cerrado'
+│   WHEN '95' THEN 'Cancelado'
+├─ PROBLEMA:
+│   Si status codes cambian, múltiples queries necesitan actualización
+│   Inconsistencia entre archivos es posible
+├─ SOLUCIÓN:
+│   Crear tabla REFERENCE_CODES o usar constantes en SP base
+│   O crear view para mapeo de estados
+├─ IMPACTO: Bajo pero mejora mantenibilidad
+└─ RIESGO: Bajo - Funcional pero frágil
+
+═══════════════════════════════════════════════════════════════════════════════
+CATEGORÍA 6: PROBLEMAS CON AGREGACIONES Y GROUP BY
+═══════════════════════════════════════════════════════════════════════════════
+
+SEVERITY: MEDIO | IMPACT: MEDIA | COUNT: 3
+
+┌─ PROBLEMA 6.1: COLUMNAS EN SELECT NO EN GROUP BY
+├─ UBICACIÓN: 
+│   • queries/bajo_demanda/auditoria_usuario.sql (múltiples UNION ALL)
+│   • queries/bajo_demanda/historial_oc.sql (múltiples UNION ALL)
+├─ TIPO: GROUP BY incorrecto
+├─ DESCRIPCIÓN:
+│   En algunas partes de UNION ALL, se selecciona columnas que no están en GROUP BY
+│   Esto viola SQL strict mode en algunas BD
+├─ CÓDIGO EJEMPLO (auditoria_usuario.sql, líneas 53-74):
+│   SELECT '02_RESUMEN_TAREAS' AS seccion,
+│          NULL AS usuario_id,
+│          '{{usuario}}' AS username,
+│          td.TASKTYPE AS nombre,     <- En SELECT
+│          ...
+│   FROM WMWHSE1.TASKDETAIL td
+│   WHERE ...
+│   GROUP BY td.TASKTYPE              <- No todos los campos están
+├─ PROBLEMA:
+│   Si se ejecuta en modo DB2 estricto, generará error
+│   "Not in aggregate function or GROUP BY clause"
+├─ SOLUCIÓN:
+│   Incluir todos los campos no agregados en GROUP BY
+├─ VERIFICACIÓN DB2:
+│   SET SESSION DB2_COMPATIBILITY_VECTOR='STRICT_GROUP_BY'
+└─ RIESGO: Medio - Podría fallar dependiendo de configuración DB2
+
+┌─ PROBLEMA 6.2: NULLIF CON POSIBLE DIVISIÓN POR CERO
+├─ UBICACIÓN: Múltiples archivos
+├─ TIPO: Protección inadecuada
+├─ DESCRIPCIÓN:
+│   Uso de NULLIF(..., 0) para evitar división por cero
+│   Pero si NULLIF retorna NULL, las operaciones posteriores pueden fallar
+├─ CÓDIGO EJEMPLOS:
+│   ROUND((SUM(od.OPENQTY) / NULLIF(SUM(od.ORIGINALQTY), 0)) * 100, 2)
+│   ROUND((od.SHIPPEDQTY / NULLIF(od.ORIGINALQTY, 0)) * 100, 2)
+├─ PROBLEMA:
+│   Si ORIGINALQTY es 0, NULLIF retorna NULL
+│   NULL * 100 = NULL (correcto)
+│   Pero en algunos contextos, esperaría 0 no NULL
+├─ SOLUCIÓN:
+│   Usar CASE WHEN para control más explícito:
+│   CASE WHEN SUM(od.ORIGINALQTY) > 0 
+│        THEN ROUND((SUM(od.OPENQTY) / SUM(od.ORIGINALQTY)) * 100, 2)
+│        ELSE 0 END
+├─ VERIFICACIÓN: Buscar si reportes esperan 0 en lugar de NULL
+└─ RIESGO: Bajo - Funcionalmente correcto, pero semantically diferente
+
+┌─ PROBLEMA 6.3: AGGREGATE FUNCTIONS ANIDADAS
+├─ UBICACIÓN: queries/preventivas/ubicaciones_llenas.sql
+├─ TIPO: Agregación compleja
+├─ DESCRIPCIÓN:
+│   Uso de SUM(QTY * COALESCE(...)) que requiere cálculo de expresión antes de agg
+├─ CÓDIGO (línea 36):
+│   SUM(inv.QTY * COALESCE(sk.STDCUBE, 0.001)) AS cubicaje_ocupado
+├─ PROBLEMA:
+│   Si sk.STDCUBE es NULL para muchas filas, usa 0.001 como fallback
+│   Podría resultar en cálculos imprecisos
+├─ VERIFICACIÓN:
+│   - Validar si 0.001 es valor razonable
+│   - Considerar si NULL STDCUBE debería excluir la fila
+└─ RIESGO: Bajo - Depende de datos reales
+
+═══════════════════════════════════════════════════════════════════════════════
+CATEGORÍA 7: PROBLEMAS CON QUERY_LOADER.PY
+═══════════════════════════════════════════════════════════════════════════════
+
+SEVERITY: MEDIO | IMPACT: BAJA | COUNT: 2
+
+┌─ PROBLEMA 7.1: VALIDACIÓN DE PLACEHOLDERS INCOMPLETA
+├─ UBICACIÓN: query_loader.py (línea 467-469)
+├─ TIPO: Validación de parámetros
+├─ DESCRIPCIÓN:
+│   La validación detecta {{param}} pero no valida si están reemplazados
+│   al momento de uso
+├─ CÓDIGO:
+│   if "{{" in sql_clean and "}}" in sql_clean:
+│       params = re.findall(r"\{\{(\w+)\}\}", sql_clean)
+│       if params:
+│           errors.append(f"Parámetros sin sustituir: {params}")
+├─ PROBLEMA:
+│   Esto es correcto para queries sin parámetros
+│   Pero para queries con parámetros, es normal tener {{...}}
+│   No distingue entre "parámetro pendiente de reemplazar" vs "normal"
+├─ SOLUCIÓN:
+│   Agregar bandera en QueryMetadata: tiene_parametros = True/False
+│   Y validar solo si tiene_parametros es False
+└─ RIESGO: Bajo - Falsos positivos en validación
+
+┌─ PROBLEMA 7.2: METADATA EXTRACTION IMPRECISA
+├─ UBICACIÓN: query_loader.py (línea 615-621)
+├─ TIPO: Extracción de información
+├─ DESCRIPCIÓN:
+│   Extrae tablas con patrón de comentario:
+│   r'--\s*TABLAS INVOLUCRADAS:\s*\n((?:--\s*-\s*.+\n)+)'
+│   Pero algunos comentarios usan formato ligeramente diferente
+├─ CÓDIGO:
+│   tables_match = re.search(...)
+│   if tables_match:
+│       tables = re.findall(r'--\s*-\s*(\w+)', tables_match.group(1))
+├─ PROBLEMA:
+│   Algunos archivos podrían tener spacing diferente
+│   Ej: "- RECEIPT" vs "-  RECEIPT" vs "- RECEIPT (Cabecera)"
+├─ SOLUCIÓN:
+│   Hacer regex más flexible:
+│   r'--\s*-\s*(\S+).*$'  // Captura palabra después de dash, ignora comentarios
+└─ RIESGO: Bajo - Información de metadatos incompleta
+
+═══════════════════════════════════════════════════════════════════════════════
+CATEGORÍA 8: INFORMACIÓN DE REFERENCIA Y RECOMENDACIONES
+═══════════════════════════════════════════════════════════════════════════════
+
+PROBLEMAS NO CRÍTICOS PERO MEJORABLES:
+
+├─ 8.1: Documentación incompleta de parámetros
+│   • Algunas queries no documentan rangos de valores
+│   • Ej: {{umbral_porcentaje}} sin especificar si es 0-100
+│
+├─ 8.2: Falta de versionamiento en queries
+│   • Todos tienen VERSION 1.0.0
+│   • Debería actualizarse con cambios
+│
+├─ 8.3: Inconsistencia en formato de comentarios
+│   • Algunos usan "NÚMERO:" otros "número:"
+│   • Parser case-insensitive pero sería mejor estandarizar
+│
+├─ 8.4: Falta de ejemplos de ejecución
+│   • Procedures tienen ejemplos (CALL WMWHSE1.SP_GET_DAILY_REPORT)
+│   • Pero queries no tienen ejemplos de parámetros
+│
+└─ 8.5: Sin manejo de timezones
+    • Queries usan CURRENT_DATE pero sin explicit timezone
+    • En ambiente multiregional podría haber confusiones
+
+═══════════════════════════════════════════════════════════════════════════════
+TABLA RESUMEN: PROBLEMAS POR SEVERIDAD
+═══════════════════════════════════════════════════════════════════════════════
+
+CRÍTICO (Requiere corrección inmediata):
+  1. Sintaxis NULLS LAST en 4 archivos (DB2 incompatible)
+  2. Campo SUSR1 no verificado (podría no existir)
+  3. Nombres de tablas potencialmente incorrectos (USERPROFILE, TASKDETAIL, etc.)
+  4. Parámetro usuario como string en query USERKEY INT
+
+ALTO (Importante corregir):
+  5. SQL INJECTION con LIKE en 3 archivos (mitigado por parametrización)
+  6. Variables no inicializadas en procedures
+  7. Inserción ciega en procedures sin validación
+  8. Références cruzadas de tablas no verificadas
+
+MEDIO (Debería mejorar):
+  9. GROUP BY incompleto en algunas queries
+  10. Parámetro con lógica confusa ({{tienda_destino}} = '%')
+  11. Variables SESSION.* con posibles conflictos concurrentes
+  12. Validación incompleta en query_loader.py
+
+BAJO (Mejora de calidad):
+  13. Magic numbers para status codes
+  14. Inconsistencia en ORDERKEY vs EXTERNORDERKEY
+  15. Metadata extraction imprecisa
+  16. Documentación de parámetros incompleta
+
+═══════════════════════════════════════════════════════════════════════════════
+RECOMENDACIONES PRIORITARIAS
+═══════════════════════════════════════════════════════════════════════════════
+
+ACCIÓN 1 - MÁXIMA PRIORIDAD (Hacer hoy):
+  [ ] Validar nombres exactos de tablas en DB2:
+      SELECT TABNAME FROM SYSCAT.TABLES 
+      WHERE TABSCHEMA='WMWHSE1' ORDER BY TABNAME
+  
+ACCIÓN 2 - ALTA PRIORIDAD (Esta semana):
+  [ ] Reemplazar NULLS LAST con sintaxis compatible DB2 en 4 archivos
+  [ ] Verificar campo SUSR1 en tabla RECEIPT
+  [ ] Corregir parámetro {{usuario}} en auditoria_usuario.sql
+  [ ] Inicializar todas las variables en stored procedures
+  
+ACCIÓN 3 - MEDIA PRIORIDAD (Próximas dos semanas):
+  [ ] Revisar GROUP BY incompleto en queries UNION ALL
+  [ ] Refactorizar SESSION temporary tables a PRIVATE TEMPORARY
+  [ ] Documentar todos los parámetros con rangos válidos
+  [ ] Crear tabla de referencia para status codes
+  
+ACCIÓN 4 - BAJA PRIORIDAD (Mejora técnica):
+  [ ] Mejorar validación en query_loader.py
+  [ ] Estandarizar formato de comentarios
+  [ ] Agregar ejemplos de ejecución con parámetros
+  [ ] Implementar versionamiento adecuado de queries
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Análisis completado el: 2025-11-21
+Total de problemas identificados: 20+ problemas documentados
+Archivos analizados: 31 archivos SQL + 1 Python
+Líneas de código revisadas: 2,101+ líneas SQL
+
+═══════════════════════════════════════════════════════════════════════════════

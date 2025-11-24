@@ -1,0 +1,111 @@
+{
+    "_comment": "SACITY Configuration Template - CEDIS 427",
+    "_version": "1.0.0",
+
+    "server": {
+        "host": "192.168.1.1",
+        "port": 23,
+        "timeout": 30,
+        "usuario": "",
+        "password": ""
+    },
+
+    "display": {
+        "rows": 24,
+        "cols": 80,
+        "font_name": "Courier New",
+        "font_size": 12,
+        "color_background": "#000000",
+        "color_foreground": "#00FF00",
+        "color_cursor": "#FFFFFF"
+    },
+
+    "scanner": {
+        "enabled": true,
+        "prefix": "",
+        "suffix": "\r",
+        "beep_on_scan": true,
+        "aim_mode": "trigger",
+        "symbologies": {
+            "code128": true,
+            "code39": true,
+            "ean13": true,
+            "ean8": true,
+            "upca": true,
+            "upce": true,
+            "interleaved2of5": true,
+            "datamatrix": true,
+            "qrcode": true
+        }
+    },
+
+    "session": {
+        "auto_connect": true,
+        "reconnect": true,
+        "reconnect_delay_seconds": 5,
+        "reconnect_max_attempts": 10,
+        "heartbeat_interval_seconds": 30,
+        "timeout_seconds": 300,
+        "keepalive": true
+    },
+
+    "keyboard": {
+        "mode": "numeric",
+        "function_keys": {
+            "F1": "\\x1bOP",
+            "F2": "\\x1bOQ",
+            "F3": "\\x1bOR",
+            "F4": "\\x1bOS",
+            "F5": "\\x1b[15~",
+            "F6": "\\x1b[17~",
+            "F7": "\\x1b[18~",
+            "F8": "\\x1b[19~",
+            "F9": "\\x1b[20~",
+            "F10": "\\x1b[21~"
+        },
+        "scan_trigger": "orange_button"
+    },
+
+    "network": {
+        "wifi": {
+            "enabled": true,
+            "ssid": "",
+            "security": "WPA2",
+            "password": "",
+            "auto_connect": true
+        },
+        "ethernet": {
+            "enabled": false,
+            "dhcp": true,
+            "ip": "",
+            "subnet": "",
+            "gateway": "",
+            "dns": ""
+        }
+    },
+
+    "device": {
+        "auto_start": true,
+        "startup_delay_seconds": 5,
+        "power_save_timeout_minutes": 10,
+        "battery_warning_percent": 20,
+        "battery_critical_percent": 10
+    },
+
+    "logging": {
+        "enabled": true,
+        "level": "INFO",
+        "file": "\\Application\\SACITY\\sacity.log",
+        "max_size_kb": 1024,
+        "max_files": 3
+    },
+
+    "wms": {
+        "_comment": "Manhattan WMS specific settings",
+        "terminal_type": "VT220",
+        "codepage": "437",
+        "language": "ES",
+        "warehouse": "C22",
+        "cedis": "427"
+    }
+}

@@ -1,0 +1,377 @@
+================================================================================
+ANÁLISIS DETALLADO DE CÓDIGO - SAC V01_427_ADMJAJA
+================================================================================
+Fecha: 2025-11-21
+Archivos Analizados: main.py, monitor.py
+Problemas Encontrados: 17 categorías principales
+
+================================================================================
+PROBLEMAS CRÍTICOS (Requieren atención inmediata)
+================================================================================
+
+1. ENTRADA DE USUARIO SIN VALIDACIÓN
+   Archivo: main.py
+   Líneas: 564, 635, 636, 686, 810, 813, 825, 826, 827, 843, 876, 937, 953
+   Severidad: ALTO
+   
+   Descripción:
+   - input() se usa sin try-except para manejar EOFError
+   - Causará falla si el programa se ejecuta en modo no interactivo
+   - No hay validación de entrada del usuario
+   
+   Ejemplo del problema:
+   ```
+   if input("\n📧 ¿Deseas enviar el reporte por correo? (s/n): ").lower() == 's':
+   ```
+   
+   Solución:
+   ```
+   try:
+       respuesta = input("\n📧 ¿Deseas enviar el reporte por correo? (s/n): ").lower()
+       if respuesta == 's':
+           # continuar
+   except EOFError:
+       print("No input disponible. Abortando.")
+       return
+   ```
+
+2. FUNCIÓN STUB SIN IMPLEMENTACIÓN
+   Archivo: main.py
+   Líneas: 851-852
+   Severidad: ALTO
+   
+   Descripción:
+   - Opción 5 del menú ("Programa de Recibo") solo imprime "Función en desarrollo"
+   - No hay lógica implementada
+   - Confunde al usuario
+   
+   Código actual:
+   ```
+   elif opcion == '5':
+       print("\n📦 Programa de Recibo")
+       print("Función en desarrollo")
+   ```
+   
+   Solución:
+   - Implementar la funcionalidad, O
+   - Remover del menú hasta que esté lista
+
+3. BARE EXCEPT STATEMENTS (Captura demasiado amplia)
+   Archivo: monitor.py
+   Líneas: 199, 379
+   Severidad: MEDIO
+   
+   Descripción:
+   - except: pass captura TODAS las excepciones
+   - Esto incluye KeyboardInterrupt y SystemExit que deberían propagarse
+   - Oculta errores importantes
+   
+   Código actual:
+   ```
+   except:
+       pass  # Si no se puede convertir fecha, continuar
+   ```
+   
+   Solución:
+   ```
+   except (ValueError, TypeError):
+       pass  # Si no se puede convertir fecha, continuar
+   ```
+
+================================================================================
+PROBLEMAS DE VALIDACIÓN DE DATOS
+================================================================================
+
+4. RENOMBRADO DE COLUMNAS SIN VALIDACIÓN
+   Archivo: main.py
+   Líneas: 510-526 (validar_orden_compra)
+   Líneas: 598-602, 608-611 (generar_reporte_diario)
+   Severidad: MEDIO
+   
+   Descripción:
+   - Se renombran columnas asumiendo que existen
+   - rename() ignora columnas inexistentes sin error
+   - Código posterior asume que las columnas renombradas existen
+   
+   Ejemplo:
+   ```
+   df_oc = df_oc.rename(columns={
+       'oc_numero': 'OC',
+       'qty_original': 'TOTAL_OC',  # Sin verificar si existe
+       'fecha_entrega': 'VIGENCIA'
+   })
+   ```
+   
+   Solución:
+   ```
+   expected_cols = {'oc_numero', 'qty_original', 'fecha_entrega'}
+   missing_cols = expected_cols - set(df_oc.columns)
+   if missing_cols:
+       logger.error(f"Columnas faltantes: {missing_cols}")
+       return
+   df_oc = df_oc.rename(columns={...})
+   ```
+
+5. ACCESO A ELEMENTO SIN VALIDACIÓN (iloc[0])
+   Archivo: monitor.py
+   Líneas: 345, 365
+   Severidad: ALTO
+   
+   Descripción:
+   - Acceso a iloc[0] sin verificar si DataFrame está vacío
+   - Causará IndexError si df_asn está vacío
+   
+   Ejemplos:
+   ```
+   status_actual = df_asn['STATUS'].iloc[0]  # Línea 345
+   ultima_mod = pd.to_datetime(df_asn['ULTIMA_MOD'].iloc[0])  # Línea 365
+   ```
+   
+   Solución:
+   ```
+   if not df_asn.empty and 'STATUS' in df_asn.columns:
+       status_actual = df_asn['STATUS'].iloc[0]
+   else:
+       logger.error("DataFrame vacío o columna no existe")
+   ```
+
+6. MÉTODOS GENERADOR SIN VALIDACIÓN DE RETORNO
+   Archivo: main.py
+   Líneas: 560, 631
+   Severidad: MEDIO
+   
+   Descripción:
+   - Se llama a create_reporte_*() sin verificar si fue exitoso
+   - Asume que el archivo se creó correctamente
+   
+   Código:
+   ```
+   generador.crear_reporte_validacion_oc(df_validacion, archivo_excel)
+   logger.info(f"✅ Reporte generado: {archivo_excel}")  # Asume éxito
+   ```
+   
+   Solución:
+   ```
+   resultado = generador.crear_reporte_validacion_oc(df_validacion, archivo_excel)
+   if resultado:
+       logger.info(f"✅ Reporte generado: {archivo_excel}")
+   else:
+       logger.error(f"❌ Error al generar reporte")
+   ```
+
+7. ACCESO A ATRIBUTO SIN VALIDACIÓN
+   Archivo: monitor.py
+   Línea: 85
+   Severidad: MEDIO
+   
+   Descripción:
+   - Acceso a db_connection.connection sin verificar si existe
+   - Podría causar AttributeError
+   
+   Código:
+   ```
+   if not db_connection or not db_connection.connection:
+   ```
+   
+   Solución:
+   ```
+   if (not db_connection or 
+       not hasattr(db_connection, 'connection') or 
+       not db_connection.connection):
+   ```
+
+8. QUERY DE PRUEBA SIN VALIDACIÓN
+   Archivo: monitor.py
+   Líneas: 104-105
+   Severidad: BAJO
+   
+   Descripción:
+   - Se ejecuta SELECT 1 pero no se valida el resultado
+   - Asume éxito sin verificar
+   
+   Código:
+   ```
+   test_query = "SELECT 1 FROM SYSIBM.SYSDUMMY1"
+   db_connection.execute_query(test_query)
+   logger.info("✅ Conexión DB2 validada correctamente")
+   ```
+   
+   Solución:
+   ```
+   result = db_connection.execute_query(test_query)
+   if result is not None and not result.empty:
+       logger.info("✅ Conexión DB2 validada correctamente")
+   else:
+       raise Exception("Query de prueba falló")
+   ```
+
+================================================================================
+PROBLEMAS DE CONSISTENCIA
+================================================================================
+
+9. ACCESO MIXTO A DICCIONARIOS DE CONFIGURACIÓN
+   Archivo: main.py
+   Líneas: 249, 292, 339, 384 (usa .get()), vs 878 (acceso directo)
+   Severidad: BAJO
+   
+   Descripción:
+   - Usos inconsistentes de CEDIS config
+   - Algunos usan .get(), otros acceso directo
+   - Podría causar KeyError en algunos casos
+   
+   Ejemplos:
+   ```
+   CEDIS.get('almacen', 'C22')  # Línea 249 - seguro
+   CEDIS['name']                # Línea 878 - podría fallar
+   ```
+   
+   Solución:
+   - Estandarizar siempre usar .get() para todas las claves
+
+10. INCONSISTENCIA EN PARÁMETROS DE QUERY
+    Archivo: monitor.py vs main.py
+    Líneas: monitor.py 592 vs main.py 245
+    Severidad: BAJO
+    
+    Descripción:
+    - monitor.py usa QueryCategory.BAJO_DEMANDA (Enum)
+    - main.py usa "bajo_demanda" (String)
+    - Inconsistencia en el código base
+    
+    Solución:
+    - Estandarizar - elegir Enum O String, pero no ambos
+
+11. INCONSISTENCIA EN MANEJO DE CONEXIÓN DB
+    Archivo: main.py
+    Líneas: 983-993
+    Severidad: BAJO
+    
+    Descripción:
+    - --oc no intenta conectar a DB (usa modo DEMO)
+    - --reporte-diario sí intenta conectar
+    - Comportamiento inconsistente
+    
+    Solución:
+    - Estandarizar: ambos conectan O ambos permiten modo DEMO
+
+================================================================================
+PROBLEMAS DE PRÁCTICA DE CÓDIGO
+================================================================================
+
+12. IMPORT DENTRO DE FUNCIÓN
+    Archivo: monitor.py
+    Línea: 588
+    Severidad: BAJO
+    
+    Descripción:
+    - Importa módulo dentro de validacion_completa_oc()
+    - Los imports deben estar al inicio del archivo
+    
+    Código:
+    ```
+    def validacion_completa_oc(...):
+        from queries import load_query_with_params, QueryCategory
+    ```
+    
+    Solución:
+    ```
+    # Al inicio del archivo (línea 25+)
+    from queries import load_query_with_params, QueryCategory
+    ```
+
+13. IMPORT NO UTILIZADO
+    Archivo: main.py
+    Línea: 36
+    Severidad: BAJO
+    
+    Descripción:
+    - TELEGRAM_CONFIG se importa pero nunca se usa directamente
+    - Solo se usa indirectamente a través de crear_notificador_desde_config()
+    
+    Solución:
+    - Remover si no se usa, O documentar su propósito
+
+14. CÓDIGO COMENTADO INNECESARIO
+    Archivo: monitor.py
+    Líneas: 728, 731
+    Severidad: BAJO
+    
+    Descripción:
+    - Líneas de ejemplo comentadas en __main__
+    - Deberían estar activas o removidas
+    
+    Código:
+    ```
+    # errores = monitor.validar_conexion_db(None)  # Simular sin conexión
+    # errores = monitor.validar_oc_existente(pd.DataFrame(), "OC12345")
+    ```
+    
+    Solución:
+    - Descomentar para ejemplos activos O remover completamente
+
+15. VALIDACIÓN INCOMPLETA DE CONFIG
+    Archivo: monitor.py
+    Líneas: 470-471
+    Severidad: BAJO
+    
+    Descripción:
+    - Acceso a email_config.get() sin validar que config exista
+    - Si email_config es None, causará AttributeError
+    
+    Código:
+    ```
+    msg['From'] = self.email_config.get('user')
+    msg['To'] = self.email_config.get('alert_recipients', ...)
+    ```
+    
+    Solución:
+    ```
+    if not self.email_config or 'user' not in self.email_config:
+        logger.error("Email config incompleto")
+        return False
+    ```
+
+================================================================================
+RESUMEN DE IMPACTO
+================================================================================
+
+CRÍTICOS (REQUIEREN ATENCIÓN INMEDIATA):
+- Entrada sin validación (12 instancias)
+- Función stub sin implementación (1)
+- Bare except (2)
+- Acceso iloc sin validación (2)
+
+DE ALTO IMPACTO:
+- Renombrado sin validación (5 instancias)
+- Métodos sin validación de retorno (2)
+
+DE MEDIO IMPACTO:
+- Acceso a atributos sin validación
+- Inconsistencias
+- Mala práctica de código
+
+================================================================================
+PRÓXIMOS PASOS RECOMENDADOS
+================================================================================
+
+1. INMEDIATO:
+   - Envolver todos los input() en try-except EOFError
+   - Remover o implementar la función "Programa de Recibo"
+   - Cambiar bare except a excepciones específicas
+
+2. CORTO PLAZO:
+   - Validar columnas antes de renombrar
+   - Validar DataFrames vacíos antes de iloc[0]
+   - Validar retornos de métodos generador
+
+3. MEDIANO PLAZO:
+   - Estandarizar acceso a configuración (CEDIS)
+   - Estandarizar QueryCategory vs string
+   - Mover imports al inicio del archivo
+
+4. LARGO PLAZO:
+   - Agregar pruebas unitarias
+   - Documentar contratos esperados
+   - Code review process
+
+================================================================================

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumen Semanal - {{ cedis_nombre }}</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 850px; margin: 0 auto; background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, {{ color_secundario }} 0%, #002b7a 100%); color: white; padding: 35px; text-align: center; }
+        .header .icon { font-size: 42px; margin-bottom: 10px; }
+        .header h1 { margin: 0 0 10px 0; font-size: 28px; }
+        .header .period { font-size: 16px; background: rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 20px; display: inline-block; margin: 10px 0; }
+        .content { padding: 30px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 25px 0; }
+        .kpi-box { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 20px; border-radius: 10px; text-align: center; border-top: 4px solid {{ color_secundario }}; }
+        .kpi-box .value { font-size: 32px; font-weight: bold; color: {{ color_secundario }}; }
+        .kpi-box .label { font-size: 11px; color: #666; text-transform: uppercase; font-weight: 600; margin-top: 8px; }
+        .kpi-box .trend { font-size: 12px; margin-top: 5px; }
+        .trend-up { color: #28a745; }
+        .trend-down { color: #dc3545; }
+        .trend-neutral { color: #6c757d; }
+        .section { margin: 30px 0; }
+        .section h2 { color: {{ color_secundario }}; font-size: 18px; border-bottom: 2px solid {{ color_secundario }}; padding-bottom: 10px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th { background-color: {{ color_secundario }}; color: white; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase; }
+        td { padding: 10px 12px; border-bottom: 1px solid #e0e0e0; }
+        tr:hover { background-color: #f8f9fa; }
+        .comparison-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+        .comparison-box { background-color: #f8f9fa; padding: 20px; border-radius: 10px; }
+        .comparison-box h4 { margin: 0 0 15px 0; color: #333; font-size: 14px; }
+        .progress-bar { background-color: #e0e0e0; border-radius: 10px; height: 20px; overflow: hidden; margin: 10px 0; }
+        .progress-fill { height: 100%; border-radius: 10px; transition: width 0.3s ease; }
+        .progress-fill.good { background: linear-gradient(90deg, #28a745, #20c997); }
+        .progress-fill.warning { background: linear-gradient(90deg, #ffc107, #fd7e14); }
+        .progress-fill.danger { background: linear-gradient(90deg, #dc3545, #e83e8c); }
+        .highlight-box { background: linear-gradient(135deg, #e7f3ff 0%, #cce5ff 100%); padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid {{ color_secundario }}; }
+        .highlight-box h4 { margin: 0 0 10px 0; color: #004085; }
+        .day-summary { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin: 20px 0; }
+        .day-box { text-align: center; padding: 15px 5px; border-radius: 8px; background-color: #f8f9fa; }
+        .day-box .day-name { font-size: 11px; color: #666; font-weight: 600; }
+        .day-box .day-value { font-size: 18px; font-weight: bold; color: #333; margin-top: 5px; }
+        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #e0e0e0; }
+        @media screen and (max-width: 600px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } .day-summary { grid-template-columns: repeat(4, 1fr); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">&#128202;</div>
+            <h1>RESUMEN SEMANAL</h1>
+            <div class="period">{{ periodo_semana|default:"Semana del DD/MM al DD/MM/YYYY" }}</div>
+            <p>{{ cedis_nombre }} - {{ empresa }}</p>
+        </div>
+
+        <div class="content">
+            <div class="kpi-grid">
+                <div class="kpi-box">
+                    <div class="value">{{ oc_procesadas|default:"0" }}</div>
+                    <div class="label">OC Procesadas</div>
+                    <div class="trend {{ tendencia_oc_clase|default:'trend-neutral' }}">{{ tendencia_oc|default:"--" }}</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="value">{{ asn_recibidos|default:"0" }}</div>
+                    <div class="label">ASN Recibidos</div>
+                    <div class="trend {{ tendencia_asn_clase|default:'trend-neutral' }}">{{ tendencia_asn|default:"--" }}</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="value">{{ unidades_procesadas|default:"0" }}</div>
+                    <div class="label">Unidades</div>
+                    <div class="trend {{ tendencia_unidades_clase|default:'trend-neutral' }}">{{ tendencia_unidades|default:"--" }}</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="value">{{ precision_pct|default:"0%" }}</div>
+                    <div class="label">Precision</div>
+                    <div class="trend {{ tendencia_precision_clase|default:'trend-neutral' }}">{{ tendencia_precision|default:"--" }}</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Actividad por Dia</h2>
+                <div class="day-summary">
+                    {{ resumen_dias|default:"<div class='day-box'><div class='day-name'>LUN</div><div class='day-value'>--</div></div><div class='day-box'><div class='day-name'>MAR</div><div class='day-value'>--</div></div><div class='day-box'><div class='day-name'>MIE</div><div class='day-value'>--</div></div><div class='day-box'><div class='day-name'>JUE</div><div class='day-value'>--</div></div><div class='day-box'><div class='day-name'>VIE</div><div class='day-value'>--</div></div><div class='day-box'><div class='day-name'>SAB</div><div class='day-value'>--</div></div><div class='day-box'><div class='day-name'>DOM</div><div class='day-value'>--</div></div>" }}
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Comparativo Semanal</h2>
+                <div class="comparison-grid">
+                    <div class="comparison-box">
+                        <h4>Cumplimiento de Recepciones</h4>
+                        <div class="progress-bar">
+                            <div class="progress-fill {{ cumplimiento_clase|default:'good' }}" style="width: {{ cumplimiento_pct|default:'0' }}%;"></div>
+                        </div>
+                        <p style="margin: 5px 0; font-size: 14px;"><strong>{{ cumplimiento_pct|default:'0' }}%</strong> de recepciones a tiempo</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>Tasa de Errores</h4>
+                        <div class="progress-bar">
+                            <div class="progress-fill {{ errores_clase|default:'good' }}" style="width: {{ errores_pct|default:'0' }}%;"></div>
+                        </div>
+                        <p style="margin: 5px 0; font-size: 14px;"><strong>{{ errores_pct|default:'0' }}%</strong> tasa de errores</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Top Proveedores de la Semana</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Proveedor</th>
+                            <th>OC</th>
+                            <th>Unidades</th>
+                            <th>Cumplimiento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ tabla_proveedores|default:"<tr><td colspan='5' style='text-align:center;'>Sin datos de proveedores</td></tr>" }}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="highlight-box">
+                <h4>&#127942; Logros de la Semana</h4>
+                <ul style="margin: 0; padding-left: 20px;">
+                    {{ logros_semana|default:"<li>Sin logros destacados esta semana</li>" }}
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>Oportunidades de Mejora</h2>
+                <ul>
+                    {{ oportunidades_mejora|default:"<li>Sin oportunidades identificadas</li>" }}
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>{{ sistema_nombre }}</strong> - {{ cedis_nombre }}</p>
+            <p>Desarrollado por: {{ desarrollador }} - {{ desarrollador_cargo }}</p>
+            <p style="margin-top: 10px; font-style: italic; color: #999;">"{{ lema }}"</p>
+        </div>
+    </div>
+</body>
+</html>

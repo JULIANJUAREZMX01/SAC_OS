@@ -1,0 +1,88 @@
+{#
+═══════════════════════════════════════════════════════════════
+TEMPLATE: Filtro de Rango de Fechas Reutilizable
+Sistema SAC - CEDIS Chedraui Cancún 427
+═══════════════════════════════════════════════════════════════
+
+Macro reutilizable para generar filtros de fecha.
+Puede incluirse en otros templates.
+
+Variables disponibles:
+- date_column: Columna de fecha a filtrar
+- date_start: Fecha inicio (YYYY-MM-DD)
+- date_end: Fecha fin (YYYY-MM-DD)
+- relative_days: Días relativos a hoy (alternativa a fechas fijas)
+- include_time: Incluir hora en filtro
+═══════════════════════════════════════════════════════════════
+#}
+
+{# Macro para filtro de fechas #}
+{% macro date_filter(column, start=None, end=None, relative_days=None, include_time=False) %}
+{% if relative_days %}
+{# Modo relativo: últimos N días #}
+    {% if include_time %}
+    AND {{ column }} >= CURRENT_TIMESTAMP - {{ relative_days }} DAYS
+    {% else %}
+    AND DATE({{ column }}) >= CURRENT_DATE - {{ relative_days }} DAYS
+    {% endif %}
+{% elif start and end %}
+{# Modo absoluto: rango de fechas #}
+    {% if include_time %}
+    AND {{ column }} BETWEEN TIMESTAMP('{{ start }} 00:00:00') AND TIMESTAMP('{{ end }} 23:59:59')
+    {% else %}
+    AND DATE({{ column }}) BETWEEN '{{ start }}' AND '{{ end }}'
+    {% endif %}
+{% elif start %}
+{# Solo fecha inicio #}
+    {% if include_time %}
+    AND {{ column }} >= TIMESTAMP('{{ start }} 00:00:00')
+    {% else %}
+    AND DATE({{ column }}) >= '{{ start }}'
+    {% endif %}
+{% elif end %}
+{# Solo fecha fin #}
+    {% if include_time %}
+    AND {{ column }} <= TIMESTAMP('{{ end }} 23:59:59')
+    {% else %}
+    AND DATE({{ column }}) <= '{{ end }}'
+    {% endif %}
+{% endif %}
+{% endmacro %}
+
+{# Macro para filtro de fecha actual (hoy) #}
+{% macro today_filter(column, include_time=False) %}
+    {% if include_time %}
+    AND {{ column }} >= CURRENT_TIMESTAMP - 1 DAY
+    {% else %}
+    AND DATE({{ column }}) = CURRENT_DATE
+    {% endif %}
+{% endmacro %}
+
+{# Macro para filtro de semana actual #}
+{% macro current_week_filter(column) %}
+    AND DATE({{ column }}) >= CURRENT_DATE - (DAYOFWEEK(CURRENT_DATE) - 1) DAYS
+    AND DATE({{ column }}) <= CURRENT_DATE
+{% endmacro %}
+
+{# Macro para filtro de mes actual #}
+{% macro current_month_filter(column) %}
+    AND YEAR({{ column }}) = YEAR(CURRENT_DATE)
+    AND MONTH({{ column }}) = MONTH(CURRENT_DATE)
+{% endmacro %}
+
+{# Ejemplo de uso en un template principal:
+   {% from 'date_range_filter.sql.j2' import date_filter, today_filter %}
+
+   SELECT * FROM ORDERS o
+   WHERE o.STATUS = '0'
+   {{ date_filter('o.ADDDATE', date_start, date_end) }}
+
+   O para filtros predefinidos:
+   {{ today_filter('o.ADDDATE') }}
+   {{ current_week_filter('o.ADDDATE') }}
+#}
+
+{# Uso directo del template como filtro standalone #}
+{% if date_column %}
+{{ date_filter(date_column, date_start, date_end, relative_days, include_time) }}
+{% endif %}

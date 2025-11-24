@@ -1,0 +1,108 @@
+{#
+═══════════════════════════════════════════════════════════════
+TEMPLATE: Base Query para ASN (Advanced Shipping Notices)
+Sistema SAC - CEDIS Chedraui Cancún 427
+═══════════════════════════════════════════════════════════════
+
+Template Jinja2 para generar queries de ASN/Recibos.
+Soporta filtros de estado, fechas y comparación esperado/recibido.
+
+Variables disponibles:
+- schema: Schema de BD (default: WMWHSE1)
+- storerkey: Código de almacén
+- asn_numero: ASN específico a buscar
+- oc_relacionada: Filtrar por OC relacionada
+- include_detail: Incluir detalle de líneas
+- include_sku_info: Incluir información de SKU
+- include_variance: Incluir análisis de varianzas
+- status_filter: Lista de status a filtrar
+- date_column: Columna para filtro de fecha
+- date_start: Fecha inicio
+- date_end: Fecha fin
+- only_pending: Solo ASN pendientes de recibir
+═══════════════════════════════════════════════════════════════
+#}
+
+SELECT
+    {# Información de cabecera #}
+    r.RECEIPTKEY AS asn_numero,
+    r.EXTERNRECEIPTKEY AS asn_externo,
+    r.STORERKEY AS almacen,
+    r.POKEY AS oc_relacionada,
+    r.CARRIERKEY AS transportista,
+    r.TRAILERKEY AS trailer,
+    r.DOOR AS anden,
+    r.EXPECTEDRECEIPTDATE AS fecha_esperada,
+    r.RECEIPTDATE AS fecha_recibo,
+    r.ADDDATE AS fecha_creacion,
+    r.STATUS AS status,
+    CASE r.STATUS
+        WHEN '0' THEN 'Creado'
+        WHEN '5' THEN 'En Tránsito'
+        WHEN '9' THEN 'Recibido Parcial'
+        WHEN '10' THEN 'Recibido'
+        WHEN '80' THEN 'Cerrado'
+        WHEN '95' THEN 'Cancelado'
+        ELSE 'Desconocido'
+    END AS status_descripcion
+    {% if include_detail %}
+    ,
+    rd.RECEIPTLINENUMBER AS linea,
+    rd.SKU AS sku,
+    rd.QTYEXPECTED AS qty_esperada,
+    rd.QTYRECEIVED AS qty_recibida,
+    rd.QTYEXPECTED - COALESCE(rd.QTYRECEIVED, 0) AS qty_pendiente
+    {% endif %}
+    {% if include_sku_info %}
+    ,
+    sk.DESCR AS descripcion_sku,
+    sk.INNERPACK AS inner_pack,
+    CASE
+        WHEN sk.INNERPACK > 0 THEN ROUND(rd.QTYEXPECTED / sk.INNERPACK, 2)
+        ELSE rd.QTYEXPECTED
+    END AS cajas_esperadas
+    {% endif %}
+    {% if include_variance %}
+    ,
+    CASE
+        WHEN rd.QTYRECEIVED > rd.QTYEXPECTED THEN 'EXCEDENTE'
+        WHEN COALESCE(rd.QTYRECEIVED, 0) < rd.QTYEXPECTED AND r.STATUS IN ('10', '80') THEN 'FALTANTE'
+        WHEN rd.QTYRECEIVED IS NULL OR rd.QTYRECEIVED = 0 THEN 'SIN_RECIBIR'
+        ELSE 'OK'
+    END AS tipo_varianza,
+    COALESCE(rd.QTYRECEIVED, 0) - rd.QTYEXPECTED AS varianza_qty,
+    ROUND((COALESCE(rd.QTYRECEIVED, 0) / NULLIF(rd.QTYEXPECTED, 0)) * 100, 2) AS porcentaje_recibido
+    {% endif %}
+FROM
+    {{ schema | default('WMWHSE1') }}.RECEIPT r
+    {% if include_detail or include_sku_info or include_variance %}
+    INNER JOIN {{ schema | default('WMWHSE1') }}.RECEIPTDETAIL rd ON r.RECEIPTKEY = rd.RECEIPTKEY
+    {% endif %}
+    {% if include_sku_info %}
+    LEFT JOIN {{ schema | default('WMWHSE1') }}.SKU sk ON rd.SKU = sk.SKU AND r.STORERKEY = sk.STORERKEY
+    {% endif %}
+WHERE
+    r.STORERKEY = '{{ storerkey | default('C22') }}'
+    {% if asn_numero %}
+    AND (r.RECEIPTKEY = '{{ asn_numero }}' OR r.EXTERNRECEIPTKEY = '{{ asn_numero }}')
+    {% endif %}
+    {% if oc_relacionada %}
+    AND r.POKEY = '{{ oc_relacionada }}'
+    {% endif %}
+    {% if status_filter %}
+    AND r.STATUS IN ({% for s in status_filter %}'{{ s }}'{% if not loop.last %}, {% endif %}{% endfor %})
+    {% endif %}
+    {% if only_pending %}
+    AND r.STATUS NOT IN ('10', '80', '95')
+    {% endif %}
+    {% if date_start and date_end %}
+    AND DATE(r.{{ date_column | default('ADDDATE') }}) BETWEEN '{{ date_start }}' AND '{{ date_end }}'
+    {% endif %}
+ORDER BY
+    r.ADDDATE DESC
+    {% if include_detail %}
+    , rd.RECEIPTLINENUMBER
+    {% endif %}
+{% if limit %}
+FETCH FIRST {{ limit }} ROWS ONLY
+{% endif %}

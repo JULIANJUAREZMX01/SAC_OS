@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validacion OC {{ oc_numero }} - {{ cedis_nombre }}</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 750px; margin: 0 auto; background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, {{ color_primario }} 0%, #C41230 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { margin: 0 0 10px 0; font-size: 24px; }
+        .header .oc-number { font-size: 36px; font-weight: bold; margin: 15px 0; letter-spacing: 2px; }
+        .header p { margin: 5px 0; opacity: 0.95; }
+        .content { padding: 30px; }
+        .status-box { padding: 25px; border-radius: 12px; margin: 25px 0; text-align: center; border-left: 6px solid; }
+        .status-ok { background-color: #d4edda; border-color: #28a745; }
+        .status-ok h2 { color: #155724; }
+        .status-warning { background-color: #fff3cd; border-color: #ffc107; }
+        .status-warning h2 { color: #856404; }
+        .status-error { background-color: #f8d7da; border-color: #dc3545; }
+        .status-error h2 { color: #721c24; }
+        .status-box h2 { margin: 0 0 10px 0; font-size: 24px; }
+        .status-box p { margin: 0; font-size: 14px; }
+        .details-section { margin: 30px 0; }
+        .details-section h3 { color: {{ color_primario }}; font-size: 16px; border-bottom: 2px solid {{ color_primario }}; padding-bottom: 8px; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th { background-color: {{ color_primario }}; color: white; padding: 12px; text-align: left; font-size: 13px; }
+        td { padding: 10px 12px; border-bottom: 1px solid #e0e0e0; }
+        tr:hover { background-color: #f8f9fa; }
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
+        .info-item { background-color: #f8f9fa; padding: 15px; border-radius: 8px; }
+        .info-item .label { font-size: 11px; color: #666; text-transform: uppercase; font-weight: 600; }
+        .info-item .value { font-size: 18px; font-weight: bold; color: #333; margin-top: 5px; }
+        .discrepancy { background-color: #fff3cd; padding: 3px 8px; border-radius: 4px; color: #856404; font-weight: bold; }
+        .match { background-color: #d4edda; padding: 3px 8px; border-radius: 4px; color: #155724; font-weight: bold; }
+        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #e0e0e0; }
+        @media screen and (max-width: 600px) { .info-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>VALIDACION DE ORDEN DE COMPRA</h1>
+            <div class="oc-number">{{ oc_numero|default:"N/A" }}</div>
+            <p>{{ cedis_nombre }}</p>
+            <p>{{ fecha_actual }} - {{ hora_actual }}</p>
+        </div>
+
+        <div class="content">
+            <div class="status-box status-{{ status_clase|default:'ok' }}">
+                <h2>{{ status_icono|default:"" }} STATUS: {{ status_validacion|default:"OK" }}</h2>
+                <p>{{ status_mensaje|default:"La orden de compra ha sido validada correctamente." }}</p>
+            </div>
+
+            <div class="details-section">
+                <h3>Informacion de la OC</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="label">Numero de OC</div>
+                        <div class="value">{{ oc_numero|default:"N/A" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Proveedor</div>
+                        <div class="value">{{ proveedor|default:"N/A" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Fecha OC</div>
+                        <div class="value">{{ fecha_oc|default:"N/A" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Total SKUs</div>
+                        <div class="value">{{ total_skus|default:"0" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h3>Resultados de Validacion</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Concepto</th>
+                            <th>OC</th>
+                            <th>Distribuciones</th>
+                            <th>Diferencia</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ tabla_validacion|default:"<tr><td colspan='5' style='text-align:center;'>Sin datos de validacion</td></tr>" }}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="details-section">
+                <h3>Resumen de Distribuciones</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="label">Total Unidades OC</div>
+                        <div class="value">{{ total_unidades_oc|default:"0" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Total Unidades Distribuidas</div>
+                        <div class="value">{{ total_unidades_dist|default:"0" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Tiendas Destino</div>
+                        <div class="value">{{ total_tiendas|default:"0" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Discrepancias</div>
+                        <div class="value">{{ total_discrepancias|default:"0" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {{ seccion_errores }}
+
+            <div style="background-color: #e7f3ff; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #0066cc;">
+                <strong>Nota:</strong> {{ nota|default:"El archivo Excel adjunto contiene el detalle completo de la validacion." }}
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>{{ sistema_nombre }}</strong> - {{ cedis_nombre }}</p>
+            <p>Desarrollado por: {{ desarrollador }} - {{ desarrollador_cargo }}</p>
+            <p style="margin-top: 10px; font-style: italic; color: #999;">"{{ lema }}"</p>
+        </div>
+    </div>
+</body>
+</html>

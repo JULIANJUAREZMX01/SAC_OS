@@ -1,0 +1,139 @@
+# ============================================
+# SAC v2.0 - Dependencias del Proyecto
+# Sistema de Automatización de Consultas
+# CEDIS Cancún 427
+# ============================================
+# Actualizado: 2025-11-22
+# Compatible con: Python 3.10, 3.11, 3.12, 3.13
+# ============================================
+
+# ─────────────────────────────────────────────
+# CORE - Procesamiento de Datos
+# ─────────────────────────────────────────────
+# NOTA: Para Python 3.13, usar versiones recientes con wheels precompilados
+pandas>=2.2.0                 # Manipulación y análisis de datos (wheels disponibles para Python 3.13)
+numpy>=2.0.0                  # Operaciones numéricas (wheels disponibles para Python 3.13)
+
+# ─────────────────────────────────────────────
+# REPORTES Y EXCEL
+# ─────────────────────────────────────────────
+openpyxl>=3.1.2              # Lectura/escritura Excel (xlsx) - Pure Python
+XlsxWriter>=3.2.0            # Generación avanzada de Excel - Pure Python
+Pillow>=10.4.0               # Procesamiento de imágenes para reportes
+reportlab>=4.2.0             # Generación de PDFs profesionales
+pypdf>=4.0.0                 # Lectura de PDFs
+
+# ─────────────────────────────────────────────
+# INTELIGENCIA ARTIFICIAL - SAC VISION 3.0
+# ─────────────────────────────────────────────
+anthropic>=0.39.0            # API de Claude (Anthropic) - Motor principal de IA
+pyautogui>=0.9.54            # Control de mouse y teclado (Computer Use)
+pyscreeze>=1.0.1             # Captura de pantalla (dependencia de pyautogui)
+
+# ─────────────────────────────────────────────
+# CONFIGURACIÓN Y VALIDACIÓN
+# ─────────────────────────────────────────────
+python-dotenv>=1.0.0         # Gestión de variables de entorno - Pure Python
+pydantic>=2.9.0              # Validación de datos moderna
+pydantic-settings>=2.5.0     # Settings con Pydantic v2
+PyYAML>=6.0.2                # Parseo de archivos YAML
+
+# ─────────────────────────────────────────────
+# INTERFAZ DE CONSOLA
+# ─────────────────────────────────────────────
+rich>=13.9.0                 # UI profesional para consola - Pure Python
+colorama>=0.4.6              # Output coloreado (compatibilidad Windows) - Pure Python
+tqdm>=4.66.5                 # Barras de progreso - Pure Python
+
+# ─────────────────────────────────────────────
+# PROGRAMACIÓN Y SCHEDULING
+# ─────────────────────────────────────────────
+schedule>=1.2.2              # Programador de tareas para modo daemon - Pure Python
+
+# ─────────────────────────────────────────────
+# FECHAS Y TIEMPO
+# ─────────────────────────────────────────────
+python-dateutil>=2.9.0       # Manejo avanzado de fechas - Pure Python
+pytz>=2024.1                 # Zonas horarias - Pure Python
+
+# ─────────────────────────────────────────────
+# WEB Y API
+# ─────────────────────────────────────────────
+requests>=2.32.0             # Cliente HTTP
+Flask>=3.0.3                 # Framework web para dashboard
+Jinja2>=3.1.4                # Motor de templates
+fastapi>=0.115.0             # Framework web moderno para APIs REST
+uvicorn[standard]>=0.32.0    # Servidor ASGI para FastAPI
+slowapi>=0.1.9               # Rate limiting para FastAPI
+python-multipart>=0.0.12     # Manejo de formularios multipart en FastAPI
+
+# ─────────────────────────────────────────────
+# EMAIL Y COMUNICACIÓN
+# ─────────────────────────────────────────────
+aiosmtplib>=3.0.2           # Cliente SMTP asincrónico
+email-validator>=2.2.0      # Validación de emails
+
+# ─────────────────────────────────────────────
+# NOTIFICACIONES
+# ─────────────────────────────────────────────
+python-telegram-bot>=21.6    # Bot de Telegram
+twilio>=9.3.0                # API de Twilio para WhatsApp (opcional)
+
+# ─────────────────────────────────────────────
+# DISPOSITIVOS Y COMUNICACION SERIAL
+# ─────────────────────────────────────────────
+pyserial>=3.5                # Comunicación serial para dispositivos
+
+# ─────────────────────────────────────────────
+# BASE DE DATOS - IBM DB2
+# ─────────────────────────────────────────────
+# IMPORTANTE: Se requiere al menos uno de estos drivers
+# ibm-db: Driver nativo de IBM (recomendado en Linux)
+# pyodbc: Requiere IBM DB2 ODBC Driver instalado en el sistema
+#
+ibm-db>=3.2.3                # Driver IBM nativo (RECOMENDADO para Linux)
+pyodbc>=5.2.0                # Driver ODBC (requiere IBM DB2 ODBC Driver en sistema)
+
+sqlalchemy>=2.0.35           # ORM y query builder
+
+# ─────────────────────────────────────────────
+# TESTING
+# ─────────────────────────────────────────────
+pytest>=8.3.0                # Framework de testing
+pytest-cov>=6.0.0            # Cobertura de tests
+pytest-asyncio>=0.24.0       # Tests asíncronos
+
+# ─────────────────────────────────────────────
+# DESARROLLO Y CALIDAD DE CÓDIGO
+# ─────────────────────────────────────────────
+black>=24.10.0               # Formateador de código
+flake8>=7.1.1                # Linter
+isort>=5.13.2                # Ordenador de imports
+mypy>=1.13.0                 # Type checking estático
+
+# ─────────────────────────────────────────────
+# COMPILACIÓN A EJECUTABLE (OPCIONAL)
+# ─────────────────────────────────────────────
+# pyinstaller>=6.11.0        # Generador de ejecutables (comentado - instalar si necesario)
+
+# ─────────────────────────────────────────────
+# SEGURIDAD Y AUDITORÍA
+# ─────────────────────────────────────────────
+cryptography>=43.0.3         # Encriptación para credenciales
+python-jose>=3.3.0           # JWT tokens para API
+passlib>=1.7.4               # Hashing de contraseñas
+
+# ─────────────────────────────────────────────
+# MONITOREO Y OBSERVABILIDAD
+# ─────────────────────────────────────────────
+python-json-logger>=2.0.7    # JSON logging para análisis
+prometheus-client>=0.21.0    # Métricas Prometheus
+APScheduler>=3.10.4          # Scheduler avanzado
+
+# ─────────────────────────────────────────────
+# UTILIDADES AVANZADAS
+# ─────────────────────────────────────────────
+click>=8.1.7                 # CLI framework mejorado
+tenacity>=9.0.0              # Reintentos con backoff exponencial
+validators>=0.34.0           # Validación de datos
+arrow>=1.3.0                 # Manejo de fechas mejorado

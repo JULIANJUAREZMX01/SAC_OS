@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte Planning Diario - {{ cedis_nombre }}</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, {{ color_primario }} 0%, #C41230 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { margin: 0 0 10px 0; font-size: 28px; }
+        .header p { margin: 5px 0; opacity: 0.95; }
+        .content { padding: 30px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 25px 0; }
+        .stat-box { background-color: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; border-left: 4px solid {{ color_primario }}; }
+        .stat-box .label { font-size: 11px; color: #666; text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
+        .stat-box .value { font-size: 32px; font-weight: bold; color: {{ color_primario }}; }
+        .section { margin: 30px 0; }
+        .section h2 { color: {{ color_primario }}; font-size: 18px; border-bottom: 2px solid {{ color_primario }}; padding-bottom: 10px; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th { background-color: {{ color_primario }}; color: white; padding: 12px; text-align: left; font-size: 13px; }
+        td { padding: 10px 12px; border-bottom: 1px solid #e0e0e0; }
+        tr:hover { background-color: #f8f9fa; }
+        .status-ok { color: #28a745; font-weight: bold; }
+        .status-warning { color: #ffc107; font-weight: bold; }
+        .status-error { color: #dc3545; font-weight: bold; }
+        .alert-box { padding: 15px 20px; border-radius: 8px; margin: 15px 0; border-left: 4px solid; }
+        .alert-box.info { background-color: #e7f3ff; border-color: #0066cc; }
+        .alert-box.success { background-color: #d4edda; border-color: #28a745; }
+        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #e0e0e0; }
+        .footer strong { color: {{ color_primario }}; }
+        @media screen and (max-width: 600px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>REPORTE PLANNING DIARIO</h1>
+            <p>{{ cedis_nombre }} - {{ empresa }}</p>
+            <p>{{ fecha_actual_larga }} - {{ hora_actual }}</p>
+        </div>
+
+        <div class="content">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="label">Ordenes de Compra</div>
+                    <div class="value">{{ total_oc|default:"0" }}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">ASN Activos</div>
+                    <div class="value">{{ total_asn|default:"0" }}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Distribuciones</div>
+                    <div class="value">{{ total_distribuciones|default:"0" }}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Alertas</div>
+                    <div class="value">{{ total_alertas|default:"0" }}</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Resumen Ejecutivo</h2>
+                <p>{{ resumen_ejecutivo|default:"El reporte detallado de Planning se encuentra adjunto en el archivo Excel." }}</p>
+
+                <div class="alert-box {{ tipo_alerta|default:'info' }}">
+                    <strong>{{ titulo_alerta|default:"Informacion" }}:</strong> {{ mensaje_alerta|default:"Para mas detalles, consultar el archivo Excel adjunto." }}
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Ordenes de Compra Activas</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>OC</th>
+                            <th>Proveedor</th>
+                            <th>Fecha</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ tabla_oc|default:"<tr><td colspan='4' style='text-align:center;'>Sin ordenes de compra activas</td></tr>" }}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>ASN en Transito</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ASN</th>
+                            <th>OC</th>
+                            <th>ETA</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ tabla_asn|default:"<tr><td colspan='4' style='text-align:center;'>Sin ASN en transito</td></tr>" }}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>Actividades del Dia</h2>
+                <ul>
+                    <li><strong>Recepciones programadas:</strong> {{ recepciones_programadas|default:"0" }}</li>
+                    <li><strong>Validaciones pendientes:</strong> {{ validaciones_pendientes|default:"0" }}</li>
+                    <li><strong>Distribuciones activas:</strong> {{ distribuciones_activas|default:"0" }}</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>{{ sistema_nombre }}</strong> - {{ cedis_nombre }}</p>
+            <p>Desarrollado por: {{ desarrollador }} - {{ desarrollador_cargo }}</p>
+            <p style="margin-top: 10px; font-style: italic; color: #999;">"{{ lema }}"</p>
+        </div>
+    </div>
+</body>
+</html>

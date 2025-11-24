@@ -1,0 +1,35 @@
+# ============================================
+# SAC v2.0 - Dependencias MÍNIMAS
+# Solo lo necesario para funcionalidad core
+# ============================================
+# Usar este archivo si el requirements.txt completo falla
+# Instalación: pip install -r requirements-minimal.txt
+# ============================================
+
+# Core - Procesamiento de datos
+pandas>=2.2.0
+numpy>=2.0.0
+
+# Excel
+openpyxl>=3.1.2
+XlsxWriter>=3.2.0
+
+# Configuración
+python-dotenv>=1.0.0
+
+# Consola
+rich>=13.9.0
+colorama>=0.4.6
+
+# Fechas
+python-dateutil>=2.9.0
+pytz>=2024.1
+
+# HTTP
+requests>=2.32.0
+
+# Base de datos (solo pyodbc - más fácil de instalar)
+pyodbc>=5.2.0
+
+# Email (biblioteca estándar de Python es suficiente para básico)
+# Si necesitas SMTP avanzado, añade: aiosmtplib>=3.0.2

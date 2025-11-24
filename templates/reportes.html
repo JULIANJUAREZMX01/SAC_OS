@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% block title %}Gestión de Reportes{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-file-earmark-excel text-danger"></i> Gestión de Reportes</h2>
+
+<!-- Quick Generate Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card quick-action-card border h-100" onclick="generarReporte('diario')">
+            <div class="card-body text-center py-4">
+                <i class="bi bi-calendar-day display-4 text-primary"></i>
+                <h6 class="mt-2 mb-0">Reporte Diario</h6>
+                <small class="text-muted">Resumen de operaciones del día</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card quick-action-card border h-100" onclick="generarReporte('errores')">
+            <div class="card-body text-center py-4">
+                <i class="bi bi-exclamation-triangle display-4 text-warning"></i>
+                <h6 class="mt-2 mb-0">Reporte de Errores</h6>
+                <small class="text-muted">Errores detectados por severidad</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card quick-action-card border h-100" onclick="generarReporte('estadisticas')">
+            <div class="card-body text-center py-4">
+                <i class="bi bi-graph-up display-4 text-success"></i>
+                <h6 class="mt-2 mb-0">Estadísticas</h6>
+                <small class="text-muted">Métricas de los últimos 30 días</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card quick-action-card border h-100" onclick="generarReporte('auditoria')">
+            <div class="card-body text-center py-4">
+                <i class="bi bi-shield-check display-4 text-info"></i>
+                <h6 class="mt-2 mb-0">Auditoría</h6>
+                <small class="text-muted">Registro de operaciones</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Report Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-sliders me-2"></i>Generar Reporte Personalizado</h5>
+    </div>
+    <div class="card-body">
+        <form id="customReportForm" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Tipo de Reporte</label>
+                <select class="form-select" name="tipo" id="tipoReporte" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="validaciones">Validaciones de OC</option>
+                    <option value="distribuciones">Distribuciones</option>
+                    <option value="errores">Errores del Sistema</option>
+                    <option value="metricas">Métricas Diarias</option>
+                    <option value="ejecutivo">Resumen Ejecutivo</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Fecha Inicio</label>
+                <input type="date" class="form-control" name="fecha_inicio" id="fechaInicio">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Fecha Fin</label>
+                <input type="date" class="form-control" name="fecha_fin" id="fechaFin">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Formato</label>
+                <select class="form-select" name="formato">
+                    <option value="xlsx">Excel (.xlsx)</option>
+                    <option value="csv">CSV (.csv)</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-chedraui w-100">
+                    <i class="bi bi-file-earmark-plus me-1"></i>Generar Reporte
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Generated Reports List -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-folder2-open me-2"></i>Reportes Generados</h5>
+        <button class="btn btn-sm btn-outline-secondary" onclick="location.reload()">
+            <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
+        </button>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Archivo</th>
+                    <th>Tipo</th>
+                    <th>Tamaño</th>
+                    <th>Fecha de Creación</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in archivos %}
+                <tr>
+                    <td>
+                        <i class="bi bi-file-earmark-excel text-success me-2"></i>
+                        <strong>{{ a.nombre }}</strong>
+                    </td>
+                    <td>
+                        {% if 'Validacion' in a.nombre %}
+                            <span class="badge bg-primary">Validación</span>
+                        {% elif 'Planning' in a.nombre or 'Diario' in a.nombre %}
+                            <span class="badge bg-info">Planning</span>
+                        {% elif 'Error' in a.nombre %}
+                            <span class="badge bg-warning text-dark">Errores</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Reporte</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ a.tamanio }}</td>
+                    <td>{{ a.fecha }}</td>
+                    <td>
+                        <a href="/api/descargar/{{ a.nombre }}" class="btn btn-sm btn-outline-primary" title="Descargar">
+                            <i class="bi bi-download"></i>
+                        </a>
+                        <button class="btn btn-sm btn-outline-danger" onclick="eliminarReporte('{{ a.nombre }}')" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-5">
+                        <i class="bi bi-folder display-4 d-block mb-3"></i>
+                        No hay reportes generados
+                        <br>
+                        <small>Genera un reporte usando los botones de arriba</small>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Progress Modal -->
+<div class="modal fade" id="progressModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center py-5">
+                <div class="spinner-border text-danger mb-3" style="width: 3rem; height: 3rem;"></div>
+                <h5>Generando Reporte...</h5>
+                <p class="text-muted mb-0" id="progressMessage">Procesando datos...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
+
+    // Set default dates
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date();
+        const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+        document.getElementById('fechaFin').value = today.toISOString().split('T')[0];
+        document.getElementById('fechaInicio').value = weekAgo.toISOString().split('T')[0];
+    });
+
+    // Quick generate
+    async function generarReporte(tipo) {
+        progressModal.show();
+        document.getElementById('progressMessage').textContent = `Generando reporte ${tipo}...`;
+
+        try {
+            const response = await fetch('/api/generar-reporte', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tipo: tipo })
+            });
+
+            const data = await response.json();
+            progressModal.hide();
+
+            if (data.success) {
+                showToast(`Reporte generado: ${data.archivo}`, 'success');
+                if (data.url) {
+                    window.open(data.url, '_blank');
+                }
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showToast('Error: ' + data.error, 'error');
+            }
+        } catch (error) {
+            progressModal.hide();
+            showToast('Error al generar reporte', 'error');
+        }
+    }
+
+    // Custom report form
+    document.getElementById('customReportForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = {
+            tipo: document.getElementById('tipoReporte').value,
+            fecha_inicio: document.getElementById('fechaInicio').value,
+            fecha_fin: document.getElementById('fechaFin').value,
+            formato: this.formato.value
+        };
+
+        progressModal.show();
+        document.getElementById('progressMessage').textContent = 'Generando reporte personalizado...';
+
+        try {
+            const response = await fetch('/api/generar-reporte', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+            progressModal.hide();
+
+            if (data.success) {
+                showToast(`Reporte generado: ${data.archivo}`, 'success');
+                if (data.url) {
+                    window.open(data.url, '_blank');
+                }
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showToast('Error: ' + data.error, 'error');
+            }
+        } catch (error) {
+            progressModal.hide();
+            showToast('Error al generar reporte', 'error');
+        }
+    });
+
+    // Delete report
+    async function eliminarReporte(nombre) {
+        if (!confirm(`¿Eliminar el reporte "${nombre}"?`)) return;
+
+        try {
+            const response = await fetch(`/api/reportes/${encodeURIComponent(nombre)}`, {
+                method: 'DELETE'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showToast('Reporte eliminado', 'success');
+                location.reload();
+            } else {
+                showToast('Error: ' + data.error, 'error');
+            }
+        } catch (error) {
+            showToast('Error al eliminar reporte', 'error');
+        }
+    }
+</script>
+{% endblock %}

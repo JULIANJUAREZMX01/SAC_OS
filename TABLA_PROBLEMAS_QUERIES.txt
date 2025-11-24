@@ -1,0 +1,306 @@
+════════════════════════════════════════════════════════════════════════════════════
+TABLA DE PROBLEMAS ENCONTRADOS - QUERIES SQL - SAC
+════════════════════════════════════════════════════════════════════════════════════
+
+LEYENDA:
+  ⚠️  = Aviso importante
+  [C] = Crítico    [A] = Alto    [M] = Medio    [B] = Bajo
+  
+════════════════════════════════════════════════════════════════════════════════════
+[C] PROBLEMA 1.1: NULLS LAST - Sintaxis incompatible con DB2
+════════════════════════════════════════════════════════════════════════════════════
+ARCHIVOS AFECTADOS:
+  ✗ queries/preventivas/ubicaciones_llenas.sql              (líneas 104-105)
+  ✗ queries/obligatorias/recibo_programado.sql             (línea 90)
+  ✗ queries/bajo_demanda/auditoria_usuario.sql             (línea 126)
+  ✗ queries/bajo_demanda/movimientos_lpn.sql               (línea 104)
+
+PROBLEMA:
+  ORDER BY campo DESC NULLS LAST   <- Sintaxis Oracle/PostgreSQL
+
+SOLUCIÓN:
+  ORDER BY CASE WHEN campo IS NULL THEN 1 ELSE 0 END, campo DESC
+
+PRIORIDAD:     🔴 MÁXIMA (Hoy)
+ESFUERZO:      ⏱️  30 minutos
+RIESGO:        Fallo de ejecución SQL
+
+════════════════════════════════════════════════════════════════════════════════════
+[C] PROBLEMA 1.2: Campo SUSR1 potencialmente no existente
+════════════════════════════════════════════════════════════════════════════════════
+ARCHIVO AFECTADO:
+  ✗ queries/obligatorias/recibo_programado.sql             (línea 65)
+
+CÓDIGO PROBLEMÁTICO:
+  LEFT JOIN WMWHSE1.STORER sup ON r.SUSR1 = sup.STORERKEY
+
+PROBLEMA:
+  Campo SUSR1 podría no existir en tabla RECEIPT
+  Comentario indica incertidumbre: "-- Campo proveedor puede variar"
+
+VERIFICACIÓN NECESARIA:
+  db2> SELECT COLNAME FROM SYSCAT.COLUMNS 
+       WHERE TABNAME='RECEIPT' AND COLNAME LIKE '%USR%'
+
+PRIORIDAD:     🔴 MÁXIMA (Hoy)
+ESFUERZO:      ⏱️  15 minutos (solo validación)
+RIESGO:        Error SQL / Resultados incorrectos
+
+════════════════════════════════════════════════════════════════════════════════════
+[C] PROBLEMA 1.3: Nombres de tablas sin verificación en DB2
+════════════════════════════════════════════════════════════════════════════════════
+TABLAS POTENCIALMENTE PROBLEMÁTICAS:
+  ✗ USERPROFILE         (vs USER_PROFILE)                 - 2 archivos
+  ✗ TASKDETAIL          (vs TASK_DETAIL o TASKINSTANCE)   - 3 archivos
+  ✗ PUTAWAYZONE         (vs PUTAWAY_ZONE)                 - 5 archivos
+  ✗ RECEIPTDETAIL       (vs RECEIPT_DETAIL)               - 8 archivos
+  ✗ ORDERDETAIL         (vs ORDER_DETAIL)                 - 12 archivos
+  ✗ LOTXLOCXID          (inusual, requiere validación)    - 7 archivos
+  ✗ ITRN                (abreviación corta, verificar)    - 2 archivos
+
+VERIFICACIÓN NECESARIA:
+  db2> SELECT TABNAME FROM SYSCAT.TABLES 
+       WHERE TABSCHEMA='WMWHSE1' 
+       ORDER BY TABNAME
+
+IMPACTO:       Crítico - Si nombres incorrectos, TODAS las queries fallarán
+PRIORIDAD:     🔴 MÁXIMA (Hoy)
+ESFUERZO:      ⏱️  15 minutos (solo validación)
+RIESGO:        Fallo total del sistema de queries
+
+════════════════════════════════════════════════════════════════════════════════════
+[C] PROBLEMA 1.4: Mismatch de tipos: usuario (string) vs USERKEY (int)
+════════════════════════════════════════════════════════════════════════════════════
+ARCHIVO AFECTADO:
+  ✗ queries/bajo_demanda/auditoria_usuario.sql             (líneas 69, 95)
+
+CÓDIGO PROBLEMÁTICO:
+  WHERE td.USERKEY = '{{usuario}}'
+  
+  Problema: {{usuario}} es VARCHAR (username) pero USERKEY es INT/BIGINT
+
+SOLUCIÓN:
+  Cambiar a:
+  WHERE td.ADDWHO = '{{usuario}}'   (si ADDWHO es el campo de username)
+
+VERIFICACIÓN:
+  Revisar schema de TASKDETAIL:
+  db2> SELECT COLNAME, COLTYPE FROM SYSCAT.COLUMNS 
+       WHERE TABNAME='TASKDETAIL'
+
+PRIORIDAD:     🔴 CRÍTICO (Esta semana)
+ESFUERZO:      ⏱️  20 minutos
+RIESGO:        Query retorna 0 filas / Error
+
+════════════════════════════════════════════════════════════════════════════════════
+[A] PROBLEMA 2.1: SQL INJECTION con LIKE (Bajo riesgo - mitigado)
+════════════════════════════════════════════════════════════════════════════════════
+ARCHIVOS AFECTADOS:
+  ⚠️  queries/bajo_demanda/buscar_asn.sql                  (líneas 89-90)
+  ⚠️  queries/bajo_demanda/buscar_lpn.sql                  (líneas 61-62, 99-100)
+  ⚠️  queries/bajo_demanda/buscar_oc.sql                   (línea 79)
+
+CÓDIGO PROBLEMÁTICO:
+  OR r.RECEIPTKEY LIKE '%{{asn_numero}}%'
+  OR r.EXTERNRECEIPTKEY LIKE '%{{asn_numero}}%'
+
+VULNERABILIDAD:
+  Parámetro {{asn_numero}} sin escape de % y _
+  Aunque mitigado por parametrización, podría mejorar
+
+MITIGATION:
+  1. Validar en aplicación antes de ejecutar
+  2. Usar ESCAPE clause: LIKE '{{asn_numero}}' ESCAPE '\'
+  3. Mantener actual si parametrización es robusta
+
+PRIORIDAD:     🟠 ALTO (Esta semana)
+ESFUERZO:      ⏱️  20 minutos
+RIESGO:        SQL injection (bajo, mitigado)
+
+════════════════════════════════════════════════════════════════════════════════════
+[A] PROBLEMA 2.2: Variables no inicializadas en procedimiento
+════════════════════════════════════════════════════════════════════════════════════
+ARCHIVO AFECTADO:
+  ✗ queries/ddl/procedures/sp_validate_oc.sql              (línea 42)
+
+CÓDIGO PROBLEMÁTICO:
+  DECLARE v_oc_status VARCHAR(10);  -- Sin DEFAULT
+  ...
+  SELECT STATUS INTO v_oc_status FROM ... FETCH FIRST 1 ROW ONLY
+  -- Si no hay fila, v_oc_status queda undefined
+
+SOLUCIÓN:
+  DECLARE v_oc_status VARCHAR(10) DEFAULT NULL;
+
+PRIORIDAD:     🟠 ALTO (Esta semana)
+ESFUERZO:      ⏱️  10 minutos
+RIESGO:        Comportamiento undefined
+
+════════════════════════════════════════════════════════════════════════════════════
+[A] PROBLEMA 2.3: SESSION temporary tables con posible concurrencia
+════════════════════════════════════════════════════════════════════════════════════
+ARCHIVOS AFECTADOS:
+  ✗ queries/ddl/procedures/sp_get_daily_report.sql         (múltiples)
+  ✗ queries/ddl/procedures/sp_validate_oc.sql              (línea 50)
+
+CÓDIGO PROBLEMÁTICO:
+  DECLARE GLOBAL TEMPORARY TABLE SESSION.VALIDATION_RESULTS (...)
+  ON COMMIT DROP TABLE
+
+PROBLEMA:
+  • Tablas GLOBAL TEMPORARY pueden tener conflictos entre usuarios
+  • Si múltiples usuarios ejecutan simultáneamente, podrían compartir datos
+
+SOLUCIÓN:
+  1. Usar PRIVATE TEMPORARY TABLE (si DB2 lo soporta)
+  2. O refactorizar para retornar resultados sin tabla intermedia
+  3. O usar tabla permanente con ID de sesión
+
+PRIORIDAD:     🟠 ALTO (Próximas dos semanas)
+ESFUERZO:      ⏱️  2-3 horas (requiere refactoring)
+RIESGO:        Corrupción de datos en ambiente concurrente
+
+════════════════════════════════════════════════════════════════════════════════════
+[M] PROBLEMA 3.1: GROUP BY incompleto en UNION ALL
+════════════════════════════════════════════════════════════════════════════════════
+ARCHIVOS AFECTADOS:
+  ⚠️  queries/bajo_demanda/auditoria_usuario.sql            (líneas 53-74)
+  ⚠️  queries/bajo_demanda/historial_oc.sql                 (múltiples UNION)
+
+CÓDIGO PROBLEMÁTICO:
+  SELECT '02_RESUMEN_TAREAS',
+         td.TASKTYPE AS nombre,
+         COUNT(*) AS cantidad,
+         ...
+  FROM WMWHSE1.TASKDETAIL td
+  GROUP BY td.TASKTYPE   <- Faltan columnas en GROUP BY
+
+PROBLEMA:
+  • Viola SQL strict mode en algunas configuraciones DB2
+  • Error: "Not in aggregate function or GROUP BY clause"
+
+SOLUCIÓN:
+  Incluir TODAS las columnas no agregadas en GROUP BY:
+  GROUP BY td.TASKTYPE, td.ORDERKEY, td.SKU, ...
+
+VERIFICACIÓN:
+  db2> SET SESSION DB2_COMPATIBILITY_VECTOR='STRICT_GROUP_BY'
+
+PRIORIDAD:     🟡 MEDIO (Próximas dos semanas)
+ESFUERZO:      ⏱️  45 minutos
+RIESGO:        Fallo condicional según config DB2
+
+════════════════════════════════════════════════════════════════════════════════════
+[M] PROBLEMA 3.2: Lógica confusa con parámetro {{tienda_destino}}
+════════════════════════════════════════════════════════════════════════════════════
+ARCHIVO AFECTADO:
+  ⚠️  queries/bajo_demanda/detalle_distribucion.sql         (líneas 80-84)
+
+CÓDIGO PROBLEMÁTICO:
+  WHERE (
+      '{{tienda_destino}}' = '%'
+      OR o.CONSIGNEEKEY = '{{tienda_destino}}'
+      OR o.CONSIGNEEKEY LIKE '{{tienda_destino}}'
+  )
+
+PROBLEMA:
+  Si {{tienda_destino}} = '%', la condición SIEMPRE es true
+  No es claro si esto es intencional o error
+
+SOLUCIÓN:
+  Si se desea "todos": usar NULL en lugar de '%'
+  WHERE ({{tienda_destino}} IS NULL OR o.CONSIGNEEKEY = '{{tienda_destino}}')
+
+PRIORIDAD:     🟡 MEDIO (Próximas dos semanas)
+ESFUERZO:      ⏱️  15 minutos
+RIESGO:        Resultados incorrectos si parámetro mal usado
+
+════════════════════════════════════════════════════════════════════════════════════
+[M] PROBLEMA 3.3: Hardcoded status codes en múltiples lugares
+════════════════════════════════════════════════════════════════════════════════════
+APARICIONES:
+  ✗ 20+ lugares donde aparecen CASE WHEN status codes:
+    '0' -> 'Creado'
+    '5' -> 'En Tránsito'
+    '9' -> 'Recibido Parcial'
+    '10' -> 'Recibido'
+    '80' -> 'Cerrado'
+    '95' -> 'Cancelado'
+
+PROBLEMA:
+  • Si status codes cambian, múltiples queries necesitan actualización
+  • Inconsistencia potencial entre archivos
+  • Difícil de mantener
+
+SOLUCIÓN:
+  Crear tabla de referencia:
+  CREATE TABLE REFERENCE_STATUS_CODES (
+      STATUS_CODE VARCHAR(3),
+      DESCRIPTION VARCHAR(50),
+      CATEGORY VARCHAR(20)
+  )
+  
+  Luego usar JOIN en lugar de CASE WHEN
+
+PRIORIDAD:     🟡 MEDIO (Mejora de mantenibilidad)
+ESFUERZO:      ⏱️  2-3 horas
+RIESGO:        Bajo (funcional pero frágil)
+
+════════════════════════════════════════════════════════════════════════════════════
+[B] PROBLEMA 4.1: Metadata extraction imprecisa en query_loader.py
+════════════════════════════════════════════════════════════════════════════════════
+ARCHIVO:
+  ⚠️  queries/query_loader.py                               (línea 615-621)
+
+CÓDIGO:
+  tables_match = re.search(
+    r'--\s*TABLAS INVOLUCRADAS:\s*\n((?:--\s*-\s*.+\n)+)'
+  )
+
+PROBLEMA:
+  Patrón regex muy estricto, algunos archivos podrían tener spacing diferente
+
+SOLUCIÓN:
+  Hacer regex más flexible:
+  r'--\s*-\s*(\S+).*$'
+
+PRIORIDAD:     🟢 BAJO (Mejora de calidad)
+ESFUERZO:      ⏱️  20 minutos
+RIESGO:        Bajo (información de metadatos incompleta)
+
+════════════════════════════════════════════════════════════════════════════════════
+RESUMEN POR PRIORIDAD
+════════════════════════════════════════════════════════════════════════════════════
+
+🔴 CRÍTICO (Hacer hoy/mañana):
+   [1] Verificar nombres de tablas en DB2               - 15 min
+   [2] Validar campo SUSR1                               - 15 min
+   [3] Corregir NULLS LAST (4 archivos)                  - 30 min
+   [4] Corregir usuario en auditoria_usuario.sql         - 20 min
+   TOTAL: ~80 minutos
+
+🟠 ALTO (Esta semana):
+   [5] SQL INJECTION with LIKE                           - 20 min
+   [6] Inicializar variables                             - 10 min
+   [7] SESSION tables concurrencia                       - 2-3 horas
+   TOTAL: ~3.5 horas
+
+🟡 MEDIO (Próximas 2 semanas):
+   [8] GROUP BY incompleto                               - 45 min
+   [9] Lógica parámetro tienda_destino                   - 15 min
+   [10] Hardcoded status codes                           - 2-3 horas
+   TOTAL: ~4 horas
+
+🟢 BAJO (Técnica):
+   [11] Metadata extraction                              - 20 min
+   [12] Documentación parámetros                         - 1-2 horas
+   TOTAL: ~1.5 horas
+
+════════════════════════════════════════════════════════════════════════════════════
+TIEMPO TOTAL ESTIMADO:
+  • Crítico: 80 minutos (hoy)
+  • Alto: 3.5 horas (semana 1)
+  • Medio: 4 horas (semanas 2-3)
+  • Bajo: 1.5 horas (técnica)
+  • TOTAL: ~9-10 horas de trabajo de desarrollo
+════════════════════════════════════════════════════════════════════════════════════

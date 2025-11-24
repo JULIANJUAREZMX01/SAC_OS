@@ -1,0 +1,189 @@
+═══════════════════════════════════════════════════════════════════════════════
+🚀 SACITY v1.0.0 - QUICK REFERENCE CARD
+Sistema de Automatización de Consultas - Chedraui CEDIS 427
+═══════════════════════════════════════════════════════════════════════════════
+
+📊 STATUS: ✅ PRODUCTION READY (95.6%) | Versión: 1.0.0 | Fecha: 2025-11-22
+
+═══════════════════════════════════════════════════════════════════════════════
+1️⃣  CONFIGURACIÓN INICIAL (1 MINUTO)
+═══════════════════════════════════════════════════════════════════════════════
+
+$ cp env .env
+$ nano .env  # Editar estos campos:
+  - EMAIL_USER=sac@chedraui.com.mx
+  - EMAIL_PASSWORD=tu_password
+  - TELNET_USER=admin
+
+═══════════════════════════════════════════════════════════════════════════════
+2️⃣  USAR SACITY LITE (Para MC9100/9200 legacy)
+═══════════════════════════════════════════════════════════════════════════════
+
+from modules.modulo_symbol_mc9000_lite import GestorSymbolLite
+
+gestor = GestorSymbolLite()
+if gestor.conectar("192.168.1.100", familia="MC9200"):
+    resultado = gestor.ejecutar_comando("power")
+    print(resultado.respuesta)  # "Battery: 78%"
+
+Características:
+✅ 17KB | <5MB RAM | Zero dependencies | Python 3.6+
+
+═══════════════════════════════════════════════════════════════════════════════
+3️⃣  USAR SACITY ESTÁNDAR (Recomendado para producción)
+═══════════════════════════════════════════════════════════════════════════════
+
+from modules import GestorDispositivosSymbol, ConfiguracionEmail
+
+config = ConfiguracionEmail(
+    usuario="sac@chedraui.com.mx",
+    contraseña="PASSWORD",
+    destinatarios_alertas=["operador@chedraui.com.mx"]
+)
+
+gestor = GestorDispositivosSymbol()
+gestor.conectar_telnet("192.168.1.100", config_email=config)
+
+# Health check automático con alertas por email
+reporte = gestor.ejecutar_health_check(enviar_alertas=True)
+
+Características:
+✅ 66KB | ~15MB RAM | Email alerts | Health check automático
+
+═══════════════════════════════════════════════════════════════════════════════
+4️⃣  VALIDAR ANTES DE PRODUCCIÓN
+═══════════════════════════════════════════════════════════════════════════════
+
+$ python validar_sacity_produccion.py
+
+Expected output:
+✅ SACITY ESTÁ LISTO PARA PRODUCCIÓN
+📈 PUNTUACIÓN: 43.0/45 (95.6%)
+
+═══════════════════════════════════════════════════════════════════════════════
+5️⃣  MONITOREAR EN PRODUCCIÓN
+═══════════════════════════════════════════════════════════════════════════════
+
+# Ver logs en tiempo real
+$ tail -f output/logs/sac_427.log
+
+# Monitorear via cron (cada 30 minutos)
+*/30 * * * * /usr/bin/python3 /ruta/sac_monitor.py
+
+═══════════════════════════════════════════════════════════════════════════════
+6️⃣  COMANDOS REMOTOS VÍA EMAIL
+═══════════════════════════════════════════════════════════════════════════════
+
+Usuarios envían email a: sac@chedraui.com.mx
+Asunto: "Comando: power"
+
+Sistema responde en 1-2 minutos con:
+Subject: [SAC] Respuesta: power - ✅ EXITOSO
+Body: Battery: 78%, AC Power: Not Connected, ...
+
+═══════════════════════════════════════════════════════════════════════════════
+7️⃣  TROUBLESHOOTING RÁPIDO
+═══════════════════════════════════════════════════════════════════════════════
+
+❌ No se conecta:
+   $ telnet 192.168.1.100 23
+   (Verificar IP y puerto abierto)
+
+❌ No envía alertas:
+   - Verificar .env tiene EMAIL_USER y EMAIL_PASSWORD
+   - Verificar destinatarios_alertas no vacío
+   - Revisionar logs: tail -f output/logs/sac_427.log
+
+❌ Comandos email no procesados:
+   - Verificar ReceptorComandosEmail está corriendo
+   - Verificar buzón IMAP en Office 365
+
+═══════════════════════════════════════════════════════════════════════════════
+8️⃣  VERSIONES DISPONIBLES
+═══════════════════════════════════════════════════════════════════════════════
+
+LITE (17KB):
+  - Ultra-lightweight para dispositivos legacy
+  - <50KB, <5MB RAM
+  - Úsalo si: Recursos muy limitados o MC9100/9200 viejos
+  - Importar: from modules.modulo_symbol_mc9000_lite import GestorSymbolLite
+
+ESTÁNDAR (66KB) ⭐ RECOMENDADO:
+  - Balance perfecto: features + performance
+  - ~200KB, ~15MB RAM
+  - Úsalo si: Deployments modernos con email alerts
+  - Importar: from modules import GestorDispositivosSymbol
+
+PRO (100KB):
+  - Full-featured con operación remota completa
+  - ~350KB, ~25MB RAM
+  - Úsalo si: Central de distribución con 10+ dispositivos
+  - Importar: from modules import ProcesadorComandosEmail
+
+═══════════════════════════════════════════════════════════════════════════════
+9️⃣  CHECKLIST PRE-DEPLOYMENT
+═══════════════════════════════════════════════════════════════════════════════
+
+□ Archivo .env creado y configurado con credenciales reales
+□ Dispositivos Symbol conectados a la red
+□ Prueba: telnet <IP> 23 (conexión exitosa)
+□ Email de test enviado y recibida respuesta
+□ Ejecutado: python validar_sacity_produccion.py
+□ Resultado: PUNTUACIÓN 95%+ (PRODUCTION READY)
+□ Logs monitoreados: tail -f output/logs/sac_427.log
+□ Documento leído: SACITY_DEPLOYMENT_INMEDIATO.md
+□ Team entrenado en uso de comandos email
+
+═══════════════════════════════════════════════════════════════════════════════
+🔟 ARCHIVOS IMPORTANTES
+═══════════════════════════════════════════════════════════════════════════════
+
+DOCUMENTACIÓN:
+📄 SACITY_DEPLOYMENT_INMEDIATO.md    ← LEER PRIMERO (5 min)
+📄 SACITY_DEPLOYMENT.md              ← Guía técnica detallada
+📄 SACITY_OPTIMIZATION.md            ← Comparativa de versiones
+📄 AUDIT_SACITY_EMULATOR.md          ← Reporte auditoría
+
+CÓDIGO:
+🐍 modules/modulo_symbol_mc9000_lite.py        ← LITE (17KB)
+🐍 modules/modulo_symbol_mc9000.py             ← ESTÁNDAR (66KB)
+🐍 modules/modulo_symbol_email_commands.py     ← EMAIL (19KB)
+
+HERRAMIENTAS:
+🔧 validar_sacity_produccion.py     ← Pre-deployment validator
+🔧 .env                              ← Credenciales (NO COMMITAR)
+🔧 env                               ← Template .env
+
+═══════════════════════════════════════════════════════════════════════════════
+❤️  SOPORTE & CONTACTO
+═══════════════════════════════════════════════════════════════════════════════
+
+Técnico: Julián Alexander Juárez Alvarado (ADMJAJA)
+Jefe de Sistemas - CEDIS Chedraui Cancún 427
+
+Región Sureste Supervisor: Itza Vera Reyes Sarubí (Villahermosa)
+
+═══════════════════════════════════════════════════════════════════════════════
+📈 MÉTRICAS ESPERADAS EN PRODUCCIÓN
+═══════════════════════════════════════════════════════════════════════════════
+
+Disponibilidad:        99.5%+ (reconexión automática)
+Latencia alertas:      < 5 minutos (heartbeat cada 30s)
+Latencia comandos:     1-2 minutos (polling cada 60s)
+CPU ahorro:            -40% vs anterior (polling vs blocking sleep)
+Battery ahorro:        +15% en dispositivos legacy
+
+═══════════════════════════════════════════════════════════════════════════════
+✨ FILOSOFÍA SACITY
+═══════════════════════════════════════════════════════════════════════════════
+
+"Simple, rápido y confiable para dispositivos legacy MC9100/9200 de 8+ años.
+Zero external dependencies. Bajo consumo CPU/RAM. Múltiples arquitecturas.
+Email alerts automáticas. Comandos remotos vía email. Todo en stdlib Python.
+
+Diseñado para que los sistemas trabajen al servicio de los analistas,
+no al revés."
+
+© 2025 Tiendas Chedraui S.A. de C.V. - CEDIS 427
+
+═══════════════════════════════════════════════════════════════════════════════

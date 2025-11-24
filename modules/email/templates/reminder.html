@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recordatorio - {{ cedis_nombre }}</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 650px; margin: 0 auto; background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; padding: 30px; text-align: center; }
+        .header .icon { font-size: 50px; margin-bottom: 10px; }
+        .header h1 { margin: 0 0 10px 0; font-size: 26px; }
+        .header p { margin: 5px 0; opacity: 0.95; }
+        .content { padding: 30px; }
+        .reminder-box { background: linear-gradient(135deg, #e7f3ff 0%, #cce5ff 100%); border-radius: 12px; padding: 25px; margin: 20px 0; text-align: center; border: 2px dashed #0066cc; }
+        .reminder-box .title { font-size: 20px; font-weight: bold; color: #004085; margin-bottom: 10px; }
+        .reminder-box .message { font-size: 15px; color: #004085; line-height: 1.6; }
+        .deadline { background-color: #fff3cd; padding: 20px; border-radius: 10px; margin: 20px 0; display: flex; align-items: center; justify-content: center; gap: 15px; }
+        .deadline .icon { font-size: 30px; }
+        .deadline .text { text-align: left; }
+        .deadline .label { font-size: 12px; color: #856404; text-transform: uppercase; font-weight: 600; }
+        .deadline .value { font-size: 22px; font-weight: bold; color: #856404; }
+        .task-list { margin: 25px 0; }
+        .task-list h3 { color: #333; font-size: 16px; margin-bottom: 15px; }
+        .task-item { display: flex; align-items: center; padding: 12px 15px; background-color: #f8f9fa; margin: 8px 0; border-radius: 8px; border-left: 4px solid #17a2b8; }
+        .task-item .checkbox { width: 20px; height: 20px; border: 2px solid #17a2b8; border-radius: 4px; margin-right: 12px; }
+        .task-item.completed { opacity: 0.6; }
+        .task-item.completed .checkbox { background-color: #17a2b8; }
+        .priority-indicator { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; margin-left: auto; }
+        .priority-high { background-color: #f8d7da; color: #721c24; }
+        .priority-medium { background-color: #fff3cd; color: #856404; }
+        .priority-low { background-color: #d4edda; color: #155724; }
+        .action-buttons { text-align: center; margin: 25px 0; }
+        .btn { display: inline-block; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: 600; margin: 5px; }
+        .btn-primary { background-color: #17a2b8; color: white; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .notes { background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0; font-size: 13px; color: #666; }
+        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #e0e0e0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">&#128276;</div>
+            <h1>RECORDATORIO</h1>
+            <p>{{ cedis_nombre }}</p>
+            <p>{{ fecha_actual }}</p>
+        </div>
+
+        <div class="content">
+            <div class="reminder-box">
+                <div class="title">{{ titulo_recordatorio|default:"Recordatorio Importante" }}</div>
+                <div class="message">{{ mensaje_recordatorio|default:"Tienes tareas pendientes que requieren tu atencion." }}</div>
+            </div>
+
+            <div class="deadline">
+                <div class="icon">&#9200;</div>
+                <div class="text">
+                    <div class="label">Fecha Limite</div>
+                    <div class="value">{{ fecha_limite|default:"No especificada" }}</div>
+                </div>
+            </div>
+
+            <div class="task-list">
+                <h3>&#128203; Tareas Pendientes</h3>
+                {{ lista_tareas|default:"<div class='task-item'><div class='checkbox'></div><span>Sin tareas pendientes</span></div>" }}
+            </div>
+
+            <div class="action-buttons">
+                {{ botones_accion|default:"" }}
+            </div>
+
+            <div class="notes">
+                <strong>&#128221; Notas:</strong><br>
+                {{ notas_adicionales|default:"Este es un recordatorio automatico generado por el sistema. Si ya completaste las tareas, puedes ignorar este mensaje." }}
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>{{ sistema_nombre }}</strong> - {{ cedis_nombre }}</p>
+            <p>Desarrollado por: {{ desarrollador }} - {{ desarrollador_cargo }}</p>
+        </div>
+    </div>
+</body>
+</html>

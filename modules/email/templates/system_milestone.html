@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hito del Sistema SAC</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 650px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, {{ color_primario }} 0%, #8B0000 100%);
+            color: white;
+            padding: 35px 25px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        .header .milestone-badge {
+            display: inline-block;
+            background-color: #FFD700;
+            color: #333;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .content {
+            padding: 30px;
+        }
+        .milestone-info {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid {{ color_primario }};
+        }
+        .milestone-info h2 {
+            color: {{ color_primario }};
+            margin: 0 0 15px 0;
+            font-size: 22px;
+        }
+        .info-grid {
+            display: table;
+            width: 100%;
+        }
+        .info-row {
+            display: table-row;
+        }
+        .info-label, .info-value {
+            display: table-cell;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            width: 40%;
+        }
+        .info-value {
+            color: #333;
+        }
+        .status-active {
+            display: inline-block;
+            background-color: {{ color_exito }};
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .features-section {
+            margin: 25px 0;
+        }
+        .features-section h3 {
+            color: {{ color_primario }};
+            border-bottom: 2px solid {{ color_primario }};
+            padding-bottom: 10px;
+        }
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .features-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        .features-list li:last-child {
+            border-bottom: none;
+        }
+        .feature-icon {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: {{ color_exito }};
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 15px;
+            font-size: 14px;
+        }
+        .schedule-section {
+            background-color: {{ color_info }};
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .schedule-section h3 {
+            color: #0056b3;
+            margin: 0 0 15px 0;
+        }
+        .schedule-grid {
+            display: table;
+            width: 100%;
+        }
+        .schedule-row {
+            display: table-row;
+        }
+        .schedule-time, .schedule-task {
+            display: table-cell;
+            padding: 8px 5px;
+        }
+        .schedule-time {
+            font-weight: bold;
+            color: {{ color_primario }};
+            width: 80px;
+        }
+        .alert-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .alert-box p {
+            margin: 0;
+            color: #856404;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 25px;
+            text-align: center;
+            border-top: 3px solid {{ color_primario }};
+        }
+        .footer p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 13px;
+        }
+        .footer .quote {
+            font-style: italic;
+            color: #888;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: {{ color_primario }};
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{ titulo_hito }}</h1>
+            <div class="milestone-badge">{{ tipo_hito }}</div>
+        </div>
+
+        <div class="content">
+            <div class="milestone-info">
+                <h2>{{ subtitulo_hito }}</h2>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <div class="info-label">Sistema:</div>
+                        <div class="info-value">{{ sistema_nombre }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">CEDIS:</div>
+                        <div class="info-value">{{ cedis_nombre }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Version:</div>
+                        <div class="info-value">{{ version_sistema }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Fecha de Activacion:</div>
+                        <div class="info-value">{{ fecha_activacion }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Estado:</div>
+                        <div class="info-value"><span class="status-active">{{ estado_sistema }}</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <p>{{ mensaje_hito }}</p>
+
+            <div class="features-section">
+                <h3>Funcionalidades Activas</h3>
+                <ul class="features-list">
+                    {{ lista_funcionalidades }}
+                </ul>
+            </div>
+
+            <div class="schedule-section">
+                <h3>Horarios de Ejecucion Automatica</h3>
+                <div class="schedule-grid">
+                    {{ tabla_horarios }}
+                </div>
+            </div>
+
+            <div class="alert-box">
+                <p><strong>Nota Importante:</strong> {{ nota_importante }}</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>{{ empresa }}</strong></p>
+            <p>{{ cedis_nombre }} - Region {{ region }}</p>
+            <p>Desarrollado por: {{ desarrollador }} ({{ desarrollador_cargo }})</p>
+            <p class="quote">"{{ lema }}"</p>
+            <p style="margin-top: 15px; font-size: 11px; color: #999;">
+                Generado: {{ fecha_hora_actual }}
+            </p>
+        </div>
+    </div>
+</body>
+</html>

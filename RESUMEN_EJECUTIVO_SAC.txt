@@ -1,0 +1,604 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                       RESUMEN EJECUTIVO - SISTEMA SAC                       ║
+║          Sistema de Automatización de Consultas v1.0.0                      ║
+║              CEDIS Cancún 427 - Tiendas Chedraui S.A. de C.V.              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+INFORMACIÓN DEL PROYECTO
+═════════════════════════════════════════════════════════════════════════════════
+
+Nombre:                Sistema SAC (Sistema de Automatización de Consultas)
+Versión:              1.0.0
+Organización:         Tiendas Chedraui S.A. de C.V.
+Centro de Dist.:      CEDIS Cancún 427
+Región:               Sureste
+Desarrollador Lead:   Julián Alexander Juárez Alvarado (ADMJAJA)
+Fecha de Análisis:    21 de Noviembre de 2025
+
+FILOSOFÍA DEL PROYECTO
+═════════════════════════════════════════════════════════════════════════════════
+
+    "Las máquinas y los sistemas al servicio de los analistas"
+    
+El sistema SAC fue desarrollado con dedicación para que el equipo de Planning
+tenga más tiempo para tomar decisiones inteligentes en lugar de realizar 
+validaciones manuales, reduciendo errores y acelerando procesos de suministro.
+
+
+OBJETIVO PRINCIPAL
+═════════════════════════════════════════════════════════════════════════════════
+
+Automatizar validación y monitoreo de Órdenes de Compra (OC) contra su
+distribución en el sistema Manhattan WMS (DB2), proporcionando:
+
+✓ Validación automática en tiempo real
+✓ Detección proactiva de 15+ tipos de errores
+✓ Reportes profesionales Excel con formato Chedraui
+✓ Alertas multi-canal (Email + Telegram + WhatsApp)
+✓ Monitoreo 24/7 mediante daemon automático
+
+
+ESTADÍSTICAS DEL CÓDIGO
+═════════════════════════════════════════════════════════════════════════════════
+
+Total de Líneas:        ~10,000 líneas Python
+Archivos Principales:   15+ módulos core
+Componentes:            30+ módulos especializados
+Tests:                  25+ archivos de test
+Documentación:          6 archivos README + análisis completo
+
+Archivo Principal:      maestro.py (1,141 líneas - Orquestador)
+Segundo Principal:      main.py (1,009 líneas - Interfaz)
+Monitoreo:             monitor.py (935 líneas)
+Email:                 gestor_correos.py (476 líneas)
+Telegram:              notificaciones_telegram.py (920 líneas)
+
+
+PUNTOS DE ENTRADA DEL SISTEMA
+═════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ OPCIÓN 1: INTERFAZ INTERACTIVA - main.py                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Uso:            python main.py                                             │
+│ Modo:           Menú interactivo con 10 opciones                           │
+│ Casos de uso:   Validación manual, reportes bajo demanda                   │
+│ Características:                                                            │
+│  • Menu interactivo con 10 opciones                                        │
+│  • Validar OC específica (--oc OC123)                                       │
+│  • Generar reporte diario (--reporte-diario)                               │
+│  • Enviar alertas manuales por Telegram                                    │
+│  • Ver estado del sistema                                                  │
+│  • Probar conexiones (DB2, Email, Telegram)                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ OPCIÓN 2: ORQUESTADOR CENTRAL - maestro.py (RECOMENDADO)                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Uso Daemon:     python maestro.py --daemon                                 │
+│ Modo:           Servicio continuo 24/7 con scheduler                       │
+│ Casos de uso:   Automatización completa de operaciones                     │
+│ Horarios:                                                                   │
+│  • 06:00 - Reporte matutino + Monitoreo                                    │
+│  • 09:00 - Validación de OC pendientes                                     │
+│  • 12:00 - Monitoreo de medio día                                          │
+│  • 15:00 - Validación preventiva                                           │
+│  • 18:00 - Reporte vespertino                                              │
+│  • 21:00 - Resumen del día                                                 │
+│  • CADA 15 MIN - Monitoreo continuo (24/7)                                 │
+│                                                                             │
+│ Opciones CLI:                                                              │
+│  • --daemon: Modo servicio continuo                                        │
+│  • --ejecutar-ahora: Ejecutar ciclo completo (35 min)                      │
+│  • --validar OC123: Validar OC específica                                   │
+│  • --reporte-diario: Generar reporte del día                               │
+│  • --status: Ver estado del sistema                                        │
+│  • --config: Mostrar configuración                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+ARQUITECTURA DEL SISTEMA
+═════════════════════════════════════════════════════════════════════════════════
+
+CAPA 1: PRESENTACIÓN
+    ├─ main.py (Interfaz interactiva)
+    └─ maestro.py (Orquestador central)
+          ↓
+CAPA 2: CONFIGURACIÓN
+    └─ config.py (Centralización de parámetros)
+          ↓
+CAPA 3: ACCESO A DATOS
+    ├─ modules/db_connection.py (DB2 Connection Pool)
+    ├─ modules/db_pool.py (Pool de conexiones)
+    └─ queries/ (Cargador de SQL)
+          ↓
+CAPA 4: LÓGICA DE NEGOCIO
+    ├─ monitor.py (MonitorTiempoReal + ValidadorProactivo)
+    ├─ modules/validators/ (Validadores específicos)
+    └─ modules/repositories/ (Acceso a datos por entidad)
+          ↓
+CAPA 5: PROCESAMIENTO
+    ├─ modules/reportes_excel.py (Generación de reportes)
+    ├─ modules/chart_generator.py (Gráficos)
+    └─ modules/pivot_generator.py (Tablas dinámicas)
+          ↓
+CAPA 6: SALIDA
+    ├─ gestor_correos.py (8 tipos de emails)
+    ├─ notificaciones_telegram.py (Alertas por Telegram)
+    └─ notificaciones_whatsapp.py (Alertas por WhatsApp - dev)
+
+
+CARACTERÍSTICAS PRINCIPALES
+═════════════════════════════════════════════════════════════════════════════════
+
+1. VALIDACIÓN AUTOMÁTICA DE OC
+   ├─ 7 validaciones base de MonitorTiempoReal
+   ├─ 10+ validaciones adicionales de ValidadorAvanzado
+   └─ Total: 15+ tipos de validaciones diferentes
+   
+2. MONITOREO EN TIEMPO REAL
+   ├─ Ejecución cada 15 minutos (modo daemon)
+   ├─ Detección de 15+ tipos de errores
+   ├─ Generación de alertas automáticas
+   └─ Severidad: CRÍTICO, ALTO, MEDIO, BAJO, INFO
+   
+3. REPORTES PROFESIONALES
+   ├─ 5+ tipos de reportes Excel
+   ├─ Formato corporativo Chedraui
+   ├─ Tablas dinámicas (pivot)
+   ├─ Gráficos (barras, pie, líneas)
+   └─ Auto-filter y estadísticas
+   
+4. NOTIFICACIONES MULTI-CANAL
+   ├─ Email: 8 tipos (planning, alertas, confirmaciones, etc.)
+   ├─ Telegram: Alertas inmediatas con rate limiting
+   ├─ WhatsApp: En desarrollo
+   └─ Logs: Sistema de logging con rotación automática
+   
+5. ORQUESTACIÓN AUTOMÁTICA
+   ├─ Scheduling de tareas programadas
+   ├─ Modo daemon con 24/7 monitoring
+   ├─ Ciclo completo ejecutable (35 min)
+   └─ Reset automático diario (contador de alertas)
+
+
+INTEGRACIÓN CON MANHATTAN WMS
+═════════════════════════════════════════════════════════════════════════════════
+
+Base de Datos:      IBM DB2 (Enterprise)
+Host:               WM260BASD
+Puerto:             50000
+Database:           WM260BASD
+Schema:             WMWHSE1 (Manhattan WMS)
+Driver:             IBM DB2 ODBC DRIVER / pyodbc
+
+Tablas Principales:
+├─ ORDERS: Cabecera de órdenes de compra
+├─ ORDERDETAIL: Detalle línea a línea
+├─ DISTRO: Distribuciones a tiendas
+├─ INBOUND: Recepciones
+├─ INVENTORY: Stock actual
+└─ LOCATION: Ubicaciones del almacén
+
+Características:
+• Retry automático con backoff exponencial
+• Connection pooling para eficiencia
+• Queries organizadas en 4 categorías
+• Soporte para templates Jinja2
+• Caché de queries cargadas
+
+
+CATEGORÍAS DE QUERIES SQL
+═════════════════════════════════════════════════════════════════════════════════
+
+OBLIGATORIAS (8 queries) - Ejecución diaria
+├─ oc_diarias.sql .................... OC ingresadas/modificadas hoy
+├─ oc_pendientes.sql ................. OC sin completar
+├─ oc_vencidas.sql ................... OC con vigencia expirada
+├─ asn_status.sql .................... Status de llegadas (ASN)
+├─ asn_pendientes.sql ................ ASN sin recibir
+├─ distribuciones_dia.sql ............ Distribuciones del día
+├─ inventario_resumen.sql ............ Inventario actual
+└─ recibo_programado.sql ............ Cronograma de recepciones
+
+PREVENTIVAS - Validaciones proactivas
+└─ Queries para detectar anomalías y OC en riesgo
+
+BAJO_DEMANDA (6 queries) - Búsquedas puntuales
+├─ buscar_oc.sql ..................... Detalles de OC específica
+├─ buscar_asn.sql .................... Detalles de ASN
+├─ buscar_lpn.sql .................... Datos de LPN (caja)
+├─ buscar_sku.sql .................... Información de producto
+├─ detalle_distribucion.sql ......... Distribuciones de una OC
+├─ historial_oc.sql .................. Movimientos históricos
+└─ movimientos_lpn.sql ............... Historial de LPN
+
+DDL - Data Definition Language
+├─ views/v_oc_summary.sql ........... Resumen OC con totales
+├─ views/v_asn_status.sql ........... Vista de ASN
+├─ views/v_distribution_totals.sql . Totales por distribución
+├─ procedures/sp_validate_oc.sql .... Validación en BD
+└─ procedures/sp_get_daily_report.sql Reporte del día
+
+
+TIPOS DE VALIDACIONES (15+)
+═════════════════════════════════════════════════════════════════════════════════
+
+VALIDACIONES CRÍTICAS (🔴)
+├─ CONEXION_DB: Conexión a DB2 activa
+├─ DISTRO_EXCEDENTE: Distribución > OC (!!!)
+├─ SIN_DISTRIBUCIONES: OC sin asignar
+├─ TIENDA_INACTIVA: Distribución a tienda cerrada
+├─ CAPACIDAD_EXCEDIDA: Almacén sobrecargado
+└─ PRESUPUESTO_EXCEDIDO: Monto > presupuesto disponible
+
+VALIDACIONES ALTAS (🟠)
+├─ OC_VENCIDA: Vigencia expirada
+├─ OC_NO_ENCONTRADA: No existe en BD
+├─ DISTRO_INCOMPLETA: Distribución < OC
+├─ ASN_NO_ENCONTRADO: ASN no existe
+├─ DOCUMENTACION_FALTANTE: Documentos requeridos ausentes
+└─ APROBACIONES_INCOMPLETAS: Faltan aprobaciones
+
+VALIDACIONES MEDIAS (🟡)
+├─ SKU_SIN_IP: Sin Inner Pack configurado
+├─ ASN_STATUS_INVALIDO: Status no reconocido
+├─ HORARIO_FUERA_OPERACION: Recibo fuera de horario
+└─ DATOS_NULOS: Campos requeridos vacíos
+
+VALIDACIONES BAJAS (🟢)
+├─ ASN_SIN_ACTUALIZACION: No actualizado hace días
+├─ SECUENCIA_OC_GAPS: Números faltantes
+└─ CAMBIO_DE_ESTADO: Informativo
+
+INFORMACIÓN (ℹ️)
+└─ OC_ALTA_PRIORIDAD: Requiere atención especial
+
+
+TIPOS DE REPORTES EXCEL
+═════════════════════════════════════════════════════════════════════════════════
+
+1. VALIDACIÓN OC vs DISTRIBUCIONES
+   ├─ Archivo: Validacion_OC_{OC}_{timestamp}.xlsx
+   ├─ Hojas: Validación OC + Estadísticas
+   ├─ Contenido: Datos, errores por severidad, gráficos
+   └─ Uso: Análisis individual de OC
+
+2. DISTRIBUCIONES POR OC
+   ├─ Archivo: Distribuciones_OC_{OC}_{timestamp}.xlsx
+   ├─ Hojas: Detalle + Pivot Tiendas + Pivot SKU
+   ├─ Contenido: Distribuciones desglosadas, análisis
+   └─ Uso: Análisis de tiendas y SKUs
+
+3. REPORTE PLANNING DIARIO
+   ├─ Archivo: Planning_Diario_427_{YYYYMMDD}.xlsx
+   ├─ Hojas: Resumen + OC + ASN + Errores
+   ├─ Contenido: Estadísticas del día, KPIs, tendencias
+   └─ Uso: Decisiones diarias de planning
+
+4. REPORTE DE ERRORES
+   ├─ Archivo: Errores_{timestamp}.xlsx
+   ├─ Hojas: Por Severidad + Timeline + Por Tipo
+   ├─ Contenido: Detalle de problemas, causas, soluciones
+   └─ Uso: Auditoria y mejora continua
+
+5. RECONCILIACIÓN
+   ├─ Archivo: Reconciliacion_{timestamp}.xlsx
+   ├─ Contenido: Validación de consistencia de datos
+   └─ Uso: Control de calidad
+
+
+TIPOS DE EMAILS (8)
+═════════════════════════════════════════════════════════════════════════════════
+
+1. REPORTE PLANNING DIARIO
+   Cuando:     Diariamente a las 06:00 y 18:00
+   Destinatarios: planning@chedraui.com.mx
+   Contenido:  OC del día + ASN + Estadísticas
+   Adjunto:    Excel con reporte completo
+
+2. ALERTA CRÍTICA
+   Cuando:     Inmediato (error CRÍTICO detectado)
+   Destinatarios: supervisor@chedraui.com.mx
+   Contenido:  Detalle del problema + solución
+   Adjunto:    Excel con listado de errores
+
+3. VALIDACIÓN OC
+   Cuando:     A demanda (validar OC)
+   Contenido:  Resultado de validación + status
+   Adjunto:    Reporte de validación
+
+4. PROGRAMA DE RECIBO
+   Cuando:     Diariamente a las 06:00
+   Contenido:  Cronograma de recepciones próximas
+   Adjunto:    Excel con cronograma
+
+5. RESUMEN SEMANAL
+   Cuando:     Viernes al cierre
+   Contenido:  Estadísticas acumuladas de la semana
+   Adjunto:    Excel con análisis semanal
+
+6. NOTIFICACIÓN DE ERROR
+   Cuando:     Inmediato (error detectado)
+   Contenido:  Detalle del problema + módulo + solución
+   Adjunto:    Documentación del error
+
+7. RECORDATORIO
+   Cuando:     Configurable
+   Contenido:  Tareas pendientes, OC a revisar
+   Adjunto:    Lista de pendientes
+
+8. CONFIRMACIÓN DE PROCESO
+   Cuando:     Post-ejecución
+   Contenido:  Resultado final + archivos generados
+   Adjunto:    Reportes generados
+
+
+ALERTAS POR TELEGRAM
+═════════════════════════════════════════════════════════════════════════════════
+
+Tipos (5):
+├─ 🔴 CRITICO: Acción inmediata requerida
+├─ 🟠 ALTO: Atención urgente
+├─ 🟡 MEDIO: Revisar
+├─ 🟢 BAJO: Informativo
+└─ ℹ️ INFO: Estado del sistema
+
+Características:
+• Rate limiter: 1 mensaje/segundo por chat
+• Respeta límites de API de Telegram
+• Retry automático en caso de fallo
+• Soporte para múltiples chat_ids
+
+Métodos:
+├─ enviar_alerta(): Alerta genérica con tipo
+├─ enviar_alerta_critica(): Alerta inmediata CRÍTICA
+├─ enviar_estado_sistema(): Status de conectividad
+├─ enviar_resumen_diario(): Resumen de OC/ASN
+└─ enviar_documento(): Enviar archivos/fotos
+
+
+ESTRUCTURA DE DIRECTORIOS
+═════════════════════════════════════════════════════════════════════════════════
+
+SAC_V01_427_ADMJAJA/
+│
+├─ Configuración & Core
+│  ├─ main.py (1,009 L) ...................... Interfaz principal
+│  ├─ maestro.py (1,141 L) ................... Orquestador central
+│  ├─ config.py (304 L) ...................... Config centralizada
+│  ├─ monitor.py (935 L) ..................... Monitoreo y validación
+│  └─ env / .env ............................ Variables de entorno
+│
+├─ Comunicaciones
+│  ├─ gestor_correos.py (476 L) ............. Gestor de emails
+│  ├─ notificaciones_telegram.py (920 L) ... Notificaciones Telegram
+│  └─ notificaciones_whatsapp.py (573 L) ... Notificaciones WhatsApp
+│
+├─ modules/
+│  ├─ db_connection.py ...................... Conexión a DB2
+│  ├─ db_pool.py ............................ Pool de conexiones
+│  ├─ reportes_excel.py ..................... Generador de reportes
+│  ├─ excel_styles.py ....................... Estilos corporativos
+│  ├─ chart_generator.py .................... Generador de gráficos
+│  ├─ pivot_generator.py .................... Tablas dinámicas
+│  ├─ query_builder.py ...................... Constructor de queries
+│  ├─ anomaly_detector.py ................... Detección de anomalías
+│  ├─ reconciliation.py ..................... Reconciliación de datos
+│  │
+│  ├─ email/ .............................. Sistema avanzado de email
+│  │  ├─ email_client.py
+│  │  ├─ template_engine.py
+│  │  ├─ queue.py
+│  │  └─ scheduler.py
+│  │
+│  ├─ validators/ ......................... Validadores específicos
+│  │  ├─ oc_validator.py
+│  │  ├─ distribution_validator.py
+│  │  ├─ asn_validator.py
+│  │  └─ ... (5+ más)
+│  │
+│  └─ repositories/ ....................... Acceso a datos por entidad
+│     ├─ oc_repository.py
+│     ├─ distribution_repository.py
+│     └─ asn_repository.py
+│
+├─ queries/
+│  ├─ query_loader.py ...................... Cargador de queries
+│  ├─ obligatorias/ (8 .sql) ............... Queries diarias
+│  ├─ preventivas/ ......................... Queries preventivas
+│  ├─ bajo_demanda/ (6 .sql) ............... Queries bajo demanda
+│  └─ ddl/ ................................. Vistas y procedures
+│
+├─ tests/ ................................ Suite de pruebas (25+ tests)
+├─ docs/ .................................. Documentación
+├─ output/
+│  ├─ logs/ ............................... Archivos de log
+│  └─ resultados/ ......................... Reportes generados
+│
+└─ Utilidades
+   ├─ verificar_sistema.py
+   ├─ ejemplos.py
+   ├─ build_exe.py
+   └─ instalar_sac.py
+
+
+OPERACIÓN DIARIA
+═════════════════════════════════════════════════════════════════════════════════
+
+MODO DAEMON (AUTOMÁTICO 24/7):
+
+    00:00 ┌─ RESET DIARIO
+          └─ Limpiar contadores
+
+    06:00 ┌─ REPORTE MATUTINO
+          ├─ Monitoreo inicial
+          ├─ Generar reporte Planning diario
+          ├─ Email a planning@
+          └─ Telegram con resumen
+
+    09:00 ┌─ VALIDACIÓN PENDIENTES
+          ├─ Ejecutar queries preventivas
+          ├─ Identificar OC en riesgo
+          └─ Telegram si hay críticos
+
+    12:00 ┌─ MONITOREO MEDIO DÍA
+          └─ Verificación rápida de status
+
+    15:00 ┌─ VALIDACIÓN PREVENTIVA
+          └─ Segunda onda del día
+
+    18:00 ┌─ REPORTE VESPERTINO
+          ├─ Generar reporte de tarde
+          ├─ Email con resumen
+          └─ Telegram con alertas
+
+    21:00 ┌─ RESUMEN DEL DÍA
+          ├─ Consolidar estadísticas
+          └─ Telegram con totales del día
+
+CADA 15 MIN ┌─ MONITOREO CONTINUO
+            ├─ Validación de conexión
+            ├─ Detección de errores
+            └─ Alertas inmediatas si CRÍTICO
+
+
+RENDIMIENTO Y ESCALABILIDAD
+═════════════════════════════════════════════════════════════════════════════════
+
+Ciclo Completo:      ~35 minutos (monitoreo + validación + reporte + resumen)
+Monitoreo Individual: ~5-10 segundos
+Validación OC:       ~2-5 segundos
+Reporte Excel:       ~10-15 segundos
+Envío Email:         ~2-3 segundos
+Envío Telegram:      ~1 segundo
+
+Conexión Pool:
+├─ Mínimo: 1 conexión
+├─ Máximo: 5 conexiones
+├─ Timeout adquisición: 30 segundos
+├─ Health check: Cada 60 segundos
+└─ Max lifetime: 1 hora
+
+Monitoreo Continuo:
+├─ Frecuencia: Cada 15 minutos
+├─ Timeout: 60 segundos (espera entre ciclos)
+├─ Memory footprint: <500 MB
+└─ CPU: <5% durante idle
+
+
+SEGURIDAD Y CREDENCIALES
+═════════════════════════════════════════════════════════════════════════════════
+
+Gestión de Credenciales:
+├─ Nunca en código (uso de variables de entorno)
+├─ Archivo .env (.gitignore)
+├─ Template env para referencia
+└─ Validación en startup
+
+Credenciales Requeridas:
+├─ DB2: DB_USER, DB_PASSWORD
+├─ Email: EMAIL_USER, EMAIL_PASSWORD
+├─ Telegram: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_IDS
+└─ Opcionales: TELEGRAM (deshabilitado por defecto)
+
+Validación:
+├─ validar_configuracion(): Verifica credenciales completas
+├─ Warnings si credenciales no configuradas
+└─ Modo DEMO automático si falta DB2
+
+Logs:
+├─ Almacenados en output/logs/
+├─ Rotación automática (10 MB, 5 backups)
+└─ Información sensible: Nunca en logs
+
+
+VENTAJAS DEL SISTEMA
+═════════════════════════════════════════════════════════════════════════════════
+
+PARA PLANNING:
+✓ Automatización de validaciones manuales
+✓ Detección inmediata de inconsistencias
+✓ Reportes profesionales listos para ejecutivos
+✓ Alertas automáticas antes de que sea tarde
+✓ Historial completo para análisis
+
+PARA OPERACIONES:
+✓ Reducción de errores (15+ validaciones automáticas)
+✓ Menos reclamaciones por distribución incorrecta
+✓ Mejor control de inventario
+✓ Visibilidad 24/7 del estado de OC y ASN
+✓ Preparación proactiva para recepciones
+
+PARA SISTEMAS:
+✓ Integración transparente con Manhattan WMS
+✓ Arquitectura modular y mantenible
+✓ Extensible (fácil agregar validaciones)
+✓ Pool de conexiones eficiente
+✓ Sistema de logging robusto
+
+PARA LA ORGANIZACIÓN:
+✓ Reducción de costos operativos
+✓ Mejora en cadena de suministro
+✓ Decisiones basadas en datos en tiempo real
+✓ Menos desperdicios y devoluciones
+✓ Mayor satisfacción del cliente
+
+
+ROADMAP Y FUTURO
+═════════════════════════════════════════════════════════════════════════════════
+
+PRÓXIMAS MEJORAS:
+├─ Dashboard Web (en desarrollo)
+├─ WhatsApp Notifications (en desarrollo)
+├─ Machine Learning para anomaly detection
+├─ API REST para integración externa
+├─ Historial completo en BD (auditoría)
+├─ Soporte para múltiples CEDIS
+├─ Sincronización con ERP corporativo
+└─ Mobile app para alertas
+
+
+INSTALACIÓN Y EJECUCIÓN
+═════════════════════════════════════════════════════════════════════════════════
+
+REQUISITOS:
+├─ Python 3.8+
+├─ PyODBC o IBM DB2 driver
+├─ Acceso a DB2 Manhattan WMS
+├─ Credenciales Email (Office 365)
+├─ Token de Telegram (opcional)
+└─ 500 MB RAM mínimo
+
+INSTALACIÓN:
+1. python instalar_sac.py
+2. Editar .env con credenciales
+3. python maestro.py --daemon
+
+EJECUCIÓN:
+├─ Interactivo: python main.py
+├─ Daemon: python maestro.py --daemon
+├─ Ciclo completo: python maestro.py --ejecutar-ahora
+├─ Validar OC: python maestro.py --validar OC123
+└─ Ver estado: python maestro.py --status
+
+
+CONCLUSIÓN
+═════════════════════════════════════════════════════════════════════════════════
+
+El Sistema SAC es una solución empresarial completa y robusta que automatiza
+validación de órdenes de compra en tiempo real, integrándose de forma nativa
+con Manhattan WMS para:
+
+    ✓ Automatizar validaciones de OC
+    ✓ Detectar errores antes de que causen problemas
+    ✓ Generar reportes profesionales automáticamente
+    ✓ Alertar al equipo en tiempo real
+    ✓ Proporcionar visibilidad 24/7
+
+Desarrollado con dedicación para que el equipo de Planning tenga más tiempo
+para tomar decisiones inteligentes en lugar de realizar validaciones manuales.
+
+El resultado: Operación más eficiente, menos errores, mejores decisiones.
+
+═════════════════════════════════════════════════════════════════════════════════

@@ -1,0 +1,141 @@
+-- ============================================
+-- VISTA: V_ASN_STATUS
+-- Estado de ASN (Advanced Shipping Notices)
+-- CATEGORÍA: DDL - Vista
+-- AUTOR: ADMJAJA
+-- FECHA: 2025-11-21
+-- VERSION: 1.0.0
+-- ============================================
+
+-- DESCRIPCIÓN:
+-- Vista que consolida el estado de todos los ASN
+-- con métricas de recibo, varianzas y alertas.
+
+-- PERMISOS REQUERIDOS:
+-- CREATE VIEW en schema WMWHSE1
+
+-- DEPENDENCIAS:
+-- - WMWHSE1.RECEIPT
+-- - WMWHSE1.RECEIPTDETAIL
+-- - WMWHSE1.SKU
+
+-- ============================================
+-- SCRIPT DE CREACIÓN
+-- ============================================
+
+-- Eliminar vista si existe
+DROP VIEW WMWHSE1.V_ASN_STATUS;
+
+-- Crear vista
+CREATE VIEW WMWHSE1.V_ASN_STATUS AS
+SELECT
+    -- Identificadores
+    r.RECEIPTKEY AS ASN_NUMERO,
+    r.EXTERNRECEIPTKEY AS ASN_EXTERNO,
+    r.STORERKEY AS ALMACEN,
+    r.POKEY AS OC_RELACIONADA,
+
+    -- Logística
+    r.CARRIERKEY AS TRANSPORTISTA,
+    r.TRAILERKEY AS TRAILER,
+    r.DOOR AS ANDEN,
+
+    -- Fechas
+    r.EXPECTEDRECEIPTDATE AS FECHA_ESPERADA,
+    r.RECEIPTDATE AS FECHA_RECIBO,
+    r.CLOSEDDATE AS FECHA_CIERRE,
+    r.ADDDATE AS FECHA_CREACION,
+    r.EDITDATE AS FECHA_MODIFICACION,
+
+    -- Estado
+    r.STATUS AS STATUS_CODE,
+    CASE r.STATUS
+        WHEN '0' THEN 'Creado'
+        WHEN '5' THEN 'En Tránsito'
+        WHEN '9' THEN 'Recibido Parcial'
+        WHEN '10' THEN 'Recibido'
+        WHEN '80' THEN 'Cerrado'
+        WHEN '95' THEN 'Cancelado'
+        ELSE 'Desconocido'
+    END AS STATUS_DESCRIPCION,
+
+    -- Métricas agregadas
+    COUNT(DISTINCT rd.RECEIPTLINENUMBER) AS TOTAL_LINEAS,
+    COUNT(DISTINCT rd.SKU) AS TOTAL_SKUS,
+    SUM(rd.QTYEXPECTED) AS QTY_ESPERADA_TOTAL,
+    SUM(COALESCE(rd.QTYRECEIVED, 0)) AS QTY_RECIBIDA_TOTAL,
+    SUM(rd.QTYEXPECTED) - SUM(COALESCE(rd.QTYRECEIVED, 0)) AS QTY_PENDIENTE_TOTAL,
+
+    -- Porcentaje de recibo
+    CASE
+        WHEN SUM(rd.QTYEXPECTED) > 0 THEN
+            ROUND((SUM(COALESCE(rd.QTYRECEIVED, 0)) / SUM(rd.QTYEXPECTED)) * 100, 2)
+        ELSE 0
+    END AS PORCENTAJE_RECIBIDO,
+
+    -- Análisis de varianzas
+    SUM(CASE WHEN COALESCE(rd.QTYRECEIVED, 0) > rd.QTYEXPECTED
+             THEN COALESCE(rd.QTYRECEIVED, 0) - rd.QTYEXPECTED ELSE 0 END) AS QTY_EXCEDENTE,
+    SUM(CASE WHEN COALESCE(rd.QTYRECEIVED, 0) < rd.QTYEXPECTED AND r.STATUS IN ('10', '80')
+             THEN rd.QTYEXPECTED - COALESCE(rd.QTYRECEIVED, 0) ELSE 0 END) AS QTY_FALTANTE,
+
+    -- Conteo de líneas con varianza
+    SUM(CASE WHEN COALESCE(rd.QTYRECEIVED, 0) > rd.QTYEXPECTED THEN 1 ELSE 0 END) AS LINEAS_EXCEDENTE,
+    SUM(CASE WHEN COALESCE(rd.QTYRECEIVED, 0) < rd.QTYEXPECTED AND r.STATUS IN ('10', '80')
+             THEN 1 ELSE 0 END) AS LINEAS_FALTANTE,
+
+    -- Indicadores de alerta
+    CASE
+        WHEN r.STATUS IN ('0', '5') AND r.EXPECTEDRECEIPTDATE < CURRENT_DATE THEN 'ATRASADO'
+        WHEN r.STATUS = '9' AND DATEDIFF(DAY, r.EDITDATE, CURRENT_DATE) > 3 THEN 'ESTANCADO'
+        WHEN r.STATUS = '80' AND SUM(COALESCE(rd.QTYRECEIVED, 0)) < SUM(rd.QTYEXPECTED) THEN 'CERRADO_INCOMPLETO'
+        WHEN r.STATUS = '95' THEN 'CANCELADO'
+        WHEN r.STATUS = '10' OR r.STATUS = '80' THEN 'COMPLETO'
+        ELSE 'EN_PROCESO'
+    END AS INDICADOR_ALERTA,
+
+    -- Días en proceso
+    DATEDIFF(DAY, r.ADDDATE, CURRENT_DATE) AS DIAS_DESDE_CREACION,
+    DATEDIFF(DAY, COALESCE(r.EDITDATE, r.ADDDATE), CURRENT_DATE) AS DIAS_SIN_MOVIMIENTO,
+
+    -- Auditoría
+    r.ADDWHO AS CREADO_POR,
+    r.EDITWHO AS MODIFICADO_POR,
+    r.NOTES AS NOTAS
+
+FROM
+    WMWHSE1.RECEIPT r
+    LEFT JOIN WMWHSE1.RECEIPTDETAIL rd ON r.RECEIPTKEY = rd.RECEIPTKEY
+
+GROUP BY
+    r.RECEIPTKEY,
+    r.EXTERNRECEIPTKEY,
+    r.STORERKEY,
+    r.POKEY,
+    r.CARRIERKEY,
+    r.TRAILERKEY,
+    r.DOOR,
+    r.EXPECTEDRECEIPTDATE,
+    r.RECEIPTDATE,
+    r.CLOSEDDATE,
+    r.ADDDATE,
+    r.EDITDATE,
+    r.STATUS,
+    r.ADDWHO,
+    r.EDITWHO,
+    r.NOTES;
+
+-- ============================================
+-- GRANT DE PERMISOS
+-- ============================================
+
+GRANT SELECT ON WMWHSE1.V_ASN_STATUS TO PUBLIC;
+
+-- ============================================
+-- COMENTARIOS
+-- ============================================
+
+COMMENT ON TABLE WMWHSE1.V_ASN_STATUS IS 'Vista de estado de ASN - Sistema SAC';
+COMMENT ON COLUMN WMWHSE1.V_ASN_STATUS.INDICADOR_ALERTA IS 'Estado de alerta: ATRASADO, ESTANCADO, CERRADO_INCOMPLETO, CANCELADO, COMPLETO, EN_PROCESO';
+COMMENT ON COLUMN WMWHSE1.V_ASN_STATUS.QTY_EXCEDENTE IS 'Cantidad total recibida de más';
+COMMENT ON COLUMN WMWHSE1.V_ASN_STATUS.QTY_FALTANTE IS 'Cantidad total no recibida en ASN cerrados';

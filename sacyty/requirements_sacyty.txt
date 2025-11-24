@@ -1,0 +1,51 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# SACYTY - Dependencias Mínimas
+# Sistema de Automatización Chedraui - Modelo TinY
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Este archivo contiene las dependencias MÍNIMAS necesarias para ejecutar SACYTY
+# en dispositivos con recursos limitados.
+#
+# Instalación:
+#   pip install -r requirements_sacyty.txt
+#
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# DEPENDENCIAS ESENCIALES (Requeridas)
+# ─────────────────────────────────────────────────────────────────────────────
+# Carga de variables de entorno
+python-dotenv>=1.0.0
+
+# DEPENDENCIAS OPCIONALES (Recomendadas)
+# ─────────────────────────────────────────────────────────────────────────────
+# Procesamiento de datos - Instalar para funcionalidad completa
+pandas>=2.0.0
+
+# Generación de reportes Excel
+openpyxl>=3.1.0
+
+# DRIVERS DE BASE DE DATOS (Según plataforma)
+# ─────────────────────────────────────────────────────────────────────────────
+# Windows: Usar pyodbc con IBM DB2 ODBC Driver
+# pyodbc>=5.0.1
+
+# Linux/Mac: Usar ibm_db
+# ibm-db>=3.2.3
+
+# NOTAS DE INSTALACIÓN
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. Para instalación mínima (sin pandas/openpyxl):
+#    pip install python-dotenv
+#
+# 2. Para instalación completa con reportes:
+#    pip install -r requirements_sacyty.txt
+#
+# 3. Para Windows con DB2:
+#    pip install pyodbc
+#    (Requiere IBM DB2 ODBC Driver instalado)
+#
+# 4. Para Linux/Mac con DB2:
+#    pip install ibm-db
+#    (Requiere clidriver de IBM)
+#
+# ═══════════════════════════════════════════════════════════════════════════════

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificacion de Error - {{ cedis_nombre }}</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 700px; margin: 0 auto; background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #fd7e14 0%, #e65c00 100%); color: white; padding: 30px; text-align: center; }
+        .header .icon { font-size: 40px; margin-bottom: 10px; }
+        .header h1 { margin: 0 0 10px 0; font-size: 24px; }
+        .header p { margin: 5px 0; opacity: 0.95; }
+        .content { padding: 30px; }
+        .error-details { background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 10px; padding: 25px; margin: 20px 0; }
+        .error-details h3 { margin: 0 0 15px 0; color: #856404; font-size: 16px; }
+        .error-code { font-family: 'Courier New', monospace; background-color: #f8f9fa; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #fd7e14; overflow-x: auto; }
+        .info-table { width: 100%; margin: 20px 0; border-collapse: collapse; }
+        .info-table td { padding: 10px 12px; border-bottom: 1px solid #e0e0e0; }
+        .info-table td:first-child { font-weight: bold; width: 150px; color: #555; background-color: #f8f9fa; }
+        .severity-badge { display: inline-block; padding: 6px 14px; border-radius: 15px; font-weight: 600; font-size: 12px; text-transform: uppercase; }
+        .severity-alto { background-color: #fd7e14; color: white; }
+        .severity-medio { background-color: #ffc107; color: #333; }
+        .severity-bajo { background-color: #17a2b8; color: white; }
+        .steps-box { background-color: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .steps-box h4 { margin: 0 0 15px 0; color: #333; }
+        .steps-box ol { margin: 0; padding-left: 20px; }
+        .steps-box li { margin: 8px 0; color: #555; }
+        .context-box { background-color: #e7f3ff; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #0066cc; }
+        .context-box h4 { margin: 0 0 10px 0; color: #004085; }
+        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #e0e0e0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">&#9888;</div>
+            <h1>NOTIFICACION DE ERROR</h1>
+            <p>{{ sistema_nombre }} - {{ cedis_nombre }}</p>
+            <p>{{ fecha_hora_actual }}</p>
+        </div>
+
+        <div class="content">
+            <div class="error-details">
+                <h3>&#128270; Detalle del Error</h3>
+                <p><strong>Tipo:</strong> {{ tipo_error|default:"Error no especificado" }}</p>
+                <p><strong>Mensaje:</strong> {{ mensaje_error|default:"Sin mensaje de error" }}</p>
+            </div>
+
+            <table class="info-table">
+                <tr>
+                    <td>Severidad:</td>
+                    <td><span class="severity-badge severity-{{ severidad_clase|default:'medio' }}">{{ severidad|default:"MEDIO" }}</span></td>
+                </tr>
+                <tr>
+                    <td>Modulo:</td>
+                    <td>{{ modulo_origen|default:"No especificado" }}</td>
+                </tr>
+                <tr>
+                    <td>Fecha/Hora:</td>
+                    <td>{{ fecha_hora_actual }}</td>
+                </tr>
+                <tr>
+                    <td>ID Error:</td>
+                    <td><code>{{ error_id|default:"N/A" }}</code></td>
+                </tr>
+                {{ info_adicional }}
+            </table>
+
+            <div class="error-code">
+                <strong>Stack Trace / Detalles Tecnicos:</strong>
+                <pre style="margin: 10px 0 0 0; white-space: pre-wrap; word-wrap: break-word;">{{ stack_trace|default:"No disponible" }}</pre>
+            </div>
+
+            <div class="steps-box">
+                <h4>&#9881; Pasos para Resolver</h4>
+                <ol>
+                    {{ pasos_resolver|default:"<li>Revisar los logs del sistema para mas detalles</li><li>Verificar la configuracion del modulo afectado</li><li>Contactar a Sistemas si el error persiste</li>" }}
+                </ol>
+            </div>
+
+            <div class="context-box">
+                <h4>&#128203; Contexto Adicional</h4>
+                <p>{{ contexto_adicional|default:"Este error fue detectado automaticamente por el sistema de monitoreo. Si el problema persiste, contacte al equipo de sistemas." }}</p>
+            </div>
+
+            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                <p style="margin: 0; font-size: 13px; color: #666;">
+                    <strong>Nota:</strong> Este error ha sido registrado automaticamente en el sistema de logs.
+                    El equipo de sistemas sera notificado si el error ocurre con frecuencia.
+                </p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>{{ sistema_nombre }}</strong> - Sistema de Monitoreo</p>
+            <p>Desarrollado por: {{ desarrollador }} - {{ desarrollador_cargo }}</p>
+        </div>
+    </div>
+</body>
+</html>

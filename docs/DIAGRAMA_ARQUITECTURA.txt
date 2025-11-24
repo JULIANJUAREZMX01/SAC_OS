@@ -1,0 +1,181 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                    ARQUITECTURA DEL SISTEMA SAC v1.0.0                         ║
+║                   Sistema de Automatización de Consultas                        ║
+║                      CEDIS Chedraui Cancún - 427                               ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           CAPA DE ENTRADA (Entry Points)                        │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│  ┌──────────────┐  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐        │
+│  │   main.py   │  │ monitor.py  │  │ dashboard.py │  │ examples.py  │        │
+│  │  (CLI/Menu) │  │ (Real-time) │  │   (Flask)    │  │ (Tutorials)  │        │
+│  └──────┬───────┘  └─────────────┘  └──────────────┘  └──────────────┘        │
+│         │                                                                       │
+└─────────┼───────────────────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                     CAPA DE CONFIGURACIÓN (config.py)                           │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │  DB_CONFIG   │  │EMAIL_CONFIG  │  │ CEDIS config │  │ PATHS config │      │
+│  │   (DB2)      │  │ (Office365)  │  │  (427)       │  │ (Directories)│      │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                        │
+│  │ TELEGRAM_CFG │  │ LOGGING_CFG  │  │SYSTEM_CONFIG │                        │
+│  │    (Bot)     │  │    (Logs)    │  │ (version)    │                        │
+│  └──────────────┘  └──────────────┘  └──────────────┘                        │
+└─────────────────────────────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                        CAPA DE LÓGICA DE NEGOCIO                               │
+├───────────────────────────┬───────────────────────┬──────────────────────────────┤
+│                           │                       │                              │
+│  ┌──────────────────────┐ │ ┌──────────────────┐ │ ┌────────────────────────┐  │
+│  │   monitor.py         │ │ │ query_loader.py  │ │ │ modules/db_*.py        │  │
+│  ├──────────────────────┤ │ ├──────────────────┤ │ ├────────────────────────┤  │
+│  │ • MonitorTiempoReal  │ │ │ • QueryLoader    │ │ │ • db_connection        │  │
+│  │ • 15+ validaciones   │ │ │ • QueryCategory  │ │ │ • db_pool              │  │
+│  │ • ErrorSeverity      │ │ │ • Caché queries  │ │ │ • db_local (SQLite)    │  │
+│  │ • ErrorDetectado     │ │ │ • Parámetros     │ │ │ • query_builder        │  │
+│  │ • ValidadorProactivo │ │ │ • Jinja2         │ │ │ • repositories         │  │
+│  └──────────────────────┘ │ └──────────────────┘ │ └────────────────────────┘  │
+│                           │                       │                              │
+└───────────────────────────┴───────────────────────┴──────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                        CAPA DE INTEGRACIÓN                                      │
+├────────────────────────┬──────────────────┬──────────────────┬──────────────────┤
+│                        │                  │                  │                  │
+│   REPORTES EXCEL       │   EMAIL          │    TELEGRAM      │    DATABASE      │
+│   ┌────────────────┐   │ ┌──────────────┐ │ ┌──────────────┐ │ ┌────────────┐  │
+│   │reportes_excel  │   │ │gestorCorreos │ │ │notificaciones│ │ │  DB2/WMS   │  │
+│   │────────────────│   │ │──────────────│ │ │──────────────│ │ │────────────│  │
+│   │ • 10+ reports  │   │ │ • 8 tipos    │ │ │ • Crítico    │ │ │• Manhattan │  │
+│   │ • Excel xlsx   │   │ │ • Templates  │ │ │ • Alertas    │ │ │• WMWHSE1   │  │
+│   │ • Gráficos     │   │ │ • Queue      │ │ │ • Resumen    │ │ │• OC/ASN    │  │
+│   │ • Pivots       │   │ │ • Scheduler  │ │ │ • Bot API    │ │ │• Distro    │  │
+│   │ • Estilos      │   │ │ • Recipients │ │ │              │ │ │            │  │
+│   └────────────────┘   │ └──────────────┘ │ └──────────────┘ │ └────────────┘  │
+│                        │                  │                  │                  │
+└────────────────────────┴──────────────────┴──────────────────┴──────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                        CAPA DE DATOS (Queries)                                  │
+├──────────────────────┬─────────────────────┬──────────────────────┬──────────────┤
+│                      │                     │                      │              │
+│  OBLIGATORIAS (8)    │  PREVENTIVAS (8)    │  BAJO DEMANDA (8)    │  DDL/Views  │
+│  ────────────────    │  ──────────────     │  ────────────────    │  ──────────  │
+│  • oc_diarias        │ • distribuciones    │ • buscar_oc          │ • Procedures│
+│  • oc_pendientes     │   _excedentes       │ • buscar_asn         │ • Views     │
+│  • oc_vencidas       │ • distribuciones    │ • buscar_lpn         │ • Triggers  │
+│  • asn_pendientes    │   _incompletas      │ • buscar_sku         │ • Índices   │
+│  • asn_status        │ • asn_sin_actualizar│ • detalle_distribucion           │
+│  • distribuciones_dia│ • oc_por_vencer     │ • historial_oc                   │
+│  • inventario_resumen│ • sku_sin_innerpack │ • movimientos_lpn                │
+│  • recibo_programado │ • ubicaciones_llenas│ • auditoria_usuario              │
+│                      │ • usuarios_inactivos│                                  │
+└──────────────────────┴─────────────────────┴──────────────────────┴──────────────┘
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                            FLUJO DE DATOS PRINCIPAL                             ║
+╠════════════════════════════════════════════════════════════════════════════════╣
+
+1. VALIDACIÓN DE OC:
+   └─→ main.py --oc OC123456
+       ├─→ monitor.validar_oc_existente()
+       ├─→ monitor.validar_distribuciones()
+       ├─→ monitor.validar_asn()
+       ├─→ monitor.validar_errores_excel()
+       ├─→ si CRÍTICO → notificaciones_telegram.enviar_alerta()
+       ├─→ gestor_correos.enviar_alerta_critica()
+       ├─→ reportes_excel.crear_reporte_validacion_oc()
+       └─→ guardar en output/resultados/
+
+2. REPORTE DIARIO:
+   └─→ main.py --reporte-diario
+       ├─→ query_loader.load_query('oc_diarias')
+       ├─→ db_connection.execute_query()
+       ├─→ query_loader.load_query('asn_pendientes')
+       ├─→ reportes_excel.crear_reporte_planning_diario()
+       ├─→ gestor_correos.enviar_reporte_planning_diario()
+       ├─→ notificaciones_telegram.enviar_resumen_diario()
+       └─→ guardar en output/resultados/
+
+3. MONITOREO EN TIEMPO REAL:
+   └─→ monitor.py (ejecución continua)
+       ├─→ cada 15 minutos
+       │   ├─→ ejecutar queries preventivas
+       │   ├─→ buscar errores CRÍTICO
+       │   └─→ generar alertas
+       ├─→ cada hora
+       │   ├─→ sincronizar caché local
+       │   └─→ actualizar dashboard
+       └─→ dashboard.py actualiza en tiempo real
+
+4. DASHBOARD WEB:
+   └─→ python dashboard.py (http://localhost:5000)
+       ├─→ db_local.DBLocal (caché)
+       ├─→ datos actualizados cada 5 minutos
+       ├─→ visualización de OCs
+       ├─→ métricas en tiempo real
+       └─→ histórico de validaciones
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                        MÓDULOS DE APOYO (Utilities)                            ║
+╠════════════════════════════════════════════════════════════════════════════════╣
+
+┌──────────────────┐ ┌──────────────────┐ ┌──────────────────┐ ┌──────────────┐
+│  verificar_      │ │    examples.py   │ │  modulo_*.py     │ │ export_*.py  │
+│  sistema.py      │ │                  │ │                  │ │              │
+├──────────────────┤ ├──────────────────┤ ├──────────────────┤ ├──────────────┤
+│ • Verificar      │ │ • 6 ejemplos     │ │ • cartones       │ │• Exportar    │
+│   estructura     │ │ • Tutorial       │ │ • lpn            │ │  Excel       │
+│ • Imports        │ │ • Workflow       │ │ • ubicaciones    │ │• Exportar    │
+│ • Configuración  │ │                  │ │ • usuarios       │ │  PDF         │
+│ • DB2 Conexión   │ │                  │ │                  │ │• Exportar    │
+│ • Email Config   │ │                  │ │                  │ │  CSV         │
+└──────────────────┘ └──────────────────┘ └──────────────────┘ └──────────────┘
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                      ÍNDICES DE COMPLEJIDAD POR ARCHIVO                        ║
+╠════════════════════════════════════════════════════════════════════════════════╣
+
+Rango complejidad: BAJO (simples) → MEDIO (modulares) → ALTO (orquestación)
+
+BAJO (Utilidades simples):
+├─ config.py (12KB) - Configuración simple
+├─ verificar_sistema.py (15KB) - Validación
+├─ examples.py (19KB) - Tutoriales
+
+MEDIO (Módulos especializados):
+├─ modulo_cartones.py (21KB)
+├─ modulo_lpn.py (18KB)
+├─ modulo_ubicaciones.py (18KB)
+├─ modulo_usuarios.py (17KB)
+├─ query_builder.py (29KB)
+├─ export_manager.py (18KB)
+├─ exportar_pdf.py (21KB)
+└─ modules/email/* (múltiples)
+
+ALTO (Lógica central):
+├─ main.py (18KB) - Orquestador principal
+├─ monitor.py (29KB) - Sistema de validaciones
+├─ gestor_correos.py (31KB) - Sistema de notificaciones
+├─ modules/db_connection.py (43KB) - Gestión de conexiones
+├─ modules/reportes_excel.py (53KB) - Generación de reportes
+└─ dashboard.py (Web UI)
+
+MUY ALTO (Infraestructura):
+├─ modules/db_pool.py (23KB) - Pool de conexiones
+├─ modules/db_local.py (31KB) - Base de datos local
+├─ modules/db_schema.py (22KB) - Esquema de datos
+├─ modules/excel_styles.py (22KB)
+├─ modules/chart_generator.py (19KB)
+├─ modules/pivot_generator.py (19KB)
+└─ queries/query_loader.py (29KB)
+

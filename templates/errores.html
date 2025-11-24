@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% block title %}Registro de Errores{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-exclamation-triangle text-danger"></i> Registro de Errores</h2>
+
+<!-- Filters -->
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label">Severidad</label>
+                <select name="severidad" class="form-select">
+                    <option value="">Todas</option>
+                    <option value="CRÍTICO" {% if filtro_severidad == 'CRÍTICO' %}selected{% endif %}>Crítico</option>
+                    <option value="ALTO" {% if filtro_severidad == 'ALTO' %}selected{% endif %}>Alto</option>
+                    <option value="MEDIO" {% if filtro_severidad == 'MEDIO' %}selected{% endif %}>Medio</option>
+                    <option value="BAJO" {% if filtro_severidad == 'BAJO' %}selected{% endif %}>Bajo</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Estado</label>
+                <select name="pendientes" class="form-select">
+                    <option value="0" {% if not filtro_pendientes %}selected{% endif %}>Todos</option>
+                    <option value="1" {% if filtro_pendientes %}selected{% endif %}>Solo pendientes</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Módulo</label>
+                <select name="modulo" class="form-select">
+                    <option value="">Todos</option>
+                    {% for m in modulos %}
+                    <option value="{{ m }}" {% if filtro_modulo == m %}selected{% endif %}>{{ m }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-danger w-100">
+                    <i class="bi bi-filter me-1"></i>Filtrar
+                </button>
+            </div>
+            <div class="col-md-4 text-end">
+                <span class="text-muted me-3">
+                    <strong>{{ errores|length }}</strong> errores encontrados
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Severity Summary -->
+<div class="row g-3 mb-3">
+    <div class="col">
+        <div class="card border-danger">
+            <div class="card-body py-2 text-center">
+                <h4 class="mb-0 text-danger" id="countCritico">{{ stats.criticos }}</h4>
+                <small class="text-muted">Críticos</small>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card border-warning">
+            <div class="card-body py-2 text-center">
+                <h4 class="mb-0 text-warning" id="countAlto">{{ stats.altos }}</h4>
+                <small class="text-muted">Altos</small>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card">
+            <div class="card-body py-2 text-center">
+                <h4 class="mb-0" id="countMedio">{{ stats.medios }}</h4>
+                <small class="text-muted">Medios</small>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card border-success">
+            <div class="card-body py-2 text-center">
+                <h4 class="mb-0 text-success" id="countBajo">{{ stats.bajos }}</h4>
+                <small class="text-muted">Bajos</small>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-light">
+            <div class="card-body py-2 text-center">
+                <h4 class="mb-0" id="countPendientes">{{ stats.pendientes }}</h4>
+                <small class="text-muted">Pendientes</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Errors Table -->
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th width="50">ID</th>
+                    <th width="150">Fecha</th>
+                    <th>Tipo</th>
+                    <th width="100">Severidad</th>
+                    <th>Mensaje</th>
+                    <th width="120">Módulo</th>
+                    <th width="80">OC</th>
+                    <th width="100">Estado</th>
+                    <th width="80">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in errores %}
+                <tr class="{% if not e.resuelto %}table-warning{% endif %}">
+                    <td>{{ e.id }}</td>
+                    <td><small>{{ e.fecha }}</small></td>
+                    <td><strong>{{ e.tipo_error }}</strong></td>
+                    <td>
+                        {% if 'CRÍTICO' in e.severidad %}
+                            <span class="badge bg-danger">Crítico</span>
+                        {% elif 'ALTO' in e.severidad %}
+                            <span class="badge bg-warning text-dark">Alto</span>
+                        {% elif 'MEDIO' in e.severidad %}
+                            <span class="badge bg-info">Medio</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ e.severidad }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span title="{{ e.mensaje }}">
+                            {{ e.mensaje[:60] }}{% if e.mensaje|length > 60 %}...{% endif %}
+                        </span>
+                    </td>
+                    <td><code>{{ e.modulo }}</code></td>
+                    <td>
+                        {% if e.oc_relacionada %}
+                            <a href="/validar?oc={{ e.oc_relacionada }}">{{ e.oc_relacionada[:12] }}</a>
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if e.resuelto %}
+                            <span class="badge bg-success">Resuelto</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Pendiente</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not e.resuelto %}
+                        <button class="btn btn-sm btn-outline-success" onclick="marcarResuelto({{ e.id }})" title="Marcar como resuelto">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                        {% endif %}
+                        <button class="btn btn-sm btn-outline-info" onclick="verDetalles({{ e.id }})" title="Ver detalles">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9" class="text-center text-muted py-5">
+                        <i class="bi bi-check-circle display-4 text-success d-block mb-3"></i>
+                        No hay errores registrados
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detallesModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-info-circle me-2"></i>Detalles del Error</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detallesContent">
+                <!-- Content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const detallesModal = new bootstrap.Modal(document.getElementById('detallesModal'));
+
+    async function marcarResuelto(errorId) {
+        if (!confirm('¿Marcar este error como resuelto?')) return;
+
+        try {
+            const response = await fetch(`/api/errores/${errorId}/resolver`, {
+                method: 'POST'
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                showToast('Error marcado como resuelto', 'success');
+                location.reload();
+            } else {
+                showToast('Error: ' + data.error, 'error');
+            }
+        } catch (error) {
+            showToast('Error de conexión', 'error');
+        }
+    }
+
+    async function verDetalles(errorId) {
+        try {
+            const response = await fetch(`/api/errores/${errorId}`);
+            const data = await response.json();
+
+            let html = `
+                <table class="table table-bordered">
+                    <tr><th width="150">ID</th><td>${data.id}</td></tr>
+                    <tr><th>Tipo</th><td><strong>${data.tipo_error}</strong></td></tr>
+                    <tr><th>Severidad</th><td>${data.severidad}</td></tr>
+                    <tr><th>Fecha</th><td>${data.fecha}</td></tr>
+                    <tr><th>Módulo</th><td><code>${data.modulo}</code></td></tr>
+                    <tr><th>OC Relacionada</th><td>${data.oc_relacionada || '-'}</td></tr>
+                    <tr><th>Mensaje</th><td>${data.mensaje}</td></tr>
+                    <tr><th>Solución Sugerida</th><td>${data.solucion_aplicada || 'No especificada'}</td></tr>
+                    <tr><th>Estado</th><td>${data.resuelto ? '<span class="badge bg-success">Resuelto</span>' : '<span class="badge bg-warning">Pendiente</span>'}</td></tr>
+                </table>
+            `;
+
+            if (data.detalles_json) {
+                html += `
+                    <h6 class="mt-3">Datos Adicionales</h6>
+                    <pre class="bg-light p-3 rounded"><code>${JSON.stringify(JSON.parse(data.detalles_json), null, 2)}</code></pre>
+                `;
+            }
+
+            document.getElementById('detallesContent').innerHTML = html;
+            detallesModal.show();
+        } catch (error) {
+            showToast('Error al cargar detalles', 'error');
+        }
+    }
+</script>
+{% endblock %}

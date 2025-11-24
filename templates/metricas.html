@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+{% block title %}Métricas del Sistema{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-graph-up text-danger"></i> Métricas del Sistema</h2>
+
+<!-- Period Selector -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label class="col-form-label">Período de análisis:</label>
+            </div>
+            <div class="col-auto">
+                <select name="dias" class="form-select" onchange="this.form.submit()">
+                    <option value="7" {% if periodo == 7 %}selected{% endif %}>Últimos 7 días</option>
+                    <option value="14" {% if periodo == 14 %}selected{% endif %}>Últimos 14 días</option>
+                    <option value="30" {% if periodo == 30 %}selected{% endif %}>Últimos 30 días</option>
+                    <option value="60" {% if periodo == 60 %}selected{% endif %}>Últimos 60 días</option>
+                    <option value="90" {% if periodo == 90 %}selected{% endif %}>Últimos 90 días</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-outline-secondary" onclick="refreshData()">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Main Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="bi bi-check-circle display-4 text-primary"></i>
+                <h2 class="mt-2 mb-0">{{ estadisticas.validaciones.total_validaciones or 0 }}</h2>
+                <p class="text-muted mb-0">Total Validaciones</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="bi bi-percent display-4 text-success"></i>
+                <h2 class="mt-2 mb-0">{{ "%.1f"|format(estadisticas.tasa_exito) }}%</h2>
+                <p class="text-muted mb-0">Tasa de Éxito</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="bi bi-exclamation-triangle display-4 text-danger"></i>
+                <h2 class="mt-2 mb-0">{{ estadisticas.errores.total or 0 }}</h2>
+                <p class="text-muted mb-0">Total Errores</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="bi bi-box-seam display-4 text-info"></i>
+                <h2 class="mt-2 mb-0">{{ estadisticas.validaciones.oc_unicas or 0 }}</h2>
+                <p class="text-muted mb-0">OCs Únicas</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-3 mb-4">
+    <div class="col-md-8">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Validaciones por Día</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="validacionesChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Distribución de Resultados</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="resultadosChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Tiempo de Ejecución</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="tiempoChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-exclamation-circle me-2"></i>Errores por Severidad</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="erroresChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Stats Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-table me-2"></i>Métricas Diarias Detalladas</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Fecha</th>
+                    <th class="text-center">Validaciones</th>
+                    <th class="text-center">Exitosas</th>
+                    <th class="text-center">Fallidas</th>
+                    <th class="text-center">Errores</th>
+                    <th class="text-center">Críticos</th>
+                    <th class="text-center">Tiempo Prom.</th>
+                    <th class="text-center">Alertas</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in metricas %}
+                <tr>
+                    <td><strong>{{ m.fecha }}</strong></td>
+                    <td class="text-center">{{ m.total_validaciones }}</td>
+                    <td class="text-center text-success">{{ m.validaciones_exitosas }}</td>
+                    <td class="text-center text-danger">{{ m.validaciones_fallidas }}</td>
+                    <td class="text-center">{{ m.total_errores }}</td>
+                    <td class="text-center">
+                        {% if m.errores_criticos > 0 %}
+                            <span class="badge bg-danger">{{ m.errores_criticos }}</span>
+                        {% else %}
+                            <span class="text-muted">0</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">{{ "%.2f"|format(m.tiempo_promedio) }}s</td>
+                    <td class="text-center">{{ m.alertas_enviadas }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">
+                        No hay datos para el período seleccionado
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const metricas = {{ metricas_json|safe }};
+    const estadisticas = {{ estadisticas_json|safe }};
+
+    // Validaciones Chart
+    new Chart(document.getElementById('validacionesChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: metricas.map(m => m.fecha),
+            datasets: [{
+                label: 'Exitosas',
+                data: metricas.map(m => m.validaciones_exitosas),
+                backgroundColor: 'rgba(40, 167, 69, 0.8)'
+            }, {
+                label: 'Fallidas',
+                data: metricas.map(m => m.validaciones_fallidas),
+                backgroundColor: 'rgba(220, 53, 69, 0.8)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { stacked: true },
+                y: { stacked: true, beginAtZero: true }
+            }
+        }
+    });
+
+    // Results Pie Chart
+    const totalExitosas = metricas.reduce((sum, m) => sum + m.validaciones_exitosas, 0);
+    const totalFallidas = metricas.reduce((sum, m) => sum + m.validaciones_fallidas, 0);
+
+    new Chart(document.getElementById('resultadosChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Exitosas', 'Con Errores'],
+            datasets: [{
+                data: [totalExitosas, totalFallidas],
+                backgroundColor: ['#28a745', '#dc3545']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // Time Chart
+    new Chart(document.getElementById('tiempoChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: metricas.map(m => m.fecha),
+            datasets: [{
+                label: 'Tiempo promedio (s)',
+                data: metricas.map(m => m.tiempo_promedio),
+                borderColor: '#E31837',
+                backgroundColor: 'rgba(227, 24, 55, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // Errors Chart
+    new Chart(document.getElementById('erroresChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: metricas.map(m => m.fecha),
+            datasets: [{
+                label: 'Total Errores',
+                data: metricas.map(m => m.total_errores),
+                borderColor: '#ffc107',
+                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                fill: true
+            }, {
+                label: 'Críticos',
+                data: metricas.map(m => m.errores_criticos),
+                borderColor: '#dc3545',
+                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    function refreshData() {
+        location.reload();
+    }
+</script>
+{% endblock %}

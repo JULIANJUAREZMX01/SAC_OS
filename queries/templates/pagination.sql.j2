@@ -1,0 +1,73 @@
+{#
+═══════════════════════════════════════════════════════════════
+TEMPLATE: Paginación para Queries Grandes
+Sistema SAC - CEDIS Chedraui Cancún 427
+═══════════════════════════════════════════════════════════════
+
+Template para agregar paginación a queries grandes.
+Soporta sintaxis DB2 con OFFSET/FETCH.
+
+Variables disponibles:
+- page: Número de página (1-based)
+- page_size: Registros por página
+- offset: Offset directo (alternativa a page)
+- limit: Límite de registros
+- order_by: Columnas para ordenar (requerido para paginación)
+═══════════════════════════════════════════════════════════════
+#}
+
+{# Macro para calcular offset desde página #}
+{% macro calculate_offset(page, page_size) %}
+{{ (page - 1) * page_size }}
+{% endmacro %}
+
+{# Macro para cláusula ORDER BY #}
+{% macro order_clause(columns, direction='ASC') %}
+ORDER BY
+{% for col in columns %}
+    {{ col }} {{ direction }}{% if not loop.last %},{% endif %}
+
+{% endfor %}
+{% endmacro %}
+
+{# Macro para paginación DB2 #}
+{% macro paginate(page=1, page_size=50, order_columns=['1']) %}
+{{ order_clause(order_columns) }}
+OFFSET {{ calculate_offset(page, page_size) }} ROWS
+FETCH FIRST {{ page_size }} ROWS ONLY
+{% endmacro %}
+
+{# Macro para límite simple sin paginación #}
+{% macro limit_rows(limit, order_columns=['1']) %}
+{% if order_columns %}
+{{ order_clause(order_columns) }}
+{% endif %}
+FETCH FIRST {{ limit }} ROWS ONLY
+{% endmacro %}
+
+{# Template de ejemplo con paginación completa #}
+{% if include_full_example %}
+-- Ejemplo de query paginada
+WITH RankedResults AS (
+    SELECT
+        ROW_NUMBER() OVER ({{ order_clause(order_by | default(['ADDDATE DESC'])) }}) AS row_num,
+        *
+    FROM {{ schema | default('WMWHSE1') }}.{{ table }}
+    WHERE 1=1
+    {% if where_clause %}
+    AND {{ where_clause }}
+    {% endif %}
+)
+SELECT *
+FROM RankedResults
+WHERE row_num BETWEEN {{ offset | default(0) + 1 }} AND {{ (offset | default(0)) + (limit | default(50)) }}
+{% else %}
+
+{# Uso directo como fragmento de paginación #}
+{% if page and page_size %}
+{{ paginate(page, page_size, order_by | default(['1'])) }}
+{% elif limit %}
+{{ limit_rows(limit, order_by) }}
+{% endif %}
+
+{% endif %}

@@ -1,0 +1,145 @@
+{
+  "agente": {
+    "nombre": "Agente SAC Siempre Activo",
+    "codename": "Godí-24/7",
+    "version": "1.0.0",
+    "descripcion": "Asistente virtual inteligente que funciona continuamente en segundo plano",
+    "cedis": {
+      "codigo": "427",
+      "nombre": "CEDIS Cancún",
+      "organizacion": "Tiendas Chedraui S.A. de C.V.",
+      "region": "Sureste"
+    },
+    "desarrollador": {
+      "nombre_completo": "Julián Alexander Juárez Alvarado",
+      "codigo": "ADMJAJA",
+      "cargo": "Jefe de Sistemas",
+      "contacto": "sistemas@chedraui.com.mx"
+    }
+  },
+
+  "copiloto": {
+    "habilitado": true,
+    "descripcion": "Modo automático que se activa por inactividad",
+    "timeout_minutos": 30,
+    "nivel_autonomia": "basica",
+    "comentario_autonomia": "Valores: minima | basica | media | alta",
+    "tareas_autorizadas": [
+      "generacion_reporte",
+      "validacion_oc",
+      "envio_alerta",
+      "notificacion",
+      "verificacion_salud",
+      "limpieza_logs"
+    ],
+    "comentario_tareas": "Tareas que puede ejecutar automáticamente en modo copiloto",
+    "notificar_al_activar": true,
+    "horario_no_laboral": {
+      "inicio": "22:00",
+      "fin": "08:00",
+      "comentario": "Formato HH:MM - Horario en el que el agente tiene más autonomía"
+    }
+  },
+
+  "inactividad": {
+    "monitoreo_habilitado": true,
+    "timeout_minutos": 30,
+    "intervalo_chequeo_segundos": 60,
+    "registrar_eventos": true,
+    "comentario": "Monitorea inactividad del usuario y activa copiloto automáticamente"
+  },
+
+  "logging": {
+    "nivel": "INFO",
+    "archivo": "output/logs/agente_siempre_activo.log",
+    "tamaño_maximo_mb": 10,
+    "backup_count": 5,
+    "formato": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "comentario": "Niveles: DEBUG | INFO | WARNING | ERROR | CRITICAL"
+  },
+
+  "tareas_autonomas": {
+    "habilitadas": true,
+    "intervalo_procesamiento_minutos": 15,
+    "max_tareas_simultaneas": 3,
+    "timeout_ejecucion_minutos": 10,
+    "comentario": "Configuración del procesador automático de tareas"
+  },
+
+  "verificacion_salud": {
+    "habilitada": true,
+    "intervalo_minutos": 5,
+    "registrar_metricas": true,
+    "threshold_tareas_alerta": 10,
+    "comentario": "Verifica periódicamente la salud del sistema"
+  },
+
+  "notificaciones": {
+    "al_activar_copiloto": true,
+    "al_completar_tarea": false,
+    "al_error": true,
+    "canal_predeterminado": "email",
+    "canales_disponibles": [
+      "email",
+      "telegram",
+      "whatsapp"
+    ],
+    "comentario": "Configuración de notificaciones del agente"
+  },
+
+  "seguridad": {
+    "requerir_confirmacion_tareas_criticas": true,
+    "registrar_todas_acciones": true,
+    "audit_habilitado": true,
+    "comentario": "Medidas de seguridad para autonomía responsable"
+  },
+
+  "api_rest": {
+    "habilitada": false,
+    "puerto": 5000,
+    "host": "127.0.0.1",
+    "debug": false,
+    "cors_habilitado": false,
+    "comentario": "API HTTP REST para control remoto (FUTURO)"
+  },
+
+  "integraciones": {
+    "sac": {
+      "habilitada": true,
+      "timeout_segundos": 30,
+      "comentario": "Integración con Sistema SAC"
+    },
+    "email": {
+      "habilitada": true,
+      "servidor": "smtp.office365.com",
+      "puerto": 587,
+      "comentario": "Envío de notificaciones por email"
+    },
+    "telegram": {
+      "habilitada": false,
+      "api_key": "CONFIGURAR_EN_ENV",
+      "comentario": "Opcional: integración con Telegram"
+    },
+    "ollama_ia": {
+      "habilitada": false,
+      "url": "http://localhost:11434",
+      "modelo": "llama3",
+      "comentario": "Opcional: integración con Ollama para IA"
+    }
+  },
+
+  "limpieza_automatica": {
+    "habilitada": true,
+    "limpiar_logs_antiguos_dias": 30,
+    "limpiar_cache_dias": 7,
+    "limpiar_eventos_antiguos_dias": 60,
+    "comentario": "Limpieza automática de archivos antiguos"
+  },
+
+  "modo_desarrollo": {
+    "habilitado": false,
+    "debug_verbose": false,
+    "log_llamadas_funciones": false,
+    "comentario": "Opciones para desarrollo y debugging"
+  }
+}

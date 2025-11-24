@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALERTA CRITICA - {{ cedis_nombre }}</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 700px; margin: 0 auto; background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 3px solid #dc3545; }
+        .header { background: linear-gradient(135deg, #dc3545 0%, #a71d2a 100%); color: white; padding: 35px; text-align: center; }
+        .header .icon { font-size: 50px; margin-bottom: 15px; }
+        .header h1 { margin: 0 0 10px 0; font-size: 32px; text-transform: uppercase; letter-spacing: 2px; }
+        .header p { margin: 5px 0; opacity: 0.95; font-size: 14px; }
+        .content { padding: 30px; }
+        .error-box { background-color: #f8d7da; border-left: 5px solid #dc3545; padding: 25px; margin: 20px 0; border-radius: 8px; }
+        .error-box h2 { color: #721c24; margin: 0 0 15px 0; font-size: 20px; }
+        .error-box p { color: #721c24; margin: 0; font-size: 15px; line-height: 1.6; }
+        .info-table { width: 100%; margin: 25px 0; border-collapse: collapse; }
+        .info-table td { padding: 12px 15px; border-bottom: 1px solid #e0e0e0; }
+        .info-table td:first-child { font-weight: bold; width: 180px; color: #555; background-color: #f8f9fa; }
+        .action-box { background-color: #fff3cd; border-left: 5px solid #ffc107; padding: 25px; margin: 25px 0; border-radius: 8px; }
+        .action-box h3 { margin: 0 0 15px 0; color: #856404; font-size: 18px; }
+        .action-box ul { margin: 0; padding-left: 20px; color: #856404; }
+        .action-box li { margin: 8px 0; }
+        .severity { display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .severity-critico { background-color: #dc3545; color: white; }
+        .severity-alto { background-color: #fd7e14; color: white; }
+        .severity-medio { background-color: #ffc107; color: #333; }
+        .timestamp { background-color: #e9ecef; padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0; }
+        .timestamp strong { color: #dc3545; }
+        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #e0e0e0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">&#9888;</div>
+            <h1>ALERTA CRITICA</h1>
+            <p>{{ sistema_nombre }} - {{ cedis_nombre }}</p>
+            <p>{{ fecha_hora_actual }}</p>
+        </div>
+
+        <div class="content">
+            <div class="error-box">
+                <h2>{{ tipo_error|default:"Error Detectado" }}</h2>
+                <p>{{ descripcion_error|default:"Se ha detectado un error critico que requiere atencion inmediata." }}</p>
+            </div>
+
+            <div class="timestamp">
+                <strong>Detectado:</strong> {{ fecha_hora_actual }}
+            </div>
+
+            <table class="info-table">
+                <tr>
+                    <td>Severidad:</td>
+                    <td><span class="severity severity-{{ severidad_clase|default:'critico' }}">{{ severidad|default:"CRITICO" }}</span></td>
+                </tr>
+                <tr>
+                    <td>Modulo:</td>
+                    <td>{{ modulo|default:"Sistema SAC" }}</td>
+                </tr>
+                {{ info_oc }}
+                {{ info_adicional }}
+            </table>
+
+            <div class="action-box">
+                <h3>&#9889; ACCION REQUERIDA</h3>
+                <ul>
+                    <li>{{ accion_1|default:"Revisar inmediatamente el error reportado" }}</li>
+                    <li>{{ accion_2|default:"Contactar al equipo de Planning si es necesario" }}</li>
+                    <li>{{ accion_3|default:"Documentar las acciones correctivas tomadas" }}</li>
+                    <li>{{ accion_4|default:"Notificar al supervisor si el problema persiste" }}</li>
+                </ul>
+            </div>
+
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 25px;">
+                <h4 style="margin: 0 0 10px 0; color: #333;">Solucion Sugerida:</h4>
+                <p style="margin: 0; color: #555;">{{ solucion_sugerida|default:"Revisar los datos de entrada y verificar la integridad de la informacion en el sistema Manhattan WMS." }}</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>{{ sistema_nombre }}</strong> - Sistema Automatizado de Alertas</p>
+            <p>Desarrollado por: {{ desarrollador }} - {{ desarrollador_cargo }}</p>
+            <p style="color: #dc3545; font-weight: bold; margin-top: 10px;">Este es un mensaje automatico. Por favor no responder directamente.</p>
+        </div>
+    </div>
+</body>
+</html>

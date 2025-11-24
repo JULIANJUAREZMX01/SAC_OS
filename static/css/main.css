@@ -1,0 +1,413 @@
+/**
+ * ===============================================================
+ * SAC Dashboard - Estilos Principales
+ * CEDIS Chedraui Cancún 427
+ * ===============================================================
+ *
+ * Colores corporativos Chedraui con diseño profesional
+ *
+ * Desarrollado por: Julián Alexander Juárez Alvarado (ADMJAJA)
+ * Jefe de Sistemas - CEDIS Chedraui Logística Cancún
+ * ===============================================================
+ */
+
+/* ===============================================================
+   VARIABLES CSS
+   =============================================================== */
+:root {
+    --chedraui-red: #E31837;
+    --chedraui-red-dark: #b01030;
+    --chedraui-dark: #1a1a2e;
+    --chedraui-light: #f4f6f9;
+    --chedraui-white: #ffffff;
+
+    /* Colores de estado */
+    --color-success: #28a745;
+    --color-warning: #ffc107;
+    --color-danger: #dc3545;
+    --color-info: #17a2b8;
+    --color-secondary: #6c757d;
+
+    /* Colores de severidad */
+    --severity-critico: #dc3545;
+    --severity-alto: #fd7e14;
+    --severity-medio: #ffc107;
+    --severity-bajo: #28a745;
+
+    /* Sombras */
+    --shadow-sm: 0 2px 10px rgba(0,0,0,0.08);
+    --shadow-md: 0 5px 20px rgba(0,0,0,0.15);
+    --shadow-lg: 0 2px 10px rgba(0,0,0,0.2);
+
+    /* Transiciones */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+}
+
+/* ===============================================================
+   ESTILOS BASE
+   =============================================================== */
+body {
+    background-color: var(--chedraui-light);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+}
+
+/* ===============================================================
+   NAVBAR
+   =============================================================== */
+.navbar {
+    background: linear-gradient(135deg, var(--chedraui-red) 0%, var(--chedraui-red-dark) 100%);
+    box-shadow: var(--shadow-lg);
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+/* ===============================================================
+   SIDEBAR
+   =============================================================== */
+.sidebar {
+    background: var(--chedraui-dark);
+    min-height: calc(100vh - 56px);
+    position: fixed;
+    top: 56px;
+    left: 0;
+    width: 220px;
+    overflow-y: auto;
+    z-index: 100;
+}
+
+.sidebar .nav-link {
+    color: rgba(255,255,255,0.8);
+    padding: 12px 20px;
+    border-left: 3px solid transparent;
+    transition: var(--transition-normal);
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background: rgba(227, 24, 55, 0.8);
+    color: var(--chedraui-white);
+    border-left-color: var(--chedraui-white);
+}
+
+.sidebar .nav-link i {
+    width: 24px;
+}
+
+/* ===============================================================
+   CONTENIDO PRINCIPAL
+   =============================================================== */
+.main-content {
+    margin-left: 220px;
+    padding: 20px;
+    min-height: calc(100vh - 56px);
+}
+
+/* ===============================================================
+   CARDS
+   =============================================================== */
+.card {
+    border: none;
+    box-shadow: var(--shadow-sm);
+    border-radius: 10px;
+    transition: var(--transition-fast);
+}
+
+.card-header {
+    background: var(--chedraui-white);
+    border-bottom: 2px solid var(--chedraui-red);
+    border-radius: 10px 10px 0 0 !important;
+    font-weight: 600;
+}
+
+.stat-card {
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    opacity: 0.3;
+}
+
+/* ===============================================================
+   QUICK ACTIONS
+   =============================================================== */
+.quick-action-card {
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.quick-action-card:hover {
+    background: rgba(227, 24, 55, 0.05);
+    border-color: var(--chedraui-red) !important;
+    transform: translateY(-3px);
+}
+
+/* ===============================================================
+   BADGES DE SEVERIDAD
+   =============================================================== */
+.badge-critico { background-color: var(--severity-critico); }
+.badge-alto { background-color: var(--severity-alto); }
+.badge-medio { background-color: var(--severity-medio); color: #000; }
+.badge-bajo { background-color: var(--severity-bajo); }
+
+/* ===============================================================
+   TABLAS
+   =============================================================== */
+.table-hover tbody tr:hover {
+    background-color: rgba(227,24,55,0.05);
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+/* ===============================================================
+   PROGRESS BAR
+   =============================================================== */
+.progress-bar {
+    background-color: var(--chedraui-red);
+}
+
+/* ===============================================================
+   BOTONES PERSONALIZADOS
+   =============================================================== */
+.btn-chedraui {
+    background: var(--chedraui-red);
+    border: none;
+    color: var(--chedraui-white);
+    transition: var(--transition-fast);
+}
+
+.btn-chedraui:hover {
+    background: var(--chedraui-red-dark);
+    color: var(--chedraui-white);
+}
+
+.btn-chedraui:focus,
+.btn-chedraui:active {
+    background: var(--chedraui-red-dark);
+    color: var(--chedraui-white);
+    box-shadow: 0 0 0 0.25rem rgba(227, 24, 55, 0.25);
+}
+
+/* ===============================================================
+   TOAST CONTAINER
+   =============================================================== */
+.toast-container {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    z-index: 1050;
+}
+
+/* ===============================================================
+   LOADING OVERLAY
+   =============================================================== */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.loading-overlay.show {
+    display: flex;
+}
+
+/* ===============================================================
+   STATUS INDICATORS
+   =============================================================== */
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.status-ok { background: var(--color-success); }
+.status-warning { background: var(--color-warning); }
+.status-error { background: var(--color-danger); }
+.status-inactive { background: var(--color-secondary); }
+
+/* ===============================================================
+   FORMULARIOS
+   =============================================================== */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--chedraui-red);
+    box-shadow: 0 0 0 0.25rem rgba(227, 24, 55, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: var(--chedraui-red);
+    border-color: var(--chedraui-red);
+}
+
+/* ===============================================================
+   LINKS
+   =============================================================== */
+a {
+    color: var(--chedraui-red);
+}
+
+a:hover {
+    color: var(--chedraui-red-dark);
+}
+
+/* ===============================================================
+   PÁGINA DE ERROR
+   =============================================================== */
+.error-page {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.error-code {
+    font-size: 8rem;
+    font-weight: 700;
+    color: var(--chedraui-red);
+    line-height: 1;
+}
+
+.error-message {
+    font-size: 1.5rem;
+    color: var(--color-secondary);
+}
+
+/* ===============================================================
+   LOGIN PAGE
+   =============================================================== */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--chedraui-dark) 0%, #16213e 100%);
+}
+
+.login-card {
+    max-width: 400px;
+    width: 100%;
+    background: var(--chedraui-white);
+    border-radius: 15px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+.login-header {
+    background: linear-gradient(135deg, var(--chedraui-red) 0%, var(--chedraui-red-dark) 100%);
+    color: var(--chedraui-white);
+    padding: 30px;
+    text-align: center;
+}
+
+.login-body {
+    padding: 30px;
+}
+
+/* ===============================================================
+   ANIMATIONS
+   =============================================================== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* ===============================================================
+   CHARTS
+   =============================================================== */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* ===============================================================
+   RESPONSIVE
+   =============================================================== */
+@media (max-width: 768px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        min-height: auto;
+        top: 0;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .stat-icon {
+        font-size: 1.5rem;
+    }
+
+    .error-code {
+        font-size: 5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .main-content {
+        padding: 10px;
+    }
+
+    .card-body {
+        padding: 15px;
+    }
+}
+
+/* ===============================================================
+   PRINT STYLES
+   =============================================================== */
+@media print {
+    .sidebar,
+    .navbar,
+    .toast-container,
+    .loading-overlay,
+    .btn {
+        display: none !important;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 0;
+    }
+
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}
