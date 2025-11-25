@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Log id="NGDWLOGGER">
+  <LogSize name="Log size" type="integer" min="10000" max="1000000">100000</LogSize>
+  <LogPath name="Log path" type="file" filetype="txt">\NGDWLog.txt</LogPath>
+  <TempPath name="Temp path" type="folder">\Temp</TempPath>
+  <LogLevel name="Log level" type="integer" min="1" max="4">1</LogLevel>
+</Log>

@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DWProfileConfig><PlugIns><Input><PlugIn id='SCANNER'/></Input><Output><PlugIn id='KEYSTROKE'/></Output><Process/></PlugIns><DataPaths><Path><Input><PlugIn id='SCANNER'/></Input><Process><PlugIn id='ADFPLUGIN'><Enabled>0</Enabled></PlugIn><PlugIn id='PRFIXSUFIX'><Enabled>1</Enabled></PlugIn></Process><Output><PlugIn id='KEYSTROKE'/></Output></Path></DataPaths></DWProfileConfig>

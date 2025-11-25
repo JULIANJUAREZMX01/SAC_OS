@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PlugIn id="KEYSTROKE" name="KeyStroke" version=" 1.01">
+	<Keystroke name="Send as events" type="bool">1</Keystroke>
+	<Escape name="Allow Escape chars" type="bool">1</Escape>
+	<InterChar name="InterChar delay" type="integer" max="1000" min="0">10</InterChar>
+	<Keymap>
+		<Mapping name="Add new" type="add">
+			<Mapping>
+				<Char name="Character code" type="integer" min="0" max="255">0</Char>
+				<Key name="Key code" type="integer" min="0" max="65535">0</Key>
+				<Delete type="delete" />
+			</Mapping>
+		</Mapping>
+	</Keymap>
+	<Feedback>
+		<ReceiveData name="OnReceive" type="feedback">
+		</ReceiveData>
+		<SendData name="OnSend" type="feedback">
+		</SendData>
+	</Feedback>
+</PlugIn>
+

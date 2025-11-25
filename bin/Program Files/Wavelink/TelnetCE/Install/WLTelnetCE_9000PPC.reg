@@ -1,0 +1,29 @@
+REGEDIT4
+
+[HKEY_CURRENT_USER\Software\Symbol\Security\Wavelink Gemini TelnetCE]
+"PlatKey"=hex:/
+00
+
+
+[HKEY_CURRENT_USER\Software\Symbol\Security\Wavelink Gemini TelnetCE\None]
+"PlatKey"=hex:\
+00
+
+[HKEY_CURRENT_USER\Software\Symbol\Security\Wavelink Gemini TelnetCE\PDT9000_GUN]
+"PlatKey"=hex:\
+      01,02,00,00,01,68,00,00,00,a4,00,00,53,15,ea,12,ae,51,7f,ed,a3,da,07,69,3b,\
+      e5,8b,ba,f0,35,11,a7,4a,13,20,56,3c,aa,a9,3c,ff,ef,e1,a6,8c,d8,61,82,88,02,\
+      a5,7d,d9,bf,1b,41,ec,1a,31,9c,a2,78,63,11,be,9f,fe,9d,82,64,95,1f,78,ef,1b,\
+      25
+
+[HKEY_CURRENT_USER\Software\Symbol\Security\Wavelink Gemini TelnetCE\PDT9000_BRICK]
+"PlatKey"=hex:\
+00
+
+[HKEY_CURRENT_USER\Software\Symbol\Security\Wavelink Gemini TelnetCE\PDT9000_SHORT]
+"PlatKey"=hex:\
+00
+
+[HKEY_CURRENT_USER\Software\Symbol\Security\Wavelink Gemini TelnetCE\PDT9000_EMULATOR]
+"PlatKey"=hex:\
+00

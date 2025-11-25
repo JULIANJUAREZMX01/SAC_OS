@@ -1,0 +1,38 @@
+// 33-Key Symbol 9000 Common
+
+[DEFAULT]
+
+[SHIFT]
+0x30 = 4300 // Shift and 0 is F9
+
+[CONTROL]
+0x25 = 8200 // Control and Left is Previous Session
+0x27 = 8300 // Control and Right is Next Session
+0x26 = 4900 // Control and Up is Roll Up
+0x28 = 5100 // Control and Down is Roll Down
+0x70 = 5E00 // Control and F1 is F21
+0x71 = 5F00 // Control and F2 is F22
+0x72 = 6000 // Control and F3 is F23
+0x73 = 6100 // Control and F4 is F24
+0x30 = 4400 // Control and 0 is F10
+
+[ALT]
+0x53 = 1F00 // Alt and S is Soft Terminal Reset
+
+{WEB}
+[CONTROL]
+0x42 = 0xB101 // <CTRL><B> is Back
+0x46 = 0xB102 // <CTRL><F> is Forward
+0x48 = 0xB103 // <CTRL><H> is Home
+0x52 = 0xB104 // <CTRL><R> is Refresh
+0x53 = 0xB105 // <CTRL><S> is Stop
+0x30 = 0xCC30 // <CTRL><0>
+0x31 = 0xCC31 // <CTRL><1>
+0x32 = 0xCC32 // <CTRL><2>
+0x33 = 0xCC33 // <CTRL><3>
+0x34 = 0xCC34 // <CTRL><4>
+0x35 = 0xCC35 // <CTRL><5>
+0x36 = 0xCC36 // <CTRL><6>
+0x37 = 0xCC37 // <CTRL><7> 
+0x38 = 0xCC38 // <CTRL><8>
+0x39 = 0xCC39 // <CTRL><9>

@@ -1,0 +1,39 @@
+// 28-Key 9000 Gemini General
+
+[DEFAULT]
+0x6B = 002B  //Func+7 to +
+0x6A = 002A  //Func+. to *
+
+[SHIFT]
+0x20 = 5300  //Shift Space to delete
+0x6A = 0013  //Shift 1 to Sys Request
+
+[CONTROL]
+0xBE = 4700  //Ctrl+. to Home
+0x26 = 4900  //Ctrl+up to RollUp
+0x28 = 5100  //Ctrl+down to Rolldown
+0x6A = 3B00 // Ctrl+1 to F1
+0x41 = 3C00 // Ctrl+2 to F2
+0x44 = 3D00 // Ctrl+3 to F3
+0x47 = 3E00 // Ctrl+4 to F4
+0x4A = 3F00 // Ctrl+5 to F5
+0x4D = 4000 // Ctrl+6 to F6
+0x50 = 4100 // Ctrl+7 to F7
+0x54 = 4200 // Ctrl+8 to F8
+0x57 = 4300 // Ctrl+9 to F9
+0x20 = 4400 // Ctrl+0 to F10
+ 
+[ALT]
+0x41 = 0001 // Alt + A to Atten
+0x42 = 7600 // Alt + B to Field Minus
+0x45 = 0005 // Alt + E to Erase Input
+0x47 = 0007 // Alt + G to Help
+0x57 = 0010 // Alt + W to Print
+
+{WEB}
+[CONTROL]
+0x42 = 0xB101 // <CTRL><B> is Back
+0x46 = 0xB102 // <CTRL><F> is Forward
+0x48 = 0xB103 // <CTRL><H> is Home
+0x52 = 0xB104 // <CTRL><R> is Refresh
+0x53 = 0xB105 // <CTRL><S> is Stop

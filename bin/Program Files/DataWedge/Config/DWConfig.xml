@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DWConfig definitiontimestamp='43894'><Log/><Feedback/><Profiles><Profile name='Profile0' filename='Default' active='1' enabled='1'/></Profiles><AutoProfileSwitching>1</AutoProfileSwitching><DesktopAutoStart><Enabled>1</Enabled><AutoStartApp>\Application\Program Files\DataWedge\DWDemo.exe</AutoStartApp></DesktopAutoStart></DWConfig>

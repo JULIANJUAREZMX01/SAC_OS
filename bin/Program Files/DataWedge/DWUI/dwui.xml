@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DWUI>
+	<Advanced>
+		<Profiles>
+		</Profiles>
+		<Settings>
+			<AutoProfileSwitching name="Profile Selection" type="select" oid="0" value="1">
+				<option id="0" name="Auto" value="1" />
+				<option id="1" name="Manual" value="0" />
+			</AutoProfileSwitching>
+			<ActiveProfile name="Manual Profile" type="select" oid="0" value="Default">
+				<option id="0" name="Profile0" value="Default" />
+			</ActiveProfile>
+			<Log>
+				<LogSize name="Log size" type="select" min="10000" max="1000000" value="100000" oid="3">
+					<option id="0" name="10K" value="10000" />
+					<option id="1" name="20K" value="20000" />
+					<option id="2" name="50K" value="50000" />
+					<option id="3" name="100K" value="100000" />
+					<option id="4" name="200K" value="200000" />
+					<option id="5" name="500K" value="500000" />
+					<option id="6" name="1M" value="1000000" />
+				</LogSize>
+				<LogPath name="Backup folder" type="file">\</LogPath>
+				<TempPath name="Cache folder" type="file">\Temp</TempPath>
+				<LogLevel name="Log level" type="select" value="1" oid="0">
+					<option id="0" name="Errors" value="1" />
+					<option id="1" name="Warnings" value="2" />
+					<option id="2" name="Messages" value="3" />
+					<option id="3" name="Data" value="4" />
+				</LogLevel>
+			</Log>
+			<DesktopAutoStart name="Desktop Autostart">
+				<Enabled type="bool">1</Enabled>
+				<AutoStartApp name="Start Application" type="file" filetype=".exe">dwdemo.exe</AutoStartApp>
+			</DesktopAutoStart>
+			<Restore name="Restore to default" type="restore" />
+		</Settings>
+		<About type="displayonly">
+			<Title name="DataWedge" />
+			<Version name="v3.1.0" />
+			<Date name="June 2009" />
+			<Copyright name="(c) Motorola" />
+			<Blank name="" />
+			<Browser name="" />
+			<UIBuild name="" />
+		</About>
+	</Advanced>
+	<Basic name="Basic (Profile0)">
+		<Barcode name="Barcode input" type="redirect">
+			<Redirect profile="Default" plugin="Input/SCANNER" xpath="./Input/PlugIn[@id='SCANNER']/*" />
+		</Barcode>
+		<KeyStroke name="Keystroke output" type="redirect">
+			<Redirect profile="Default" plugin="Output/KEYSTROKE" xpath="./Output/PlugIn[@id='KEYSTROKE']/*" />
+		</KeyStroke>
+		<BasicFormat name="Basic format" type="redirect">
+			<Redirect profile="Default" plugin="Process/PRFIXSUFIX" xpath="./DataPaths/Path[0]/Process/PlugIn[@id='PRFIXSUFIX']/*" />
+		</BasicFormat>
+		<About name="About" type="redirect">
+			<Redirect xpath="/DWUI/Advanced/About" />
+		</About>
+	</Basic>
+</DWUI>

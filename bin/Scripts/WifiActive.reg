@@ -1,0 +1,26 @@
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\Drivers\BuiltIn\WLAN]
+"SlotResetWait"=dword:000001F4
+"SlotResetOnResume"=dword:00000000
+"InitFlags"=dword:00000000
+"InitialState"=dword:00000000
+"SupportedStates"=dword:00000011
+"FriendlyName"="WLAN Proxy Driver for Motorola WLAN Adapter"
+"IClass"=hex(7):\
+      7B,41,33,32,39,34,32,42,37,2D,39,32,30,43,2D,34,38,36,62,2D,42,30,45,36,\
+      2D,39,32,41,37,30,32,41,39,39,42,33,35,7D,00,7B,66,38,61,36,62,61,39,38,\
+      2D,30,38,37,61,2D,34,33,61,63,2D,61,39,64,38,2D,62,37,66,31,33,63,35,62,\
+      61,65,33,31,7D,00,7B,39,34,31,30,37,44,37,30,2D,33,34,43,46,2D,34,31,39,\
+      61,2D,42,41,42,41,2D,31,45,35,30,39,36,31,38,35,33,34,37,7D,00,00
+"Flags"=dword:00000008
+"WLANSlot"=dword:00000000
+"DeviceArrayIndex"=dword:00000004
+"Index"=dword:00000001
+"Order"=dword:00000008
+"Dll"="PmProxy.Dll"
+"Prefix"="WLP"
+
+[HKEY_LOCAL_MACHINE\Drivers\BuiltIn\WLAN\ActivityEvents]
+"PowerManager/SystemIdleTimerReset"=""
+

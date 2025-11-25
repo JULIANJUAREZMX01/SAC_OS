@@ -1,0 +1,227 @@
+<wap-provisioningdoc>
+<characteristic type="Install">
+<parm name="InstallPhase" value="install" />
+<parm name="SetupDLL" value="1" />
+<parm name="ProcessorType" value="2577" />
+<parm name="OSVersionMin" value="5.0" />
+<parm name="OSVersionMax" value="5.99" />
+<parm name="BuildNumberMin" value="0" />
+<parm name="BuildNumberMax" value="-536870912" />
+<parm name="AppName" value="Wavelink TelnetCE 6042" />
+<parm name="InstallDir" value="\Program Files\Wavelink\TelnetCE" translation="install" />
+<parm name="NumDirs" value="3" />
+<parm name="NumFiles" value="38" />
+<parm name="NumRegKeys" value="1" />
+<parm name="NumRegVals" value="2" />
+<parm name="NumShortcuts" value="1" />
+</characteristic>
+<characteristic type="FileOperation">
+<characteristic type="%InstallDir%" translation="install">
+<characteristic type="MakeDir" />
+<characteristic type="Charset.bin" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="0Charset.001" />
+</characteristic>
+</characteristic>
+<characteristic type="Ebcdic.bin" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="00Ebcdic.002" />
+</characteristic>
+</characteristic>
+<characteristic type="Em3270.kbb" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="00Em3270.003" />
+</characteristic>
+</characteristic>
+<characteristic type="Em5250.kbb" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="00Em5250.004" />
+</characteristic>
+</characteristic>
+<characteristic type="Emhp.kbb" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="0000Emhp.005" />
+</characteristic>
+</characteristic>
+<characteristic type="EmNone.kbb" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="00EmNone.006" />
+</characteristic>
+</characteristic>
+<characteristic type="EmNum.kbb" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="000EmNum.007" />
+</characteristic>
+</characteristic>
+<characteristic type="Emulate.msg" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="0Emulate.008" />
+</characteristic>
+</characteristic>
+<characteristic type="Emvt.kbb" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="0000Emvt.009" />
+</characteristic>
+</characteristic>
+<characteristic type="EMWEB.KBB" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="000EMWEB.010" />
+</characteristic>
+</characteristic>
+<characteristic type="S24cfg.dat" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="00S24cfg.011" />
+</characteristic>
+</characteristic>
+<characteristic type="Termcfg.bin" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="0Termcfg.012" />
+</characteristic>
+</characteristic>
+<characteristic type="hostcfgs.bin" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="hostcfgs.013" />
+</characteristic>
+</characteristic>
+<characteristic type="IBMUni.asc" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="00IBMUni.014" />
+</characteristic>
+</characteristic>
+<characteristic type="VTUni.asc" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="000VTUni.015" />
+</characteristic>
+</characteristic>
+<characteristic type="TermType.dat" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="TermType.016" />
+</characteristic>
+</characteristic>
+<characteristic type="SY903053.KMP" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="SY903053.017" />
+</characteristic>
+</characteristic>
+<characteristic type="SY905053.KMP" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="SY905053.018" />
+</characteristic>
+</characteristic>
+<characteristic type="SY90G053.KMP" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="SY90G053.019" />
+</characteristic>
+</characteristic>
+<characteristic type="SY90G053.RMT" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="SY90G053.020" />
+</characteristic>
+</characteristic>
+<characteristic type="SY90V053.KMP" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="SY90V053.021" />
+</characteristic>
+</characteristic>
+<characteristic type="SY90G028.KMP" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="SY90G028.022" />
+</characteristic>
+</characteristic>
+<characteristic type="sy90g038a.KMP" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="SY90G0~1.023" />
+</characteristic>
+</characteristic>
+<characteristic type="sy90g038n.KMP" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="SY90G0~2.024" />
+</characteristic>
+</characteristic>
+<characteristic type="SY90G043.KMP" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="SY90G043.025" />
+</characteristic>
+</characteristic>
+<characteristic type="WlPrdIst.dat" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="WlPrdIst.026" />
+</characteristic>
+</characteristic>
+<characteristic type="WLTelnetCE_9000PPC.reg" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="WLTELN~1.027" />
+</characteristic>
+</characteristic>
+<characteristic type="TelnetCE.exe" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="TelnetCE.028" />
+</characteristic>
+</characteristic>
+<characteristic type="Support.tce" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="0Support.029" />
+</characteristic>
+</characteristic>
+<characteristic type="WLB.tce" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="00000WLB.030" />
+</characteristic>
+</characteristic>
+<characteristic type="SymDev.dll" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="00SymDev.031" />
+</characteristic>
+</characteristic>
+<characteristic type="SymMsr.dll" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="00SymMsr.032" />
+</characteristic>
+</characteristic>
+<characteristic type="SymNet.dll" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="00SymNet.033" />
+</characteristic>
+</characteristic>
+<characteristic type="SymRFID.dll" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="0SymRFID.034" />
+</characteristic>
+</characteristic>
+<characteristic type="SymScan.dll" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="0SymScan.035" />
+</characteristic>
+</characteristic>
+<characteristic type="wltnoid.dll" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="0wltnoid.036" />
+</characteristic>
+</characteristic>
+<characteristic type="wltnoidc.dll" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="wltnoidc.037" />
+</characteristic>
+</characteristic>
+<characteristic type="TelnetCE_Launcher.exe" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="TELNET~1.038" />
+</characteristic>
+</characteristic>
+</characteristic>
+<characteristic type="%CE11%" translation="install">
+<characteristic type="MakeDir" />
+<characteristic type="TelnetCE.lnk" translation="install">
+<characteristic type="Shortcut">
+<parm name="Source" value="%InstallDir%\TelnetCE.exe" translation="install" />
+</characteristic>
+</characteristic>
+</characteristic>
+</characteristic>
+<characteristic type="Registry">
+<characteristic type="HKLM\Software\Wavelink\TelnetCE">
+<parm name="InstallDir" value="%InstallDir%" datatype="string" translation="install" />
+<parm name="ConfigDir" value="\Application\Wavelink\TelnetCE\Config" datatype="string" />
+</characteristic>
+</characteristic>
+</wap-provisioningdoc>

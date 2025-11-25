@@ -1,0 +1,8 @@
+REGEDIT4 /s \Application\Scripts\DisablePwrSwitch.reg
+
+[HKEY_LOCAL_MACHINE\Drivers\BuiltIn\Power\Settings]
+"DisablePwrSwitch"=dword:00000000
+"RunAppOnPwrKey"=dword:00000001
+"EnableFlushOnSuspend"=dword:00000001
+"PowerResumeTimeout"=dword:00000FA0
+

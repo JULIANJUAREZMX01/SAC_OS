@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Actions>
+	<Action name="Skip ahead" id="SKIPAHEAD" type="add">
+		<Param name="How many" id="0" type="integer" min="1">1</Param>
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+	</Action>
+	<Action name="Skip back" id="SKIPBACK" type="add">
+		<Param name="How many" id="0" type="integer" min="1">1</Param>
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+	</Action>
+	<Action name="Skip to start" id="SKIPBACK" type="add">
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+	</Action>
+	<Action name="Send next" id="SEND" type="add">
+		<Param name="How many" id="0" type="integer" min="1">1</Param>
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+	</Action>
+	<Action name="Send up to" id="SENDTO" type="add">
+		<Param name="String" id="0" type="string"></Param>
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+	</Action>
+	<Action name="Send remaining" id="SEND" type="add">
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+	</Action>
+	<Action name="Send pause" id="PAUSE" type="add">
+		<Param name="Time(ms)" id="0" type="integer" min="0" max="5000">0</Param>
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+	</Action>
+	<Action name="Move to" id="MOVEAHEADTO" type="add">
+		<Param name="String" id="1" type="string"></Param>
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+	</Action>
+	<Action name="Move past a" id="MOVEAHEADTO" type="add">
+		<Param name="String" id="1" type="string"></Param>
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+		<Param name="Past" id="0" type="hidden">1</Param>
+	</Action>
+	<Action name="Remove all spaces" id="REPLACESTRING" type="add">
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+	</Action>
+	<Action name="Stop space removal" id="REPLACESTRING" type="add">
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+		<Param name="Enabled" id="0" type="hidden">0</Param>
+	</Action>
+	<Action name="Crunch spaces" id="CRUNCHSPACES" type="add">
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+	</Action>
+	<Action name="Stop space crunch" id="CRUNCHSPACES" type="add">
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+		<Param name="Enabled" id="0" type="hidden">0</Param>
+	</Action>
+	<Action name="Remove leading 0s" id="TRIMLEFT" type="add">
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+		<Param name="String" id="1" type="hidden">0</Param>
+	</Action>
+	<Action name="Stop zero removal" id="TRIMLEFT" type="add">
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+		<Param name="Enabled" id="0" type="hidden">0</Param>
+		<Param name="String" id="1" type="hidden">0</Param>
+	</Action>
+	<Action name="Pad with zeros" id="PADLEFT" type="add">
+		<Param name="How many" id="2" type="integer" min="1">1</Param>
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+		<Param name="Character" id="1" type="hidden" min="48" max="48">48</Param>
+	</Action>
+	<Action name="Pad with spaces" id="PADLEFT" type="add">
+		<Param name="How many" id="2" type="integer" min="1">1</Param>
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+		<Param name="Character" id="1" type="hidden" min="32" max="32">32</Param>
+	</Action>
+	<Action name="Stop pad zeros" id="PADLEFT" type="add">
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+		<Param name="Enabled" id="0" type="hidden">0</Param>
+		<Param name="Character" id="1" type="hidden" min="48" max="48">48</Param>
+		<Param name="How many" id="2" type="hidden" min="0">0</Param>
+	</Action>
+	<Action name="Stop pad spaces" id="PADLEFT" type="add">
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+		<Param name="Enabled" id="0" type="hidden">0</Param>
+		<Param name="Character" id="1" type="hidden" min="32" max="32">32</Param>
+		<Param name="How many" id="2" type="hidden" min="0">0</Param>
+	</Action>
+	<Action name="Replace string" id="REPLACESTRING" type="add">
+		<Param name="Find string" id="1" type="string"></Param>
+		<Param name="Replace with" id="2" type="string"></Param>
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+	</Action>
+	<Action name="Stop replace string" id="REPLACESTRING" type="add">
+		<Param name="Find string" id="1" type="string"></Param>
+		<Param name="Replace with" id="2" type="string"></Param>
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+		<Param name="Enabled" id="0" type="hidden">0</Param>
+	</Action>
+	<Action name="Send string" id="SENDSTRING" type="add">
+		<Param name="String" id="0" type="string"> </Param>
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+	</Action>
+	<Action name="Send char" id="SENDCHAR" type="add">
+		<Param name="Character" id="0" type="integer" min="0" max="255">32</Param>
+		<Move>
+			<Up type="action" value="up" />
+			<Down type="action" value="down" />
+		</Move>
+		<Delete type="delete" />
+	</Action>
+</Actions>

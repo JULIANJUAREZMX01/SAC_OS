@@ -1,0 +1,81 @@
+// Custom Mode Support File
+
+
+//
+// To enter Custom Mode, press the key specified by the virtual key value
+// "ModeKey".  (Virtual key values can be determined by entering
+// Telnet's Diagnostic Mode (Alt-D) and selecting the "Windows Keyboard Test"
+// option.)  While in this mode, the cursor will show an asterisk ('*')
+// character.
+//
+
+; Key to enter/exit Custom Mode
+ModeKey = 0x00  ; Change this -- 0 is not valid!
+
+; TRUE if Ctrl-ModeKey should be used to enter/exit Custom Mode.
+ModeKeyCtrl = FALSE
+; TRUE if Alt-ModeKey should be used to enter/exit Custom Mode.
+ModeKeyAlt = FALSE
+; TRUE if Shift-ModeKey should be used to enter/exit Custom Mode.
+ModeKeyShift = FALSE
+; Combinations such as Ctrl-Alt-ModeKey are valid, but may not be supported by
+; some device keyboards.
+
+; TRUE if key replacements are performed while Ctrl, Alt and/or Shift are
+; pressed.  If FALSE, then standard key functionality will be used.  So, for
+; example, if EvaluateWithModifier is FALSE then Alt-D will always toggle
+; Diagnostics mode, even if Custom Mode is enabled and the D key (virtual key
+; 0x44) is mapped to something else.
+EvaluateWithModifier = FALSE
+
+; Described below
+Wrap = FALSE // (Can be TRUE or FALSE)
+
+; Milliseconds before we keep key if multiple choices
+TimeOut = 500
+
+; Set to TRUE to have Custom Mode exit after a key is converted, FALSE to stay
+; in Custom Mode
+ExitMode = FALSE
+
+
+//
+// Below this point are the key/value conversions available.
+// Each line has the format:
+//  0xAA = 0xBBBB, 0xCCCC, 0xDDDD, ...
+// All numbers can be in hexadecimal (if they start with a "0x" sequence) or
+// decimal format.
+//
+// The left side is the virtual key value that the user will input, and the
+// right side is the list of values that can be returned if the left side
+// virtual key is pressed.
+//
+// Right-side values preceeded by a 'U' character cause Emulation to be
+// supplied with the Unicode character of that value.  Right-side values that
+// are not preceeded with a 'U' perform a keypress with the virtial key value
+// on the right.  
+//
+// If there is more than one right-side value for a particular key, that key
+// can be pressed twice to get the second value, three times to get the third
+// value, etc.  If "TimeOut" milliseconds elapse after the key is pressed and
+// the key is not pressed again, the currently selected right-side value is
+// used.  The "Wrap" value determines what happens if too many keypress are
+// performed.  FALSE will cause the operation to cancel, TRUE will start over
+// with the first right-side value.
+//
+// If there is only one right-side value for a particular key, the "Wrap" and
+// "TimeOut" options do not apply to that key.
+//
+
+
+// The following items are examples only.  Please delete them and add to the
+// list as desired.
+
+// Map 'A' key to Hebrew Alef
+//0x41 = U0x05D0
+
+// Map '2' key to 'A' key (one press), 'B' key (two presses), and 'C' key
+// (three presses).  Because these are virtual key presses, the case of the
+// letter returned will depend on the current CAPS LOCK state.
+// (Values of U0x41 and U0x61 can be used to specify upper and lower-case 'A'.)
+//0x32 = 0x41, 0x42, 0x43

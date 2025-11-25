@@ -1,0 +1,3 @@
+[HKEY_LOCAL_MACHINE\Software\Wavelink\TelnetCE]
+"InstallDir"="\Application\Program Files\Wavelink\TelnetCE"
+"ConfigDir"="\Application\Wavelink\TelnetCE\Config"

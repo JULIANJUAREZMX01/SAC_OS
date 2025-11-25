@@ -1,0 +1,104 @@
+// 53-Key 9000 Gemini Common
+
+[DEFAULT]
+0x6B = 0x2B  // Func S to +
+0x6D = 002D  // Func T to -
+0x6A = 002A  // Func U to *
+0x2D = 000A  // Func Ent to New Line 3270
+0x7A = 003E  // Func L to >
+0x7B = 003C  // Func K to <
+0x7C = 007C  // Func O to |
+0x7D = 8200  // Upper Left to prev Sess
+0x7E = 8300  // Upper Right to Next Sess
+0x22 = 7600  // Func * to Field Minus
+0x23 = 5300  // Func Bksp to Del
+0x21 = 0012  // Func . to Reset
+
+[SHIFT]
+0x2E = 007F  // Shift BkSp to backspace delete
+0x08 = 007F  // Shift BkSp to backspace delete
+0x31 = 5400  // Shift 1 to F11
+0x32 = 5500  // Shift 2 to F12
+0x33 = 5600  // Shift 3 to F13
+0x34 = 5700  // Shift 4 to F14
+0x35 = 5800  // Shift 5 to F15
+0x36 = 5900  // Shift 6 to F16
+0x37 = 5A00  // Shift 7 to F17
+0x38 = 5B00  // Shift 8 to F18
+0x39 = 5C00  // Shift 9 to F19
+0x30 = 5D00  // Shift 0 to F20
+0x70 = CE31  // Shift Func 1 to PA1
+0x71 = CE32  // Shift Func 2 to PA2 
+0x72 = CE33  // Shift Func 3 to PA3
+0x73 = 4F00  // Shift Func 4 to Dup
+0x74 = 4700  // Shift Func 5 to Home
+0x75 = 4900  // Shift Func 6 to Roll Up
+0x76 = 5100  // Shift Func 7 to Roll Down
+0x77 = 5200  // Shift Func 8 to Insert
+0x78 = CD99  // Shift Func 9 to nothing (used to fix issue with Shift 9 and Shift Func 9 having same sequence)
+
+[CONTROL]
+0x26 = 9800 // Ctrl Up to View Up
+0x28 = A000 // Ctrl Dn to View Dn
+0x25 = 9B00 // Ctrl Left to View Left
+0x27 = 9D00 // Ctrl Right to View Right
+0x31 = 5E00 // Ctrl 1 to F21
+0x32 = 5F00 // Ctrl 2 to F22
+0x33 = 6000 // Ctrl 3 to F23
+0x34 = 6100 // Ctrl 4 to F24
+0x35 = 0021 // Ctrl 5 to !
+0x36 = 0023 // Ctrl 6 to #
+0x37 = 0024 // Ctrl 7 to $
+0x38 = 0025 // Ctrl 8 to %
+0x39 = 0026 // Ctrl 9 to &
+0x30 = 0028 // Ctrl 0 to (
+0x41 = 0001 // Ctrl A to ^A
+0x42 = 0002 // Ctrl B to ^B
+0x43 = 0003 // Ctrl C to ^C
+0x44 = 0004 // Ctrl D to ^D
+0x45 = 0005 // Ctrl E to ^E
+0x46 = 0006 // Ctrl F to ^F
+0x47 = 0007 // Ctrl G to ^G
+0x48 = 0008 // Ctrl H to ^H
+0x49 = 0009 // Ctrl I to ^I
+0x4A = 000A // Ctrl J to ^J
+0x4B = 000B // Ctrl K to ^K
+0x4C = 000C // Ctrl L to ^L
+0x4D = 000D // Ctrl M to ^M
+0x4E = 000E // Ctrl N to ^N
+0x4F = 000F // Ctrl O to ^O
+0x50 = 0010 // Ctrl P to ^P
+0x51 = 0011 // Ctrl Q to ^Q
+0x52 = 0012 // Ctrl R to ^R
+0x53 = 0013 // Ctrl S to ^S
+0x54 = 0014 // Ctrl T to ^T
+0x55 = 0015 // Ctrl U to ^U
+0x56 = 0016 // Ctrl V to ^V
+0x57 = 0017 // Ctrl W to ^W
+0x58 = 0018 // Ctrl X to ^X
+0x59 = 0019 // Ctrl Y to ^Y
+0x5A = 001A // Ctrl Z to ^Z
+0x08 = 001C // Ctrl Bcksp to ^\ 
+0xBE = 001D // Ctrl . to ^]
+0x6A = 001E // Ctrl * to ^^
+0x20 = 001F // Ctrl Space to ^_
+0x7D = CE32 // Ctrl upper left to ^@
+ 
+[ALT]
+0x41 = 0029  // Alt A to )
+0x42 = 0040  // Alt B to @
+0x45 = 005E  // Alt E to ^
+0x47 = 003F  // Alt G to ?
+0x34 = 4900  // Alt Shift 4 to Prev Screen VT
+0x36 = 5100  // Alt Shift 6 to Next Screen VT
+0x35 = 4F00  // Alt Shift 5 to Select VT
+0x37 = 5300  // Alt Shift 7 to Remove VT
+0x31 = 7500  // Alt Shift 1 to Clear
+
+{WEB}
+[CONTROL]
+0x42 = 0xB101 // <CTRL><B> is Back
+0x46 = 0xB102 // <CTRL><F> is Forward
+0x48 = 0xB103 // <CTRL><H> is Home
+0x52 = 0xB104 // <CTRL><R> is Refresh
+0x53 = 0xB105 // <CTRL><S> is Stop

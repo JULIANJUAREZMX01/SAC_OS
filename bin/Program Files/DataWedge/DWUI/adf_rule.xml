@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Rule>
+	<Enabled type="bool">1</Enabled>
+	<Criteria>
+		<Devices type="dynamiclist" parent="Profile" xpath="Input/PlugIn/Device">
+			<Device>
+				<Decoders type="dynamiclist" xpath="Input/PlugIn/Device[@id='%id%']/Decoders/Decoder">
+					<EnableAll name="ALL" type="bool">1</EnableAll>
+				</Decoders>
+			</Device>
+		</Devices>
+		<DataLength name="Data length" type="integer" min="0" max="9999">0</DataLength>
+		<StringAt>
+			<Str name="String" type="string"></Str>
+			<At name="At position" type="integer" min="0" max="9999">0</At>
+		</StringAt>
+	</Criteria>
+	<Actions>
+		<Action name="Send remaining" id="SEND">
+			<Move>
+				<Up type="action" value="up" />
+				<Down type="action" value="down" />
+			</Move>
+			<Delete type="delete" />
+		</Action>
+		<Action name="Add new" type="add">
+		</Action>
+	</Actions>
+	<Move>
+		<Up type="action" value="up" />
+		<Down type="action" value="down" />
+	</Move>
+	<Rename />
+	<Delete type="delete" />
+</Rule>

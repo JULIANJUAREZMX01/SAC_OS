@@ -1,0 +1,586 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PlugIn id="SCANNER" name="Barcode" version="1.0">
+  <Device id="0" name="SCN1" type="mono">
+    <Enabled type="bool">1</Enabled>
+    <Decoders name="Decoders">
+      <EnableAll name="Enable All" type="function" function="enableAllDecoders">0</EnableAll>
+      <DisableAll name="Disable All" type="function" function="disableAllDecoders">0</DisableAll>
+      <UPCEAN name="UPCEAN general">
+        <Params>
+          <Param id="0" name="Security level" type="select" oid="0" value="0">
+            <option id="0" name="None" value="0" />
+            <option id="1" name="Ambiguous" value="1" />
+            <option id="2" name="All" value="2" />
+          </Param>
+          <Param id="1" name="Supplemental2" type="bool">0</Param>
+          <Param id="2" name="Supplemental5" type="bool">0</Param>
+          <Param id="3" name="Supplemental mode" type="select" oid="0" value="0">
+            <option id="0" name="None" value="0" />
+            <option id="1" name="Always" value="1" />
+            <option id="2" name="Auto" value="2" />
+            <option id="3" name="Smart" value="3" />
+            <option id="4" name="378/379" value="4" />
+            <option id="5" name="978/979" value="5" />
+            <option id="6" name="977" value="6" />
+            <option id="7" name="414/419/434/439" value="7" />
+          </Param>
+          <Param id="4" name="Retry count" type="integer" min="2" max="10">2</Param>
+          <Param id="5" name="RW check digit" type="bool">0</Param>
+          <Param id="6" name="Linear decode" type="bool">0</Param>
+          <Param id="7" name="Bookland" type="bool">0</Param>
+          <Param id="8" name="Coupon" type="bool">0</Param>
+        </Params>
+        <SubDecoders type="hidden">
+          <Decoder id="67" name="COUPON" />
+          <Decoder id="68" name="BOOKLAND" />
+        </SubDecoders>
+      </UPCEAN>
+      <Decoder id="48" name="UPCE0">
+        <Enabled type="bool">0</Enabled>
+        <Params>
+          <Param id="0" name="Report Check Digit" type="bool">0</Param>
+          <Param id="1" name="Preamble" type="select" oid="0" value="0">
+            <option id="0" name="None" value="0" />
+            <option id="1" name="System Character" value="1" />
+            <option id="2" name="System+Country Code" value="2"></option>
+          </Param>
+          <Param id="2" name="Convert to UPCA" type="bool">0</Param>
+        </Params>
+      </Decoder>
+      <Decoder id="49" name="UPCE1">
+        <Enabled type="bool">0</Enabled>
+        <Params>
+          <Param id="0" name="Report Check Digit" type="bool">0</Param>
+          <Param id="1" name="Preamble" type="select" oid="0" value="0">
+            <option id="0" name="None" value="0" />
+            <option id="1" name="System Character" value="1" />
+            <option id="2" name="System+Country Code" value="2" />
+          </Param>
+          <Param id="2" name="Convert to UPCA" type="bool">0</Param>
+        </Params>
+      </Decoder>
+      <Decoder id="50" name="UPCA">
+        <Enabled type="bool">0</Enabled>
+        <Params>
+          <Param id="0" name="Report Check Digit" type="bool">0</Param>
+          <Param id="1" name="Preamble" type="select" oid="0" value="0">
+            <option id="0" name="None" value="0" />
+            <option id="1" name="System Character" value="1" />
+            <option id="2" name="System+Country Code" value="2" />
+          </Param>
+        </Params>
+      </Decoder>
+      <Decoder id="51" name="MSI">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="55">4</Min>
+          <Max type="integer" min="0" max="55">55</Max>
+        </Length>
+        <Params>
+          <Param id="0" name="Redundancy" type="bool">0</Param>
+          <Param id="1" name="Check Digits" type="select" oid="0" value="0">
+            <option id="0" name="One Check Digit" value="0" />
+            <option id="1" name="Two Check Digits" value="1" />
+          </Param>
+          <Param id="2" name="Check Digit Scheme" type="select" oid="1" value="1">
+            <option id="0" name="Mod 11/10" value="0"></option>
+            <option id="1" name="Mod 10/10" value="1" />
+          </Param>
+          <Param id="3" name="Report Check Digit" type="bool">0</Param>
+        </Params>
+      </Decoder>
+      <Decoder id="52" name="EAN8">
+        <Enabled type="bool">0</Enabled>
+        <Params>
+          <Param id="0" name="Convert to EAN13" type="bool">0</Param>
+        </Params>
+      </Decoder>
+      <Decoder id="53" name="EAN13">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+      <Decoder id="54" name="CODABAR">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="55">6</Min>
+          <Max type="integer" min="0" max="55">55</Max>
+        </Length>
+        <Params>
+          <Param id="0" name="Redundancy" type="bool">0</Param>
+          <Param id="1" name="CLSI Editing" type="bool">0</Param>
+          <Param id="2" name="NOTIS Editing" type="bool">0</Param>
+        </Params>
+      </Decoder>
+      <Decoder id="55" name="CODE39">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="55">0</Min>
+          <Max type="integer" min="0" max="55">55</Max>
+        </Length>
+        <Params>
+          <Param id="0" name="Verify Check Digit" type="bool">0</Param>
+          <Param id="1" name="Report Check Digit" type="bool">0</Param>
+          <Param id="2" name="Concatenation" type="bool">0</Param>
+          <Param id="3" name="Full ASCII" type="bool">0</Param>
+          <Param id="4" name="Redundancy" type="bool">0</Param>
+          <Param id="5" name="Convert to CODE32" type="bool">0</Param>
+          <Param id="6" name="CODE32 Prefix" type="bool">0</Param>
+        </Params>
+        <SubDecoders type="hidden">
+          <Decoder id="70" name="CODE32" />
+        </SubDecoders>
+      </Decoder>
+      <Decoder id="56" name="D2OF5">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="55">0</Min>
+          <Max type="integer" min="0" max="55">14</Max>
+        </Length>
+        <Params>
+          <Param id="0" name="Redundancy" type="bool">1</Param>
+        </Params>
+      </Decoder>
+      <Decoder id="57" name="I2OF5">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="55">14</Min>
+          <Max type="integer" min="0" max="55">10</Max>
+        </Length>
+        <Params>
+          <Param id="0" name="Redundancy" type="bool">1</Param>
+          <Param id="1" name="Verify Check Digit" type="select" oid="1" value="1">
+            <option id="0" name="No Check Digit" value="0" />
+            <option id="1" name="USS Check Digit" value="1" />
+            <option id="2" name="OPCC Check Digit" value="2" />
+          </Param>
+          <Param id="2" name="Report Check Digit" type="bool">0</Param>
+          <Param id="3" name="Convert to EAN13" type="bool">0</Param>
+        </Params>
+      </Decoder>
+      <Decoder id="58" name="CODE11">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="55">4</Min>
+          <Max type="integer" min="0" max="55">55</Max>
+        </Length>
+        <Params>
+          <Param id="0" name="Redundancy" type="bool">0</Param>
+          <Param id="1" name="Check Digit Count" type="select" oid="0" value="0">
+            <option id="0" name="No Check Digit" value="0" />
+            <option id="1" name="One Check Digit" value="1" />
+            <option id="2" name="Two Check Digits" value="2" />
+          </Param>
+          <Param id="2" name="Report Check Digit" type="bool">0</Param>
+        </Params>
+      </Decoder>
+      <Decoder id="59" name="CODE93">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="55">0</Min>
+          <Max type="integer" min="0" max="55">55</Max>
+        </Length>
+        <Params>
+          <Param id="0" name="Redundancy" type="bool">0</Param>
+        </Params>
+      </Decoder>
+      <Decoder id="60" name="CODE128">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="55">0</Min>
+          <Max type="integer" min="0" max="55">55</Max>
+        </Length>
+        <Params>
+          <Param id="0" name="Redundancy" type="bool">1</Param>
+          <Param id="1" name="EAN128" type="bool">1</Param>
+          <Param id="2" name="ISBT128" type="bool">1</Param>
+          <Param id="3" name="Other128" type="bool">0</Param>
+        </Params>
+        <SubDecoders type="hidden">
+          <Decoder id="63" name="EAN128" />
+          <Decoder id="65" name="ISBT128" />
+        </SubDecoders>
+      </Decoder>
+      <Decoder id="64" name="PDF417">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="2710">0</Min>
+          <Max type="integer" min="0" max="2710">0</Max>
+        </Length>
+      </Decoder>
+      <Decoder id="66" name="TRIOPTIC39">
+        <Enabled type="bool">0</Enabled>
+        <Params>
+          <Param id="0" name="Redundancy" type="bool">1</Param>
+        </Params>
+      </Decoder>
+      <Decoder id="69" name="MICROPDF">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="366">0</Min>
+          <Max type="integer" min="0" max="366">0</Max>
+        </Length>
+      </Decoder>
+      <Decoder id="71" name="MACROPDF">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="2710">0</Min>
+          <Max type="integer" min="0" max="2710">0</Max>
+        </Length>
+        <Params>
+          <Param id="0" name="Report Append Info" type="bool">1</Param>
+          <Param id="1" name="Buffer Labels" type="bool">0</Param>
+          <Param id="2" name="Exclusive" type="bool">1</Param>
+          <Param id="3" name="Convert to PDF417" type="bool">0</Param>
+        </Params>
+      </Decoder>
+      <Decoder id="72" name="MAXICODE">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="138">0</Min>
+          <Max type="integer" min="0" max="138">0</Max>
+        </Length>
+      </Decoder>
+      <Decoder id="73" name="DATAMATRIX">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="3116">0</Min>
+          <Max type="integer" min="0" max="3116">0</Max>
+        </Length>
+      </Decoder>
+      <Decoder id="74" name="QRCODE">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="7082">0</Min>
+          <Max type="integer" min="0" max="7082">0</Max>
+        </Length>
+      </Decoder>
+      <Decoder id="75" name="MACROMICROPDF">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="366">0</Min>
+          <Max type="integer" min="0" max="366">0</Max>
+        </Length>
+        <Params>
+          <Param id="0" name="Report Append Info" type="bool">1</Param>
+          <Param id="1" name="Buffer Labels" type="bool">0</Param>
+          <Param id="2" name="Exclusive" type="bool">1</Param>
+          <Param id="3" name="Convert to MICROPDF" type="bool">0</Param>
+        </Params>
+      </Decoder>
+      <Decoder id="76" name="RSS14">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+      <Decoder id="77" name="RSSLIM">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+      <Decoder id="78" name="RSSEXP">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+      <Decoder id="84" name="WEBCODE">
+        <Enabled type="bool">0</Enabled>
+        <Params>
+          <Param id="0" name="GT Webcode" type="bool">1</Param>
+        </Params>
+      </Decoder>
+      <Decoder id="85" name="CUECODE">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+      <Decoder id="86" name="COMPOSITE_AB">
+        <Enabled type="bool">0</Enabled>
+        <Params>
+          <Param id="0" name="UCC Link Mode" type="select" oid="1" value="1">
+            <option id="0" name="Never" value="0" />
+            <option id="1" name="Always" value="1" />
+            <option id="2" name="Auto" value="2" />
+          </Param>
+        </Params>
+      </Decoder>
+      <Decoder id="87" name="COMPOSITE_C">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+      <Decoder id="88" name="TLC39">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+      <Decoder id="97" name="USPOSTNET">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+      <Decoder id="98" name="USPLANET">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+      <Decoder id="99" name="UKPOSTAL">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+      <Decoder id="100" name="JAPPOSTAL">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+      <Decoder id="101" name="AUSPOSTAL">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+      <Decoder id="102" name="DUTCHPOSTAL">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+      <Decoder id="103" name="CANPOSTAL">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+      <Decoder id="112" name="CHINESE_2OF5">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="55">0</Min>
+          <Max type="integer" min="0" max="55">0</Max>
+        </Length>
+      </Decoder>
+      <Decoder id="116" name="AZTEC">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+      <Decoder id="117" name="MICROQR">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="55">0</Min>
+          <Max type="integer" min="0" max="55">0</Max>
+        </Length>
+      </Decoder>
+      <Decoder id="118" name="KOREAN_3OF5">
+        <Enabled type="bool">0</Enabled>
+        <Length>
+          <Min type="integer" min="0" max="55">0</Min>
+          <Max type="integer" min="0" max="55">0</Max>
+        </Length>
+        <Params>
+          <Param id="0" name="Redundancy" type="bool">1</Param>
+        </Params>
+      </Decoder>
+      <Decoder id="119" name="US4STATE">
+        <Enabled type="bool">0</Enabled>
+      </Decoder>
+    </Decoders>
+    <ReaderParams name="Reader Params">
+      <ReaderType name="Reader Type" type="fixed" value="0" skip="0">
+        <Params pid="0" name="Laser" skip="0">
+          <Param id="0" name="Aim type" type="select" oid="0" value="0">
+            <option id="0" name="Trigger" value="0" />
+            <option id="1" name="Timed hold" value="1" />
+            <option id="2" name="Timed release" value="2" />
+          </Param>
+          <Param id="1" name="Aim duration" type="integer" min="1000" max="10000">5000</Param>
+          <Param id="2" name="Aim mode" type="select" oid="0" value="0">
+            <option id="0" name="None" value="0" />
+            <option id="1" name="Dot" value="1" />
+            <option id="2" name="Slab" value="2" />
+            <option id="3" name="Reticle" value="3" />
+          </Param>
+          <Param id="3" name="Narrow beam" type="bool">0</Param>
+          <Param id="4" name="Raster mode" type="select" oid="0" value="0">
+            <option id="0" name="None" value="0" />
+            <option id="1" name="Open always" value="1" />
+            <option id="2" name="Smart" value="2" />
+          </Param>
+          <Param id="5" name="Beam timer" type="integer" min="0" max="10000">0</Param>
+          <Param id="6" name="Control scan LED" type="bool">0</Param>
+          <Param id="7" name="Scan LED logic level" type="bool">0</Param>
+          <Param id="8" name="Klasse Eins enable" type="bool">0</Param>
+          <Param id="9" name="Bidir. redundancy" type="bool">0</Param>
+          <Param id="10" name="Linear security level" type="select" oid="0" value="0">
+            <option id="0" name="Redundancy+length" value="0" />
+            <option id="1" name="Short or CODABAR" value="1" />
+            <option id="2" name="All twice" value="2" />
+            <option id="3" name="Long and short" value="3" />
+            <option id="4" name="All thrice" value="4" />
+          </Param>
+          <Param id="11" name="Pointer timer" type="integer" min="0" max="10000">0</Param>
+          <Param id="12" name="Raster height" type="integer" min="0" max="100">0</Param>
+          <Param id="13" name="DBP mode" type="select" oid="0" value="0">
+            <option id="0" name="Normal" value="0" />
+            <option id="1" name="Composite" value="1" />
+          </Param>
+        </Params>
+        <Params pid="1" name="Contact" skip="0">
+          <Param id="0" name="Quiet zone ratio" type="integer" min="0" max="10">1</Param>
+          <Param id="1" name="Initial scan time" type="integer" min="1000" max="10000">5000</Param>
+          <Param id="2" name="Pulse delay" type="integer" min="0" max="10000">1000</Param>
+        </Params>
+        <Params pid="2" name="Imager" skip="0">
+          <Param id="0" name="Aim type" type="select" oid="0" value="0">
+            <option id="0" name="Trigger" value="0" />
+            <option id="1" name="Timed hold" value="1" />
+            <option id="2" name="Timed release" value="2" />
+            <option id="3" name="Presentation" value="4" />
+          </Param>
+          <Param id="1" name="Aim duration" type="integer" min="1000" max="10000">5000</Param>
+          <Param id="2" name="Aim mode" type="select" oid="0" value="0">
+            <option id="0" name="None" value="0" />
+            <option id="1" name="Dot" value="1" />
+            <option id="2" name="Slab" value="2" />
+            <option id="3" name="Reticle" value="3" />
+          </Param>
+          <Param id="3" name="Beam timer" type="integer" min="0" max="10000">0</Param>
+          <Param id="4" name="Pointer timer" type="integer" min="0" max="10000">0</Param>
+          <Param id="5" name="Img capt. timeout" type="integer" min="0" max="10000">0</Param>
+          <Param id="6" name="Img comp. timeout" type="integer" min="0" max="10000">0</Param>
+          <Param id="7" name="Linear security" type="select" oid="0" value="0">
+            <option id="0" name="Redundancy+length" value="0" />
+            <option id="1" name="Short or CODABAR" value="1" />
+            <option id="2" name="All twice" value="2"></option>
+            <option id="3" name="Long and short" value="3" />
+            <option id="4" name="All thrice" value="4" />
+          </Param>
+          <Param id="8" name="Focus mode" type="select" oid="0" value="0">
+            <option id="0" name="Fixed" value="0" />
+            <option id="1" name="Auto" value="1" />
+          </Param>
+          <Param id="9" name="Focus position" type="select" oid="0" value="0">
+            <option id="0" name="Far" value="0" />
+            <option id="1" name="Near" value="1" />
+          </Param>
+          <Param id="10" name="Poor quality mode" type="bool">0</Param>
+          <Param id="11" name="Picklist mode" type="select" oid="0" value="0">
+            <option id="0" name="Disabled" value="0" />
+            <option id="1" name="Enabled/HW reticle" value="1" />
+            <option id="2" name="Software reticle" value="2" />
+          </Param>
+          <Param id="12" name="DPM mode" type="bool">0</Param>
+          <Param id="13" name="Illumination mode" type="select" oid="0" value="0">
+            <option id="0" name="Auto" value="0" />
+            <option id="1" name="Always off" value="1" />
+            <option id="2" name="Always on" value="2" />
+          </Param>
+          <Param id="14" name="VF left pos." type="integer" min="0" max="600">0</Param>
+          <Param id="15" name="VF top pos." type="integer" min="0" max="600">0</Param>
+          <Param id="16" name="VF right pos." type="integer" min="0" max="600">0</Param>
+          <Param id="17" name="VF bottom pos." type="integer" min="0" max="600">0</Param>
+          <Param id="18" name="VF mode" type="select" oid="0" value="0">
+            <option id="0" name="Disabled" value="0" />
+            <option id="1" name="Enabled" value="1" />
+            <option id="2" name="Static reticle" value="2" />
+            <option id="3" name="Dynamic reticle" value="3" />
+          </Param>
+          <Param id="19" name="VF feedback" type="select" oid="0" value="0">
+            <option id="0" name="Disabled" value="0" />
+            <option id="1" name="Enabled" value="1" />
+            <option id="2" name="Reticle" value="2" />
+          </Param>
+          <Param id="20" name="VF feedback time" type="integer" min="0" max="5000">0</Param>
+          <Param id="21" name="Inverse 1d mode" type="select" oid="0" value="0">
+            <option id="0" name="Disabled" value="0" />
+            <option id="1" name="Enabled" value="1" />
+            <option id="2" name="Auto" value="2" />
+          </Param>
+        </Params>
+      </ReaderType>
+    </ReaderParams>
+    <ScanParams name="Scan Params">
+      <CodeID type="select" oid="0" value="0">
+        <option id="0" name="None" value="0" />
+        <option id="1" name="Symbol" value="1" />
+        <option id="2" name="Aim" value="2" />
+      </CodeID>
+      <ScanType type="select" oid="1" value="1">
+        <option id="0" name="Foreground" value="0" />
+        <option id="1" name="Background" value="1" />
+        <option id="2" name="Monitor" value="2" />
+      </ScanType>
+    </ScanParams>
+    <InterfaceParams name="Interface Params">
+      <InterfaceType name="Interface Type" type="fixed" value="3" skip="0">
+        <Params pid="0" name="QSNAC" skip="0">
+          <Param id="0" name="Enable settling time" type="integer" min="0" max="10000">0</Param>
+          <Param id="1" name="Inverse label data" type="bool">0</Param>
+          <Param id="3" name="White data logic level" type="bool">0</Param>
+          <Param id="4" name="Transition resolution" type="integer" min="0" max="10000">0</Param>
+          <Param id="5" name="Power settling time" type="integer" min="0" max="10000">0</Param>
+        </Params>
+        <Params pid="1" name="SSI" skip="0">
+          <Param id="0" name="Power settling time" type="integer" min="0" max="10000">0</Param>
+          <Param id="1" name="PwrOff settling time" type="integer" min="0" max="10000">0</Param>
+        </Params>
+        <Params pid="2" name="LS48XX" skip="0">
+          <Param id="0" name="Power settling time" type="integer" min="0" max="10000">0</Param>
+        </Params>
+        <Params pid="3" name="LIGHTHOUSE" skip="0">
+          <Param id="0" name="Power settling time" type="integer" min="0" max="10000">0</Param>
+          <Param id="1" name="Enable settling time" type="integer" min="0" max="10000">0</Param>
+          <Param id="2" name="Low power time" type="integer" min="0" max="10000">0</Param>
+        </Params>
+        <Params pid="4" name="CAMSCAN" skip="0">
+          <Param id="0" name="Enable settling time" type="integer" min="0" max="10000">0</Param>
+          <Param id="1" name="Power settling time" type="integer" min="0" max="10000">0</Param>
+        </Params>
+      </InterfaceType>
+    </InterfaceParams>
+    <RSMAttributes name="RSM Params">
+      <Params name="RSM" skip="0">
+        <Param id="402" name="Picklist" type="select" oid="0" value="0">
+          <option id="0" name="Disabled" value="0" />
+          <option id="1" name="Enabled" value="2" />
+        </Param>
+        <Param id="409" name="Good decode" type="select" oid="0" value="0">
+          <option id="0" name="Enabled" value="0" />
+          <option id="1" name="Disabled" value="1" />
+        </Param>
+        <Param id="533" name="Model number" value="Unknown" type="readonly">Unknown</Param>
+        <Param id="534" name="Serial number" value="Unknown" type="readonly">Unknown</Param>
+        <Param id="535" name="Date of manufacture" value="Unknown" type="readonly">Unknown</Param>
+        <Param id="536" name="Date of service" value="Unknown" type="readonly">Unknown</Param>
+        <Param id="541" name="BT Address" value="Unknown" type="readonly">Unknown</Param>
+        <Param id="549" name="BT Authentication" type="bool">1</Param>
+        <Param id="550" name="BT Encryption" value="1" type="bool">1</Param>
+        <Param id="552" name="BT PIN code" value="12345" type="string">12345</Param>
+        <Param id="558" name="Reconnect attempts" value="12" type="integer" min="0" max="255">12</Param>
+        <Param id="559" name="Beep on Recon attempt" value="0" type="bool">0</Param>
+        <Param id="604" name="HID auto reconnect" type="select" oid="0" value="0">
+          <option id="0" name="Never" value="0" />
+          <option id="1" name="On data" value="1" />
+          <option id="2" name="Immediately" value="2" />
+        </Param>
+        <Param id="607" name="BT friendly name" value="Unknown" type="string">Unknown</Param>
+        <Param id="608" name="PIN code type" value="0" type="bool">0</Param>
+        <Param id="610" name="BT inquiry mode" type="select" oid="0" value="0">
+          <option id="0" name="General" value="0" />
+          <option id="1" name="Limited" value="1" />
+        </Param>
+        <Param id="673" name="Exclusive Code128" value="0" type="bool">0</Param>
+        <Param id="768" name="Mems" value="1" type="bool">1</Param>
+        <Param id="769" name="Proximity" value="1" type="bool">1</Param>
+        <Param id="770" name="Proximity Distance" type="select" oid="2" value="2">
+          <option id="0" name="Short" value="0" />
+          <option id="1" name="Mid" value="1" />
+          <option id="2" name="Long" value="2" />
+        </Param>
+        <Param id="777" name="Paging" value="1" type="bool">1</Param>
+        <Param id="778" name="Paging beep sequence" value="15" type="integer" min="0" max="15">15</Param>
+        <Param id="779" name="LoBatt indication" value="0" type="bool">0</Param>
+        <Param id="780" name="ScanTrig wakeup" value="0" type="bool">0</Param>
+        <Param id="784" name="BT auto reconnect" type="select" oid="2" value="2">
+          <option id="0" name="None" value="0" />
+          <option id="1" name="On power" value="1" />
+          <option id="2" name="On out of range" value="2" />
+          <option id="3" name="On power+range" value="3" />
+        </Param>
+        <Param id="787" name="LoBatt Ind cycle" value="0" type="integer" min="1" max="5">1</Param>
+        <Param id="789" name="Preferred Wireless Host" type="select" oid="0" value="18">
+          <option id="0" name="Scan" value="18" />
+          <option id="1" name="Spp" value="19" />
+          <option id="2" name="Hid" value="20" />
+        </Param>
+        <Param id="793" name="Proximity continuous" value="0" type="bool">0</Param>
+        <Param id="794" name="Good scans delay" value="0" type="integer" min="0" max="15000">0</Param>
+        <Param id="795" name="Force pairing save" type="select" oid="0" value="0">
+          <option id="0" name="Disabled" value="0" />
+          <option id="1" name="Enabled" value="1" />
+        </Param>
+        <Param id="20004" name="Firmware version" value="Unknown" type="readonly">Unknown</Param>
+        <Param id="20007" name="Device class" value="Unknown" type="readonly">Unknown</Param>
+        <Param id="30003" name="Battery status" value="Unknown" type="readonly">Unknown</Param>
+        <Param id="30009" name="Battery capacity" value="Unknown" type="readonly">Unknown</Param>
+        <Param id="30010" name="Battery ID" value="Unknown" type="readonly">Unknown</Param>
+      </Params>
+    </RSMAttributes>
+	<ReconectionTimeout type="integer" min="30000" max="300000">60000</ReconectionTimeout>
+    <SoftTrigger name="Auto trigger">
+	  <Enabled type="bool">0</Enabled>
+	  <Timeout type="integer" min="100" max="5000">3000</Timeout>
+	</SoftTrigger>
+    <Feedback name="Feedback">
+      <GoodDecode name="Good decode" type="feedback" />
+      <BadDecode name="Bad decode" type="feedback" />
+    </Feedback>
+  </Device>
+</PlugIn>

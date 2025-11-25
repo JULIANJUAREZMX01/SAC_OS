@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PlugIn id="SERIAL" name="Serial" version=" 1.00">
+  <Device id="1" name="COM1">
+    <Enabled type="bool">0</Enabled>
+    <PortSettings name="Port settings">
+      <BaudRate name="Baud rate" type="select" oid="2" value="9600">
+        <option id="0" name="2400" value="2400" />
+        <option id="1" name="4800" value="4800" />
+        <option id="2" name="9600" value="9600" />
+        <option id="3" name="19200" value="19200" />
+        <option id="4" name="38400" value="38400" />
+        <option id="5" name="57600" value="57600" />
+        <option id="6" name="115200" value="115200" />
+      </BaudRate>
+      <DataBits name="Data bits" type="select" oid="1" value="8">
+        <option id="0" name="7" value="7" />
+        <option id="1" name="8" value="8" />
+      </DataBits>
+      <StopBits name="Stop bits" type="select" oid="0" value="1">
+        <option id="0" name="1" value="1" />
+        <option id="1" name="1.5" value="1.5" />
+        <option id="2" name="2" value="2" />
+      </StopBits>
+      <Parity name="Parity" type="select" oid="0" value="none">
+        <option id="0" name="None" value="none" />
+        <option id="1" name="Odd" value="odd" />
+        <option id="2" name="Even" value="even" />
+        <option id="3" name="Mark" value="mark" />
+        <option id="4" name="Space" value="space" />
+      </Parity>
+    </PortSettings>
+    <SendAfter name="Send after...">
+      <CR name="Carriage return" type="bool">0</CR>
+      <LF name="Line feed" type="bool">0</LF>
+      <Character name="Character">
+        <Enabled type="bool">0</Enabled>
+        <Char name="Character value" type="integer" min="0" max="255">9</Char>
+      </Character>
+      <CharacterCount name="Character count">
+        <Enabled type="bool">0</Enabled>
+        <Count name="Count" type="integer" min="1" max="32768">1</Count>
+      </CharacterCount>
+      <Timeout name="Timeout">
+        <Enabled type="bool">0</Enabled>
+        <Time name="Time (ms)" type="integer" min="1" max="30000">1000</Time>
+      </Timeout>
+    </SendAfter>
+    <ReconnectTimeout name="Reconnect timeout" type="integer" max="120000" min="0">0</ReconnectTimeout>
+    <Feedback>
+      <OnData name="OnData" type="feedback" />
+    </Feedback>
+  </Device>
+</PlugIn>

@@ -1,0 +1,21 @@
+// 38-Key 9000 Gemini Short Alpha
+
+[DEFAULT]
+0x7D = 8200 //Green to Previous Session
+0x7E = 8300 //Red to Next Session
+0x6B = 002B //Blue Space to + 
+0x6A = 002A //Blue Display backlight to *
+
+[SHIFT]
+
+[CONTROL]
+
+[ALT]
+
+{WEB}
+[CONTROL]
+0x42 = 0xB101 // <CTRL><B> is Back
+0x46 = 0xB102 // <CTRL><F> is Forward
+0x48 = 0xB103 // <CTRL><H> is Home
+0x52 = 0xB104 // <CTRL><R> is Refresh
+0x53 = 0xB105 // <CTRL><S> is Stop

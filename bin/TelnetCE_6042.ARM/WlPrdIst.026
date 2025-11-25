@@ -1,0 +1,28 @@
+[TelnetCE] // Product Install
+
+[STRINGS]
+RootDir = "."
+InstallDir = "$RootDir$"
+FlashRoot = "\Application"
+FlashDir = "$FlashRoot$\Wavelink\TelnetCE"
+
+[REGFILE] // backup the registry settings
+"Name"="$InstallDir$\Install\TelnetCE.reg"
+
+[HKEY_LOCAL_MACHINE\Software\Wavelink\TelnetCE]
+"InstallDir"="$InstallDir$"
+"ConfigDir"="$FlashDir$\Config"
+
+[RENAME]
+$InstallDir$\TelnetCE_Launcher.exe=$InstallDir$\Install\TelnetCE_Launcher.exe
+$InstallDir$\WLTelnetCE_9000PPC.reg=$InstallDir$\Install\WLTelnetCE_9000PPC.reg
+
+[COPY] // Place where Symbol can see it.
+$InstallDir$\Install\WLTelnetCE_9000PPC.reg=$FlashRoot$\WLTelnetCE_9000PPC.reg
+
+[COPY] // Support Symbol's Demo application
+$InstallDir$\Install\TelnetCE_Launcher.exe=\Windows\TelnetCE.exe
+
+[SHORTCUT]
+// "$START_MENU_DIR$\TelnetCE.lnk"="$InstallDir$\TelnetCE.exe"
+// "$PROGRAMS_DIR$\TelnetCE.lnk"="$InstallDir$\TelnetCE.exe"

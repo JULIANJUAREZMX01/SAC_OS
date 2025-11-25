@@ -1,0 +1,745 @@
+; *******************************************************************
+;
+; (c) Copyright 2007, Motorola.
+; All Rights Reserved
+;
+; *******************************************************************
+;
+; NOTICE:   The source code contained in this listing is a
+;           proprietary trade secret of Motorola.
+;           Unauthorized copying, adaptation, distribution, use,
+;           or display is prohibited.
+;
+; *******************************************************************
+; *******************************************************************
+;
+; Version     : 1.0
+; Status      : Under development
+; File        : g729.reg
+; Author(s)   : Rodriguez Matias
+;
+; Create Date : Sep 29, 2008
+; Description :
+;  Registry Configuration File for G729 Audio Codecs
+;
+; Modification History :
+; Date				Name              		CR         		Comments
+; Sep 29, 2008   	Rodriguez Matias		CCMPD01111773	Initial version
+; *******************************************************************
+
+[HKEY_LOCAL_MACHINE\Drivers\BuiltIn\CODEC_G729]
+    "Prefix"="ACM" 
+    "Dll"="g729.dll"
+    "Order"=dword:00000000 ;---------------------------------
+;RegMerge Tool
+;39 files merged
+;---------------------------------
+;Common Registry Files:
+;---------------------------------
+;wspmain.reg
+;################################################################################
+;#                         COPYRIGHT 2003 MOTOROLA
+;#                           ALL RIGHTS RESERVED.
+;#             MOTOROLA CONFIDENTIAL PROPRIETARY WHEN FILLED OUT
+;#
+;################################################################################
+;#
+;#   FILE NAME       : wspstream.regf
+;#   ORIGINATOR      : Imran Raza
+;#   DATE OF ORIGIN  : 05SEP2003
+;#
+;#---------------------------------- PURPOSE ------------------------------------
+;#
+;#
+;#--------------------------------- REVISIONS -----------------------------------
+;# Date       Name                 Tracking#      Description
+;# ---------  -------------------  -------------  -------------------------------
+;# 05Mar2004  Balaji Krishnan      SWIdn00013647  Added DisableUserTOSSetting
+;# 06Mar2004  Retesh Chadha        SWIdn00012989  Added sipua timer values
+;# 09Mar2004  Bryan Knottek        SWIdn00008438  chng microDhcpTimeout value
+;# 21Mar2004  James Reus           SWIdn00007045  Changed 'Order' of dll
+;# 22Mar2004  Bryan Knottek        SWIdn00013783  add wspSkipMicroDHCP reg read
+;# 05Apr2004  Bryan Knottek        SWIdn00016489  add wspEnableBandwidthRsrv
+;# 19Apr2004  Mahesh Mutha         SWIdn00017765  add wspDispatchVocoderVSELP
+;# 30Apr2004  Bryan Knottek        SWIdn00016955  rm wspSipEnableBandwidthRsrv
+;# 19APR2004  Jeff Sandler         SWIdn00016874  Add MOT_FACTORY_SUPPORT
+;# 07May2004  Wendy Huang          SWIdn00019541  Change Vendor class id. to sccan-wlan-ms
+;#                                                in MOT_TI_WLAN_DRIVER
+;# 19APR2004  Amol Jadi            SWIdn00019146  Comment on shutdown timer.
+;# 17JUN2004  Ashar Mairaj         SWIdn00023191  Turn on the BW reservation.
+;# 23JUN2004  Krish                SWIdn00023298  Flag for G729 as preferred codec
+;# 28JUN2004  Wendy Huang          SWIdn00023835  support for enet over USB
+;# 07JUL2004  Bryan Knottek        SWIdn00024550  add wspSendBlackOnDrvActivate
+;# 21JUL2004  Bryan Knottek        SWIdn00025918  change shutdown state timeout
+;# 04AUG2004  Bryan Knottek        SWIdn00027257  set default TTYMode
+;# 09AUG2004  Jeff Neufeld         SWIdn00026137  wspSendWlnStatusInd always on
+;# 15SEP2004  Riyad Abd            SWIdn00031301  Registry configurable thread priority
+;# 05OCT2004  Santosh Kumar        SWIdn00033074  added registry variable for adhoc calls and angular ;#                                                brackets support
+;# 07OCT2004  ASHAR MAIRAJ         SWIdn00033445  Change the thread priority to 250
+;# 11OCT2004  David N. Taylor      SWIdn00033230  Configure SIPUA for Call Waiting tone.
+;# 16OCT2004  Retesh Chadha        SWIdn00034202  Change the preferred codec to G729
+;# 16OCT2004  Mahesh Mutha         SWIdn00034656  Enable Hardcode date by reg flag
+;# 04NOV2004  Ashar Mairaj         SWIdn00035505  Add wspReduceRegRenewTimer
+;# 07NOV2004  Murli S              SWIdn00035413  Added TCP IP Keep Alive Timer
+;# 12NOV2004  Ramana Kesharaju     SWIdn00034061  Tagging for FlexEdit tool.
+;# 09Nov2004  Chaya RT             SWIdn00033474  Added TTA_TEST_IND
+;# 14DEC2004  Bryan Knottek        SWIdn00036827  add retry exhausted value
+;# 17JAN2005  Bryan Knottek        SWIdn00039104  chg max retry timer values
+;# 20JAN2005  Mahesh Mutha         SWIdn00039321  Add Dispatch TLS Handshake Timeout
+;# 15NOV2004  Bryan Knottek        SWIdn00035961  controlling dhcp changes
+;# 09MAR2005  Murli                SWIdn00040481  Added varibales for testing tls connection.
+;# 04MAR2005  Bryan Knottek        SWIdn00041813  set retry exh value high
+;# 17MAR2005  Bryan Knottek /      SWIdn00042085  add DhcpMaxRetry and change
+;#            Wendy Huang                         microDhcpTimeout to 60 sec
+;# 23MAR2005  Bryan Knottek        SWIdn00035761  Support for GSM Proxy for TC
+;# 04MAY2005  Srikanth V           SWIdn00044116  Registry configuration for 
+;#                                                dynamic payload numbers of 
+;#                                                telephone events (DTMF)
+;# 02JUN2005  Pooran Singh         SWIdn00044961  changed transport mode to RTP only
+;# 16JUN2005  Wendy Huang          SWIdn00044088  Add wspRTCPChkReassocTimerVal.
+;# 12JUL2005  Ramya Jothi          SWIdn00042236  Support for PRACK & Early Offer
+;# 28Jan2005  Pooran singh Negi \  SWIdn00038845  Time out value for queued call 
+;#            Bryan Knottek                       time  wspCallQueingTimer
+; 27JUL2005   Subramanya M S     SWIdn00046806  Registry Configuration for Codec Params
+;# 06AUG2007  Esteban Papp       CCMPD00811514  Added Adapter name (extracted from tiwlanapi.regf)
+;# 23AUG2007  Esteban Papp       CCMPD00850226  Added autostart wspregwlan
+;# 24OCT2007  Esteban Papp       CCMPD00872816  reenabled bw reservation
+;# 20NOV2007  Lucas Olmos		 CCMPD00872816	disable bw reservation
+;# 04Dec2007  Esteban Papp       CCMPD00943472  Enabled BW reservation
+;# 04Jan2008  Esteban Papp       CCMPD00958256  Disable BW reservation until SR CCMPD00957905 is closed
+;# 15DIC2008  Hugo Villalba 	 CCMPD00964302	reenabled bw reservation
+;# 17DIC2007  Hugo Villalba		 ccmpd00950203	Add keys for both Unconditional & Busy-NoAnswer Call Fwd status 
+;# 30JAN2008  Esteban Papp       ccmpd00967277  Removed adapter name and added DHCP entries for supplicant adapter
+;# 5Feb2008		Pablo Aghemo		CCMPD00978022 Default codec for IC call should be G711 instead of G729
+;# 07Feb2008  Esteban Papp       CCMPD00979633  Fix codec payload type in wspstream.regf
+;# 09APR2008  Martin Acevedo     CCMPD01018521  Change the preferred codec to G729
+;# 29APR2008  Martin Acevedo     CCMPD01030182  Change DhcpMaxRetry value from 0 to FFFFFFFFF
+;# 30APR2008  Cristian Signorelli	CCMPD01030204  Add key "60" in 
+;# 06MAY2008  Lorena Begolea     CCMPD01032783  Change DhcpMaxRetry value from 0 to FFFFFFFF (eight F)
+;# 07MAY2008  Bressan Dario     CCMPD01033875  Add DhcpRetryDialogue value FFFFFFFF (eight F)
+;# 26JUN2008  Signorelli Cristian  CCMPD01057650  Change Launch106 for autostart ImportClientCertFromPSD.exe
+;# 02212009   Rodriguez Matias     CCMPD01169453       TEAM and TE Interaction Support
+;# 07/06/2010   del Corro / Oll?	CCMPD01368024	Add MC31xx CE6
+; HKEY_LOCAL_MACHINE\Comm\Name_Interface\Parms\TcpIp\DhcpSendOptions for that the DHCP Server can identify ESM subscribers uniquely
+
+;[HKEY_LOCAL_MACHINE\Init]
+;	"Launch106"="ImportClientCertFromPSD.exe"
+
+;[HKEY_LOCAL_MACHINE\Comm\Tcpip\Parms]
+;   "DisableUserTOSSetting"=dword:0
+;   "KeepAliveTime"=dword:6300000 ;1hr,45mins
+
+[HKEY_LOCAL_MACHINE\Services\VCWSP]
+"Prefix"="WSP"
+"Dll"="wspstream.cvc.dll"
+"Order"=dword:000003E7
+"Index"=dword:2
+"Priority256"=dword:000000FA
+"Display Name"="WSP"
+"Description"="Stream driver for WSP"
+
+[HKEY_LOCAL_MACHINE\Motorola\VC\Enterprise\WSP]
+  ;Use if WSP_AOFR_DOMAIN_HCODE is set in PROTOCOLS.DEF file
+"sipAoRDomain" = "comm.mot.com"
+  ;Timer values should be in seconds
+"wspDhcpingStateTimeout"=dword:0000012C       ;5 min
+"wspBootstrapingStateTimeout"=dword:0000012C  ;5 min
+;WARNING!!! "wspShutdownStateTimeout" MUST be less than
+;MM's wlan de-reg timer value (rtr.regf file).
+"wspShutdownStateTimeout"=dword:00000005       ;5 sec
+"wspVomailSubRetryMin"=dword:0000000F          ;15 sec
+"wspVomailSubRetryMax"=dword:00001C20          ;2 hrs
+"wspSipRegRetryMin"=dword:00000005             ;5 sec
+"wspSipRegSubRetryMax"=dword:00000078          ;2 min
+"wspDispRegRetryMin"=dword:00000005            ;5 sec
+"wspDispRegSubRetryMax"=dword:00000078         ;2 min
+"wspDhcpRetryMin"=dword:00000005               ;5 sec
+"wspDhcpRetryMax"=dword:00000078               ;2 min
+"wspBootstrapRetryMin"=dword:00000005          ;5 sec
+"wspBootstrapRetryMax"=dword:00000078          ;2 min
+"wspCallForwRetryMin"=dword:00000005           ;5 sec
+"wspCallForwRetryMax"=dword:0000012C           ;5 min
+"wspGsmPrxyRegRetryMin"=dword:00000005         ;5 sec
+"wspGsmPrxyRegRetryMax"=dword:00000708         ;30 min
+"wspC1ContactExpires"=dword:7FFFFFFF           ;4294967295 sec
+"wspVMContactExpires"=dword:7FFFFFFF           ;4294967295 sec
+"wspCallForwardStatusAll"=dword:00000000       ;TAPI_NOTACTIVE
+"wspCallForwardStatusBusy"=dword:00000000       ;TAPI_NOTACTIVE
+"DcmNullCipher"=dword:00000000                 ;Dcm Null Cipher Support
+"DcmTlsTimeout"=dword:00000020                 ;Time to Comple TLS HandShake
+"wspDispatchVocoderVSELP"=dword:00000000       ;0 for AMBE, 1 for VSELP
+"wspSipTransportProtocol"="TLS"         ;SIP Messages Sent over TLS
+"wspSipUriScheme"="sip:"               ;SIP URI Scheme
+"wspSipTelUriScheme"="tel:"             ;Tel URI Scheme used by SIP
+"wspSipLocalClientPort"="5061"          ;TCP/TLS Client port
+"wspSipMaxCalls"="4"                    ;MAx Calls to be supported by sip
+"wspRequireConfGenericParam"="1"        ;1=Refer-to won't have angular brackets
+"wspSendWlnStatusInd"=dword:1           ;0=don't 1=send
+"wspSipIcTimer"=dword:00030D40             ;200000 msec
+"wspSipNoAckTimer"=dword:00007D00           ;32000 msec
+"wspSipKeepAckTimer"=dword:00007D00         ;32000 msec
+"wspSipFinalRespTimer"=dword:00030D40       ;200000 msec
+"wspSip2xxRtxTimer"=dword:000001F4          ;500 msec
+"wspSip2xxRtxMax"=dword:00000FA0            ;4000 msec
+"wspEnableBandwidthRsrv"=dword:00000000     ;enable b/w reservation
+"WSPHardCodeDate"=dword:1            ;Hardcode Date
+"WSPHardCodeYear"=dword:000007D4            ;Hardcode Date Year
+"WSPHardCodeMonth"=dword:0000000A              ;Hardcode Date Month
+"WSPHardCodeDay"=dword:1                ;Hardcode Date Day
+"wspCallWaitingTone"=dword:0            ;0 - No for SIP, Yes for RTR; 1 - yes for SIP, No for RTR
+"wspSkipMicroDHCPFlag"=dword:0          ;skip micro_DHCP code
+"wspWsmStubflag"=dword:0                ;1=use stub 0=normal
+"wspSendBlackOnDrvActivate"=dword:1     ;send blk cov when drv is actvd
+"wspReduceRegRenewTimer"=dword:00000078       ;120 secs
+"wspRetryExhaustedValue"=dword:7FFFFFFF       ;num of times to retry a failure before moving to GSM
+"wspEnableConnTest"=dword:0             ;0 - Disabling Conn test , 1 - To enable
+"wspConnTestRemoteId"="9548008050"      ;Remote user Id for conn test
+"wspSupportedTransportType"=dword:1     ;1 RTP_ONLY, 2 SRTP_ONLY, 3 SRTP_RTP 4 RTP_SRTP - for sip instance
+"wspOGCallTransportType"=dword:1        ;1 RTP_ONLY, 2 SRTP_ONLY, 3 SRTP_RTP 4 RTP_SRTP  - for outgoing call
+"wspSccanMapInterval"=dword:00000258  ;10 min (used for GSM Proxy Reg and SMS in WLAN)
+"wspRTCPChkReassocTimerVal"=dword:1     ;1 secs wait for reassociation
+"wspPrackSupport"=dword:0               ;Enable/Disable support for PRACK 
+"wspEarlyOffer"=dword:0                 ;Enable/Disable support for PRACK 
+"wspInviteWithOffer"=dword:1            ;Initial INVITE goes with SDP 
+"wspReInviteWithOffer"=dword:1          ;REINVITE goes with SDP
+"wsp1xxwithSDP"=dword:0                 ;SDP(answer) in 1xx provisional response
+"wspPrackWithOffer"=dword:0             ;PRACK Method will contain another OFFER.
+"wspEnableCallQueuing"=dword:1          ;enable/disable call queueing in DHCP/BSTRAP
+"wspCallQueingTimer"=dword:1            ;1 sec timeout value for queued call
+"WSPBootFromRegistry"=dword:1			; IMPORTANT!!! Boot from registry
+"wspCodecCount"=dword:4
+"wspPayload1"=dword:00000012 ; 18
+"wspEnableSilenceSuppression1"=dword:0
+"wspPayload2"=dword:0 ; 0
+"wspEnableSilenceSuppression2"=dword:0
+"wspPayload3"=dword:00000008 ; 8
+"wspEnableSilenceSuppression3"=dword:0
+"wspPayload4"=dword:00000065 ; 101
+"wspEnableSilenceSuppression4"=dword:0
+"wspCodecName4"="telephone-event"
+"wspClockRate4"=dword:00001F40 ; 8000
+"wspEncodingParam4"=dword:0
+
+[HKEY_LOCAL_MACHINE\Motorola\VC\Enterprise\CryptoSuite]
+    ;CryptoCount
+"wspCryptoSuiteCount"=dword:1
+   ;Preferred Crypto Suite
+    ;0-> NULL
+    ;1-> AES_CM_128
+    ;2-> F8_128(Not Supported)
+"wspCryptoSuiteEncryptionAlgoIndex1"=dword:1
+    ;0-> NULL
+    ;1-> HMAC_SHA1_80
+    ;2-> HMAC_SHA1_32
+"wspCryptoSuiteAuthAlgoIndex1"=dword:1
+
+    ;Second Crypto Suite
+    ;0-> NULL
+    ;1-> AES_CM_128
+    ;2-> F8_128(Not Supported)
+"wspCryptoSuiteEncryptionAlgoIndex2"=dword:1
+    ;0-> NULL
+    ;1-> HMAC_SHA1_80
+    ;2-> HMAC_SHA1_32
+"wspCryptoSuiteAuthAlgoIndex2"=dword:2
+
+;[HKEY_LOCAL_MACHINE\Comm\TIWLNAPI1\Parms\TcpIp]   
+;   "DhcpMaxRetry"=dword:7FFFFFFF
+;   "DhcpRetryDialogue"=dword:7FFFFFFF
+
+;[HKEY_LOCAL_MACHINE\Comm\TIWLNAPI1\Parms\TcpIp\DhcpOptions]
+;   @=""
+;   "1"=""
+;   "3"=""
+;   "6"=""
+;   "15"=""
+;   "43"=""
+
+;[HKEY_LOCAL_MACHINE\Comm\TIWLNAPI1\Parms\TcpIp\DhcpSendOptions]
+; This should be REG_SZ
+;   "" = "1"
+;   "60"= hex: 3C,0E,73,63,63,61,6E,2D,77,6C,61,6E,2D,6D,73,00
+
+;[HKEY_LOCAL_MACHINE\Comm\DSFLTR_TIWLNAPI1\Parms\TcpIp]   
+;   "DhcpMaxRetry"=dword:7FFFFFFF 
+;   "DhcpRetryDialogue"=dword:7FFFFFFF
+
+;[HKEY_LOCAL_MACHINE\Comm\DSFLTR_TIWLNAPI1\Parms\TcpIp\DhcpOptions]
+;   @=""
+;   "1"=""
+;   "3"=""
+;   "6"=""
+;   "15"=""
+;   "43"=""
+
+;[HKEY_LOCAL_MACHINE\Comm\DSFLTR_TIWLNAPI1\Parms\TcpIp\DhcpSendOptions]
+; This should be REG_SZ
+;   "" = "1"
+;   "60"= hex: 3C,0E,73,63,63,61,6E,2D,77,6C,61,6E,2D,6D,73,00
+
+[HKEY_LOCAL_MACHINE\Software\Octave\DataLogger\RegistrationErrors]
+"FilePath"="RegistrationErrors"
+"Output"=dword:2
+"SeverityMask"=dword:00080000
+
+[HKEY_LOCAL_MACHINE\Motorola\VC\Enterprise\Telephony\dispatch]
+"GCModeSelector"=dword:0
+;bootstrap.reg
+;--------------------------------- REVISIONS -----------------------------------
+; Date       Name                 Tracking#       Description
+; ---------  -------------------  ----------      ------------------------------
+; 02/12/2004  Mahesh Mutha         SWIdn00012373         Added Header and 
+;                                                        Mobile Boot Strap via Registry
+; 02/19/2004  Tim Klemm            SWIdn00012643         Skip registration via Registry
+; 03/11/2004  Ramana Kesharaju     SWIdn00014280         Changing cache Time
+; 04/15/2004  Ramana Kesharaju     SWIdn00017466         Added Etag default value.
+; 04/15/2004  Dar Tariq            SWIdn00017162         set default value of vmservernum to blank
+; 04/19/2004  Jeff Sandler         SWIdn00016874         Add MOT_FACTORY_SUPPORT
+; 05/11/2004  Ramana Kesharaju     SWIdn00019780         Added Defaultdata flag
+; 05/14/2004  Ramana Kesharaju     SWIdn00020150         Added HTTP method.
+; 07/21/2004  Retesh Chadha        SWIdn00013355         Added MOT_OAP_FROM_REGISTRY
+; 09/01/2004  Saji Xavier          SWIdn00028646         Modified WLAN related registry values.
+; 11/12/2004  Ramana Kesharaju     SWIdn00034061         Tagging for FlexEdit tool.
+; 03/11/2005  Ramana Kesharaju     SWIdn00037432         Bootstrap 1.5 changes
+; 13/04/2005  Saji Xavier          SWIdn00043137         Changed voice dscp value for FACTORY support.
+; 04/17/2005  James Reus           SWIdn00043422         Movied dcsp change from 43137 out of 
+;                                                        MOT_OAP_FROM_REGISTRY check
+; 04/29/2005  Pooran               SWIdn00043580         Added  user agent header key 
+; 16/15/2005  Saji Xaviar          SWIdn00045573         Changed SIP Uri Scheme to bootstrap.
+; 08/30/2007  Esteban Papp		   CCMPD00850191		 Added entry for wsplogin app and place to store user and pwd
+; 04/03/2008  Daniel Chicco		   CCMPD00996901         Delete SecureProtocols to fix "LTK - Secure Connectivity: Web Site cannot be authenticated."
+; 02/21/2009  Rodriguez Matias     CCMPD01169453         TEAM & TE Interaction Support
+; 12/22/2010  Davalle Sebasti?n	   CCMPD01456255		 DefaultDataFlag key was in a bad path
+; 02/05/2012  Belatti Diego        CCMPD01623770		 [TE 1.1.] NANO: (EMBPD00052280) Modify nanoTE installer to perform only one reboot after instalation
+;###############################################################################
+
+;[HKEY_LOCAL_MACHINE\Motorola\VC\Enterprise\BootStrap]
+;	"wsplogin"="wsplogin.exe"
+	
+;[HKEY_CURRENT_USER\Motorola\VC\User\Bootstrap]
+;	"userid"=""
+;	"pwd"=""
+
+[HKEY_LOCAL_MACHINE\Motorola\VC]
+"Uninstall"=dword:2
+
+;--------------------------------------------------
+;Network Mobile Boot TLS Security
+;--------------------------------------------------
+[HKEY_LOCAL_MACHINE\Motorola\VC\Enterprise\BootStrap]
+"hwmode"="&hwmode=single"
+"altconfigid"="&altconfigid=1"
+"vendor"="&vendor=motorola"
+"protver"="?oapbuildver=1.0"
+"oapcachetime"="1800000"
+"IfNoneMatch"="0"
+"httpMethod"="GET"
+
+[HKEY_LOCAL_MACHINE\Motorola\VC\Enterprise\WSP]
+"WSPSkipRegistration"=dword:0           ;Skip SIP registration
+
+;this is required, since mobile_boot requires oapPackage directory to exist
+[HKEY_LOCAL_MACHINE\system\qos\voice]
+"dscp"="0"
+
+[HKEY_LOCAL_MACHINE\Motorola\VC\Enterprise\BootStrap\oapPackage]
+"DefaultDataFlag"=dword:1
+
+[HKEY_LOCAL_MACHINE\System\Telephony]
+"memberId"="53"
+"fleetId"="1"
+"urbanId"="1"
+"dispatchImsi"="900000000000053"
+
+[HKEY_LOCAL_MACHINE\subscriber\telephony]
+"sipId"="9548008053"
+"cellPhone"="9548008053"
+"entPhone"="9548009053"
+
+[HKEY_LOCAL_MACHINE\system\data]
+"dataGateway"="dg.comm.mot.com"
+
+[HKEY_LOCAL_MACHINE\System\Telephony]
+"dispatchListenUdpPort"="7000"
+"dispatchListenTcpPort"="7009"
+"dispatchProxyPort"="3334"
+"dispatchProxy"="wsn1wlan1.comm.mot.com"
+	
+[HKEY_LOCAL_MACHINE\system\handover]
+"msHoHbUdpPort"="15016"
+"mobMgrHoHbUdpPort"="15015"
+"mobMgr"="mmserver.comm.mot.com"
+"hoHbMissPktThr"="6"
+"hoHbInterval"="500"
+"hoExpTimerDuration"="10000"
+"pbxHoNum2"="8473031244"
+"pbxHoNum1"="8473031234"
+
+[HKEY_LOCAL_MACHINE\system\qos\data]
+"trafficCls"="1"
+"vlanPri"="1"
+"dscp"="1"
+
+[HKEY_LOCAL_MACHINE\system\qos\lowPriVoice]
+"trafficCls"="1"
+"vlanPri"="3"
+"dscp"="43"
+
+[HKEY_LOCAL_MACHINE\system\qos\signaling]
+"trafficCls"="2"
+"vlanPri"="4"
+"dscp"="34"
+
+[HKEY_LOCAL_MACHINE\system\qos\voice]
+"trafficCls"="3"
+"vlanPri"="5"
+
+[HKEY_LOCAL_MACHINE\system\radio]
+"wlanQuality"=""
+"apSelect"=""
+"dataCollect"=""
+
+[HKEY_LOCAL_MACHINE\system\radio\apSelect]
+"apSelHist"="4"
+"apSelWindReq"="2"
+"apSelWindMin"="4"
+"apSelWind"="5"
+
+[HKEY_LOCAL_MACHINE\system\radio\dataCollect]
+"tCollEstBs"="1200"
+"nCollMinBs"="1"
+"nCollNomBs"="2"
+"tCollEst"="900"
+"nCollMin"="2"
+"nCollNom"="3"
+"tSurveyBs"="10"
+"tSurvey"="5"
+
+[HKEY_LOCAL_MACHINE\system\radio\wlanQuality]
+"tRedBlack"="15"
+"tOrange"="15"
+"tYellow"="15"
+"redPthr"="5"
+"orangePthr"="10"
+"yellowPthr"="10"
+"reenterBar"="10"
+"wlanEnterThr"="20"
+"wlanExitThr"="9"
+"tPredRed"="500"
+"tPredOrange"="4000"
+"tPredYellow"="12000"
+"nQiAp"="3"
+"wlanQiWindReq"="2"
+"wlanQiWindMin"="5"
+"wlanQiWind"="6"
+
+[HKEY_LOCAL_MACHINE\System\Telephony]
+"numberBlocks"=""
+"pbxVendorInfo"="Avaya"
+"dodDigit"="NO_VAL"
+"wlanRetryTimer"="10"
+"oapSyncTimer"="0"
+"sipMaxForwards"="70"
+"sipSessionContinuityTimer"="240"
+"sipContactRenewShortTimer"="600"
+"sipContactRenewLongTimer"="3600"
+;??"telephonyListenUdpPortNum"="7001" ;??PLAT_IND
+"telephonyListenUdpPort"="7001"
+"gmtOffset"="0"
+"vmServerNum"=""
+"sipProxyPort"="5061"
+"sipProxy"="sipp.comm.mot.com"
+"sipRegistrar"="registrar.comm.mot.com"
+"sipUriScheme"="sips:"
+"sipProductName"="RainierSipClient"
+"sipProductVersion"="v1.0"
+"sipProductComment"="Release2"
+
+[HKEY_LOCAL_MACHINE\System\Telephony\numberBlocks]
+"nB1"=""
+"quantity"="1"
+
+[HKEY_LOCAL_MACHINE\system\telephony\numberBlocks\nB1]
+"bSp"="8479999999"
+"bSt"="8470000000"
+"aD"="2"
+;WTM.reg
+
+[HKEY_LOCAL_MACHINE\Software\Motorola\CVC\WTM]
+"DTIM"=dword:000000C8
+"CODEC"=dword:00000001
+"IP_ADDRESS_BASE"="239.192.2.2"
+"IP_ADDRESS_INC"=dword:00000000
+"IP_PORT_BASE"=dword:00001388
+"IP_PORT_INC"=dword:00000001
+"CURRENT_TALKGROUP"=dword:00000001
+"JIT_LEN"=dword:00000014
+"JIT_OFFSET"=dword:00000006
+  
+[HKEY_LOCAL_MACHINE\Software\Motorola\CVC]
+"TalkTimeOut"=dword:0000EA60
+"END_SESSION"=dword:00002710
+
+
+
+;transport_layer.reg
+;#                         COPYRIGHT 2003 MOTOROLA
+;#                           ALL RIGHTS RESERVED.
+;#             MOTOROLA CONFIDENTIAL PROPRIETARY WHEN FILLED OUT
+;#
+;################################################################################
+;#
+;#   FILE NAME       : sip_transport.regf
+;#   ORIGINATOR      : Imran Raza
+;#   DATE OF ORIGIN  : 12DEC2003
+;#
+;#---------------------------------- PURPOSE ------------------------------------
+;#
+;#
+;#--------------------------------- REVISIONS -----------------------------------
+;# Date       Name                 Tracking#      Description
+;# ---------  -------------------  -------------  -------------------------------
+;# 090105  Balaji Krishnan       SWIdn00038646    Added revisions history and disabled 
+;#                                                logging to trl_msg.txt
+;# 270105  Ramana Kesharaju      SWIdn00039738    Enabled LogTrlToFile.
+;# 02212009   Rodriguez Matias     CCMPD01169453       TEAM & TE Interaction Support
+;#-------------------------------------------------------------------------------
+
+[HKEY_LOCAL_MACHINE\Motorola\Device\TLS_NULL]
+"SIP"=dword:0
+
+; enable trl_msg.txt. Set 1 to log to file and 0 otherwise
+[HKEY_LOCAL_MACHINE\Motorola\VC\Enterprise\SIP]
+"LogTrlToFile"=dword:0
+    
+;DCMe.reg
+[HKEY_LOCAL_MACHINE\Software\Motorola\CVC\DCMe]
+"PvtHangTimerDuration"=dword:00002710
+"PvtLocalPort"=dword:00000FF0
+"PvtTransport"="UDP"
+"PvtTxPTime"=dword:00000064
+"PvtRxMaxTime"=dword:000000C8
+
+[HKEY_LOCAL_MACHINE\Software\Motorola\CDRLogger]
+"CDRLoggerEnabled"=dword:00000000
+"CDRLoggerMaxSize"=dword:00000800
+;datalogger-config.reg
+[HKEY_LOCAL_MACHINE\Software\Motorola\CVCLogger]
+"enable"=dword:00000000
+"rtlmsgenable"=dword:00000000
+"usequeue"=dword:00000001
+"logtype"=dword:00000001
+"filename"="vcLogs"
+"ip"="172.16.100.254"
+"port"=dword:000013a9
+"exclude_modules"=""
+"exclude_severities"=""
+"maxlogs"=dword:00000005
+"maxloglines"=dword:00002710
+;datalogger-service.reg
+[HKEY_LOCAL_MACHINE\Services\CVCLogger]
+"Description"="Voice Client Data Logger"
+"Display Name"="LOG"
+"Index"=dword:1
+"Order"=dword:0
+"Dll"="datalogger.dll"
+"Prefix"="LOG"
+
+
+;CVCBrAPI.reg
+[HKEY_LOCAL_MACHINE\Software\Motorola\CVC]
+"PrivateTalkTimeOut"=dword:0000EA60
+
+[HKEY_LOCAL_MACHINE\Software\Motorola\CVC]
+"ActiveCalls"=dword:0
+"DoNotDisturbTimeOut"=dword:0000EA60
+"APIInUse"=dword:0
+"AudioQosStatus"=dword:00000001
+"UdpPacketLog"=dword:0
+"multicastTTL"=dword:00000080
+"RestartSocketTimeOutInSeconds"=dword:00000000
+
+;ToneHandler.reg
+;################################################################################
+;#                         COPYRIGHT 2006 MOTOROLA
+;#                           ALL RIGHTS RESERVED.
+;#                     MOTOROLA CONFIDENTIAL PROPRIETARY
+;#
+;################################################################################
+;#
+;#   FILE NAME       : ToneHandler.reg
+;#   ORIGINATOR      : Bryan Knottek
+;#   DATE OF ORIGIN  : 17AUG2006
+;#
+;#---------------------------------- PURPOSE ------------------------------------
+;#
+;#
+;#--------------------------------- REVISIONS -----------------------------------
+;# Date       Name                 Tracking#      Description
+;# ---------  -------------------  -------------  -------------------------------
+;# 17AUG2006  B.Knottek (ebk012)   LIBjj44873     Initial version
+;# 18SEP2007  Sreenidhi-crm738     CCMPD00846253  Implementing new tone handler to support generic tone playing
+;# 29OCT2008 Lucas Olmos               CCMPD01113974     Platform Audio specific modifications in ToneHandler
+;# 03NOV2008 Quesada Manuela       ccmpd01118531   Update Sounds
+;# 17NOV2008  Caro Marcelo            ccmpd01125432            Fix Tone Files
+;# 02212009   Rodriguez Matias     CCMPD01169453       TEAM & TE Interaction Support
+;# 18MAY2010  Oll? Juan Manuel     CCMPD01348256       TP & TE Interaction
+;# 07/06/2010   del Corro / Oll?	CCMPD01368024	Add MC31xx CE6
+;#-------------------------------------------------------------------------------
+
+
+[HKEY_LOCAL_MACHINE\Services\VCToneHandler]
+"Dll"="ToneManagerSvc.cvc.dll"
+"Prefix"="TMS"
+"Index"=dword:2
+"Order"=dword:000000FC
+"Flags"=dword:0
+
+[HKEY_LOCAL_MACHINE\Software\Motorola\CVC\Tones]
+"0"="\\Windows\\MEDIA_TONE_DTMF_0"
+"1"="\\Windows\\MEDIA_TONE_DTMF_1"
+"2"="\\Windows\\MEDIA_TONE_DTMF_2"
+"3"="\\Windows\\MEDIA_TONE_DTMF_3"
+"4"="\\Windows\\MEDIA_TONE_DTMF_4"
+"5"="\\Windows\\MEDIA_TONE_DTMF_5"
+"6"="\\Windows\\MEDIA_TONE_DTMF_6"
+"7"="\\Windows\\MEDIA_TONE_DTMF_7"
+"8"="\\Windows\\MEDIA_TONE_DTMF_8"
+"9"="\\Windows\\MEDIA_TONE_DTMF_9"
+"10"="\\Windows\\MEDIA_TONE_DTMF_A"
+"11"="\\Windows\\MEDIA_TONE_DTMF_B"
+"12"="\\Windows\\MEDIA_TONE_DTMF_C"
+"13"="\\Windows\\MEDIA_TONE_DTMF_D"
+"14"="\\Windows\\MEDIA_TONE_DTMF_STAR"
+"15"="\\Windows\\MEDIA_TONE_DTMF_POUND"
+"16"="\\Windows\\MEDIA_TONE_RING_BACK"
+"17"="\\Windows\\CallUserBusyTone.cvc.wav"
+"18"="\\Windows\\MEDIA_TONE_MSG_WAITING"
+"19"="\\Windows\\MEDIA_TONE_RING1"
+"20"="\\Windows\\MEDIA_TONE_RING2"
+"21"="\\Windows\\MEDIA_TONE_RING3"
+"22"="\\Windows\\MEDIA_TONE_RING4"
+"23"="\\Windows\\MEDIA_TONE_RING5"
+"24"="\\Windows\\MEDIA_TONE_RING6"
+"25"="\\Windows\\MEDIA_TONE_RING7"
+"26"="\\Windows\\MEDIA_TONE_RING8"
+"27"="\\Windows\\MEDIA_TONE_RING9"
+"28"="\\Windows\\MEDIA_TONE_RING10"
+"29"="\\Windows\\MEDIA_TONE_RING11"
+"30"="\\Windows\\MEDIA_TONE_RING12"
+"31"="\\Windows\\TalkPermitTone.cvc.wav"
+"32"="\\Windows\\CallReceiveTone.cvc.wav"
+"33"="\\Windows\\PVT_TALK_REJECT"
+"34"="\\Windows\\CALL_ALERT_RCVD"
+"35"="\\Windows\\CALL_ALERT_SENT"
+"36"="\\Windows\\CALL_ALERT_ACK_RCVD"
+"37"="\\Windows\\CALL_ALERT_ACK_FAILED"
+"38"="\\Windows\\CallIdleTone.cvc.wav"
+"39"="\\Windows\\KEY_CHIRP_VALID"
+"40"="\\Windows\\KEY_CHIRP_INVALID"
+"41"="\\Windows\\EARPIECE_VOL_ADJUST"
+"42"="\\Windows\\SPEAKER_VOL_ADJUST"
+"43"="\\Windows\\KEYPAD_VOL_ADJUST"
+"44"="\\Windows\\NET_VOL_ADJUST"
+"45"="\\Windows\\INVALID_BATTERY"
+"46"="\\Windows\\LOW_BATTERY"
+"47"="\\Windows\\ACCESSORY_CONNECTED"
+"48"="\\Windows\\ACCESSORY_DISCONNECTED"
+"49"="\\Windows\\CALL_SETUP"
+"50"="\\Windows\\service_available.cvc.wav"
+"51"="\\Windows\\POWERUP_TONE"
+"52"="\\Windows\\POWERDOWN"
+"53"="\\Windows\\RINGER_VOL_ADJUST"
+"54"="\\Windows\\CALL_WAIT"
+"55"="\\Windows\\call_dropped.cvc.wav"
+"56"="\\Windows\\AUTOMATIC_CALL_BACK"
+"57"="\\Windows\\BonkTone.cvc.wav"
+"58"="\\Windows\\VR_VT"
+"59"="\\Windows\\VALID_KEY_PRESS"
+"60"="\\Windows\\GSM_DIAL"
+"61"="\\Windows\\GSM_SUB_BUSY"
+"62"="\\Windows\\GSM_CONGESTION"
+"63"="\\Windows\\GSM_RADIO_PATH_ACK"
+"64"="\\Windows\\GSM_CALL_DROP"
+"65"="\\Windows\\GSM_SPECIAL_INFO"
+"66"="\\Windows\\GSM_CALL_WAITING"
+"67"="\\Windows\\GSM_RINGING"
+"68"="\\Windows\\ACC_CONNECT"
+"69"="\\Windows\\ACC_DROP"
+"70"="\\Windows\\INCALL_ALERT"
+"71"="\\Windows\\FAST_BUSY"
+"72"="\\Windows\\ONEMIN_BEEP"
+"73"="\\Windows\\NETWORK_SERVICE"
+"74"="\\Windows\\PVT_TALK_REJECT_CONTINUOUS"
+"75"="\\Windows\\PVT_CALL_GROUP_RCVD"
+"76"="\\Windows\\service_unavailable.cvc.wav"
+"77"="\\Windows\\TONE_TYPE_END"
+;media_session.reg
+; *******************************************************************
+;
+; (c) Copyright 2008, Motorola.
+; All Rights Reserved
+;
+; *******************************************************************
+;
+; NOTICE:   The source code contained in this listing is a
+;           proprietary trade secret of Motorola.
+;           Unauthorized copying, adaptation, distribution, use,
+;           or display is prohibited.
+;
+; *******************************************************************
+; *******************************************************************
+;
+; Version     : 1.0
+; Status      : Under development
+; File        : media_session.reg
+; Author(s)   : Daniel Chicco
+;
+; Create Date : Nov 04, 2008
+; Description :
+;  Registry Configuration File for Attenuation Gain Classes
+;
+; NOTES:
+;  The registry path and configuration values are the same used by WM6.1
+;
+; Modification History :
+; Date				Name              		CR         		Comments
+; Nov 04, 2008   	Daniel Chicco			CCMPD01119031	Initial version
+; *******************************************************************
+
+[HKEY_CURRENT_USER\ControlPanel\SoundCategories\Attenuation]
+    "0"=dword:00000000
+    "1"=dword:00000005
+    "2"=dword:00000005
+    "3"=dword:00000000
+
+;---------------------------------
+;Platform Specific Registry Files:
+;---------------------------------
+;PhoneClient.MPA2_WM65.reg
+[HKEY_LOCAL_MACHINE\Software\Motorola\CVC]
+"PhoneClientStatus"=dword:00000001
+"EnableRegTones"=dword:00000001
+"ForbiddenWindows"=multi_sz:"MSCdial","MSClog","MSContactsUI","Moto_CallProgress","Dialog"
+
+[HKEY_LOCAL_MACHINE\Software\Motorola]
+"VCUpgradeMode"=dword:00000000
+
+[HKEY_CURRENT_USER\ControlPanel\Keybd]
+"RepeatRate"=dword:00000000
+
+[HKEY_CURRENT_USER\ControlPanel\Volume]
+"Key"=dword:00000000
+
+
+[HKEY_LOCAL_MACHINE\Security\Shell\StartInfo\Start\PTT Express Configuration.lnk] 
+"Icon"="\\Windows\\TeamExpress.png" 
+[HKEY_LOCAL_MACHINE\Software\Motorola\CVC] 
+"UnattendedMode"=dword:00000001
+[HKEY_LOCAL_MACHINE\Services\CVCLogger] 
+"Context"=dword:00000001
+[HKEY_LOCAL_MACHINE\Services\VCWSP] 
+"Context"=dword:00000001
+[HKEY_LOCAL_MACHINE\Services\VCToneHandler]
+"Context"=dword:00000001 
+

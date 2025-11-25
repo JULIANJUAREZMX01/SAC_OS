@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Settings>
+	<AutoProfileSwitching>1</AutoProfileSwitching>
+	<ActiveProfile>Default</ActiveProfile>
+	<Log>
+		<LogSize>100000</LogSize>
+		<LogPath>\</LogPath>
+		<TempPath>\Temp</TempPath>
+		<LogLevel>1</LogLevel>
+	</Log>
+	<DesktopAutoStart>
+		<Enabled>1</Enabled>
+		<AutoStartApp>dwdemo.exe</AutoStartApp>
+	</DesktopAutoStart>
+</Settings>

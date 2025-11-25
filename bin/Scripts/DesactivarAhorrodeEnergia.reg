@@ -1,0 +1,12 @@
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Power\Timeouts]
+"BattSuspendTimeout"=dword:00000000
+"BattUserIdle"=dword:00000000
+"ACSuspendTimeout"=dword:00000000
+"ACResumingSuspendTimeout"=dword:0000000F
+"BattResumingSuspendTimeout"=dword:0000000F
+"ChangeEvent"="PowerManager/ReloadActivityTimeouts"
+"ACUserIdle"=dword:00000000
+"BatteryPoll"=dword:000007D0
+

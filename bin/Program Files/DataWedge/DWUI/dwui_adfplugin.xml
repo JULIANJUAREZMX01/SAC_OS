@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PlugIn id="ADFPLUGIN" name="Advanced (ADF)" version=" 1.00">
+	<Enabled type="bool">0</Enabled>
+	<RuleSet name="Rules" type="dynamiclist">
+	</RuleSet>
+	<Feedback>
+		<OnReceive type="feedback" />
+		<OnSend type="feedback" />
+	</Feedback>
+</PlugIn>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Profile enabled="1">
+	<Enabled type="bool">1</Enabled>
+	<Applications>
+		<Application name="Add new" type="add">
+		</Application>
+	</Applications>
+	<Input>
+	</Input>
+	<Output>
+	</Output>
+	<DataPaths name="Routes">
+		<Path id="Route0" name="Route0" enabled="1">
+			<Enabled type="bool">1</Enabled>
+			<Input>
+				<Plugin name="Plugin" type="select" oid="0" value="SCANNER">
+					<option id="0" name="Barcode" value="SCANNER" />
+				</Plugin>
+			</Input>
+			<Process>
+			</Process>
+			<Output>
+				<Plugin name="Plugin" type="select" oid="0" value="KEYSTROKE">
+					<option id="0" name="Keystroke" value="KEYSTROKE" />
+				</Plugin>
+			</Output>
+			<Rename>
+			</Rename>
+		</Path>
+		<Path name="Add new" type="add">
+		</Path>
+	</DataPaths>
+</Profile>

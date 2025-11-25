@@ -1,0 +1,70 @@
+// 53-Key 9000 Gemini 5250
+[DEFAULT]
+0x6B = 002B  // Func S to +
+0x6D = 002D  // Func T to -
+0x6A = 002A  // Func U to *
+0x09 = 0F00  // Func Space to Backtab
+0x7D = 8200  // Upper Left to prev Session
+0x7E = 8300  // Upper Right to Next Session
+0x1B = 000A  // Ent to Enter
+0x21 = 001B  // Func . to Reset
+0x22 = 7600  // Func * to Field Minus
+0x23 = 5300  // Funce Bksp to Del
+0x24 = 4000  // Func 6 to F6
+0x65 = 4100  // Func 7 to F7
+
+[SHIFT]
+0x31 = 5400  // Shift 1 to F11
+0x32 = 5500  // Shift 2 to F12
+0x33 = 5600  // Shift 3 to F13
+0x34 = 5700  // Shift 4 to F14
+0x35 = 5800  // Shift 5 to F15
+0x36 = 5900  // Shift 6 to F16
+0x37 = 5A00  // Shift 7 to F17
+0x38 = 5B00  // Shift 8 to F18
+0x39 = 5C00  // Shift 9 to F19
+0x30 = 5D00  // Shift 0 to F20
+
+[CONTROL]
+0x41 = 4700  // Ctrl A to Home
+0x42 = 0010  // Ctrl B to Print
+0x43 = 0007  // Ctrl C to Help
+0x44 = 4F00  // Ctrl D to Dup
+0x45 = 0005  // Ctrl E to Er Inp
+0x46 = 000F  // Ctrl F to Ctrl O  // Clr EOF
+0x47 = 0001  // Ctrl G to Attn 
+0x48 = 5200  // Ctrl H to Ins
+0x4A = 4900  // Ctrl J to Roll up
+0x4B = 0013  // Ctrl K to SYS REQ
+0x4C = 5100  // Ctrl L to Roll down
+0x4E = 4F00  // Ctrl N to Dup
+0x52 = 5200  // Ctrl R to Insert
+0x31 = 5E00  // Ctrl 1 to F21
+0x32 = 5F00  // Ctrl 2 to F22
+0x33 = 6000  // Ctrl 3 to F23
+0x34 = 6100  // Ctrl 4 to F24
+0x26 = 9800  // Ctrl Up to View Up
+0x28 = A000  // Ctrl Dn to View Dn
+0x25 = 9B00  // Ctrl Left to View Left
+0x27 = 9D00  // Ctrl Right to View Right
+0x35 = 0021  // Ctrl 5 to !
+0x36 = 0023  // Ctrl 6 to #
+0x37 = 0024  // Ctrl 7 to $
+0x38 = 0025  // Ctrl 8 to %
+0x39 = 0026  // Ctrl 9 to &
+0x30 = 0028  // Ctrl 0 to (
+
+[ALT]
+0x41 = 0029  // Alt A to )
+0x42 = 0040  // Alt B to @
+0x45 = 005E  // Alt E to ^
+0x47 = 003F  // Alt G to ?
+0x31 = 7500  // Alt Shift 1 to Clear
+
+{WEB}
+[CONTROL]
+0x42 = 0xB101 // <CTRL><B> is Back
+0x46 = 0xB102 // <CTRL><F> is Forward
+0x48 = 0xB103 // <CTRL><H> is Home
+0x52 = 0xB104 // <CTRL><R> is Refresh
+0x53 = 0xB105 // <CTRL><S> is Stop

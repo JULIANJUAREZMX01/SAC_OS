@@ -1,0 +1,33 @@
+// 43-Key 9000 Gemini Common
+
+[DEFAULT]
+0x6B = 002B  //Func I/F9 to +
+0x6D = 002D  //Func J/F10 to -
+0x6A = 002A  //Func K/F11 to *
+0xBF = 002F  //Func L/F12 to /
+0x7D = 8200  //Upper left to prev session
+0x7E = 8300  //Upper right to next session
+
+[SHIFT]
+0x26 = 4900  //Shift up to Roll up
+0x28 = 5100  //Shift down to Roll down
+0x25 = 5200  //Shift Left to Insert
+0x27 = 7600  //Shift Right to Field Minus
+
+[CONTROL]
+0x43 = 0003  //Ctrl C to ^C
+0x20 = 5300  //Control Space to Delete
+
+[ALT]
+0x20 = 7500  //Alt Space to Clear
+0x25 = 4700  //Alt Left Arrow to Home
+0x27 = 4F00  //Alt Right Arrow to Dup
+0x53 = 1F00  //Alt S to Soft Term Reset
+
+{WEB}
+[CONTROL]
+0x42 = 0xB101 // <CTRL><B> is Back
+0x46 = 0xB102 // <CTRL><F> is Forward
+0x48 = 0xB103 // <CTRL><H> is Home
+0x52 = 0xB104 // <CTRL><R> is Refresh
+0x53 = 0xB105 // <CTRL><S> is Stop

@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PlugIn id="CLIPBOARD" name="Clipboard" version=" 1.00">
+ 	<Escape name="Allow Escape chars" type="bool">1</Escape>
+ 	<SendCtrlAsKS name="Ctrl chars as keystrokes">
+		<CtrlChar name="Ctrl characters">
+			<EnableAll name="Enable all" type="function" function="enableAllCtrlChars">0</EnableAll>
+			<DisableAll name="Disable all" type="function" function="disableAllCtrlChars">0</DisableAll>
+			<Char name="NUL (0 00h)" id="0" type="bool">1</Char>
+			<Char name="SOH (1 01h)" id="1" type="bool">1</Char>
+			<Char name="STX (2 02h)" id="2" type="bool">1</Char>
+			<Char name="ETX (3 03h)" id="3" type="bool">1</Char>
+			<Char name="EOT (4 04h)" id="4" type="bool">1</Char>
+			<Char name="ENQ (5 05h)" id="5" type="bool">1</Char>
+			<Char name="ACK (6 06h)" id="6" type="bool">1</Char>
+			<Char name="BEL (7 07h)" id="7" type="bool">1</Char>
+			<Char name="BS (8 08h)" id="8" type="bool">1</Char>
+			<Char name="TAB (9 09h)" id="9" type="bool">1</Char>
+			<Char name="LF (10 0Ah)" id="10" type="bool">1</Char>
+			<Char name="VT (11 0Bh)" id="11" type="bool">1</Char>
+			<Char name="FF (12 0Ch)" id="12" type="bool">1</Char>
+			<Char name="CR (13 0Dh)" id="13" type="bool">1</Char>
+			<Char name="SO (14 0Eh)" id="14" type="bool">1</Char>
+			<Char name="SI (15 0Fh)" id="15" type="bool">1</Char>
+			<Char name="DLE (16 10h)" id="16" type="bool">1</Char>
+			<Char name="DC1 (17 11h)" id="17" type="bool">1</Char>
+			<Char name="DC2 (18 12h)" id="18" type="bool">1</Char>
+			<Char name="DC3 (19 13h)" id="19" type="bool">1</Char>
+			<Char name="DC4 (20 14h)" id="20" type="bool">1</Char>
+			<Char name="NAK (21 15h)" id="21" type="bool">1</Char>
+			<Char name="SYN (22 16h)" id="22" type="bool">1</Char>
+			<Char name="ETB (23 17h)" id="23" type="bool">1</Char>
+			<Char name="CAN (24 18h)" id="24" type="bool">1</Char>
+			<Char name="EM (25 19h)" id="25" type="bool">1</Char>
+			<Char name="SUB (26 1Ah)" id="26" type="bool">1</Char>
+			<Char name="ESC (27 1Bh)" id="27" type="bool">1</Char>
+			<Char name="FS (28 1Ch)" id="28" type="bool">1</Char>
+			<Char name="GS (29 1Dh)" id="29" type="bool">1</Char>
+			<Char name="RS (30 1Eh)" id="30" type="bool">1</Char>
+			<Char name="US (31 1Fh)" id="31" type="bool">1</Char>
+		</CtrlChar>
+		<InterCharDelay name="InterChar delay" type="integer" min="0" max="10000">0</InterCharDelay>
+	</SendCtrlAsKS>
+	<PostPasteDelay name="Post paste delay" type="integer" min="0" max="10000">10</PostPasteDelay>
+	<Feedback>
+		<ReceiveData name="OnReceive" type="feedback"></ReceiveData>
+		<SendData name="OnSend" type="feedback"></SendData>
+	</Feedback>
+</PlugIn>

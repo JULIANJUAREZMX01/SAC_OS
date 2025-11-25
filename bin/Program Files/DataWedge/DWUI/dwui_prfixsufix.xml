@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PlugIn id="PRFIXSUFIX" name="Basic format" version="1.0">
+	<Enabled type="bool">1</Enabled>
+	<Prefix name="Prefix to data" type="string"></Prefix>
+	<Suffix name="Suffix to data" type="string"></Suffix>
+	<SendData name="Send data" type="bool">1</SendData>
+	<SendAsHex name="Send data as hex" type="bool">0</SendAsHex>
+	<SendTab name="Send TAB key" type="bool">0</SendTab>
+	<SendEnter name="Send ENTER key" type="bool">0</SendEnter>
+</PlugIn>
+	<!--AllowEscape name="Allow escapes" type="bool">1</AllowEscape-->
+	<!--Move>
+		<Up type="action" value="up" />
+		<Down type="action" value="down" />
+	</Move-->
+	<!--Delete type="delete" /-->

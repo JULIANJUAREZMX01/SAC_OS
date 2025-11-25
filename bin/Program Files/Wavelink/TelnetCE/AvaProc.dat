@@ -1,0 +1,37 @@
+*** Processing: \Application\Program Files\Wavelink\TelnetCE\WlPrdIst.dat ***
+
+Processing Section: [STRINGS], Status: Complete
+   Item: RootDir
+   Value: .
+Processing Section: [STRINGS], Status: Complete
+   Item: InstallDir
+   Value: .
+Processing Section: [STRINGS], Status: Complete
+   Item: FlashRoot
+   Value: \Application
+Processing Section: [STRINGS], Status: Complete
+   Item: FlashDir
+   Value: \Application\Wavelink\TelnetCE
+Processing Section: [REGFILE], Status: Complete
+   Item: Name
+   Value: .\Install\TelnetCE.reg
+Processing Section: [HKEY_LOCAL_MACHINE\Software\Wavelink\TelnetCE], Status: Complete
+   Item: InstallDir
+   Value: .
+Processing Section: [HKEY_LOCAL_MACHINE\Software\Wavelink\TelnetCE], Status: Complete
+   Item: ConfigDir
+   Value: \Application\Wavelink\TelnetCE\Config
+Processing Section: [RENAME], Status: Complete
+   Item: .\TelnetCE_Launcher.exe
+   Value: .\Install\TelnetCE_Launcher.exe
+Processing Section: [RENAME], Status: Complete
+   Item: .\WLTelnetCE_9000PPC.reg
+   Value: .\Install\WLTelnetCE_9000PPC.reg
+Processing Section: [COPY], Status: Complete
+   Item: .\Install\WLTelnetCE_9000PPC.reg
+   Value: \Application\WLTelnetCE_9000PPC.reg
+Processing Section: [COPY], Status: Complete
+   Item: .\Install\TelnetCE_Launcher.exe
+   Value: \Windows\TelnetCE.exe
+
+*** Processing complete ***

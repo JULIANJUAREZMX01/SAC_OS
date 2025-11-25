@@ -1,0 +1,6 @@
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\Software\Motorola\DWStartUp]
+"DontLoadOnStartUp"=dword:00000000
+"DontInstallOnStartUp"=dword:00000000
+

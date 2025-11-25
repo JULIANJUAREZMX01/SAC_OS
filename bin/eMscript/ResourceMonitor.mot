@@ -1,0 +1,1479 @@
+using "emScriptCore.dll"
+
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+// SET UP AND GLBOAL VARIABLE(S)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// LOGICAL CONTROL CONSTANT(S)
+//-----------------------------------------------------------------------------
+
+int	true				= 1
+int	false				= 0
+
+//-----------------------------------------------------------------------------
+// SCRIPT INFORMATION
+//-----------------------------------------------------------------------------
+
+String	strScriptName			= GetScriptName()
+String	strScriptVersion		= "1.3.3"
+String	strEngineVersion		= GetemScriptVersion()
+int		iCRC					= CalcFileCRC(strScriptName)
+String	strESN					= GetESN()
+
+//-----------------------------------------------------------------------------
+// SCRIPT REGISTRY SETTINGS
+//-----------------------------------------------------------------------------
+
+String	strEMScriptKey			= "HKEY_CURRENT_USER\\Software\\Symbol\\emScript"
+String	strNextSnapshotKey		= "NextSnapshot"
+String	strCmdFileCRCKey		= "Command File CRC"
+
+//-----------------------------------------------------------------------------
+// SCRIPT OUTPUT|INSTALLATION CONFIGURATION
+//-----------------------------------------------------------------------------
+
+String	strTmpDir			= "\\Temp\\"
+String	strAppDir			= "\\Application\\"
+String	strEMScriptDir			= strAppDir + "eMScript\\"
+String	strStorageDir			= strEMScriptDir
+
+String	strLogFile			= strStorageDir + "Resource" + strESN + ".csv"
+String	strLogFileBackuPExt		= ".bk.csv"
+
+String	strRMFile			= strStorageDir + "RetailMsg.txt"
+String	strRMFileBackupExt		= ".bk.txt"
+
+String	strParameterSep			= ","
+
+//-----------------------------------------------------------------------------
+// BASIC SCRIPT CONFIGURATION - ENABLE SECTIONS/FEATURES
+//-----------------------------------------------------------------------------
+
+int	iLogInterval			= 60000		// RESOURCE LOG ENTRY INTERVAL (60 SECONDS)
+int	iLogFileSizeMax			= (512*1024)	// MAXIMUM LOG FILE SIZE IN BYTES
+
+int	iLogWLANInformation		= true		// LOG WLAN (802.11) INFORMATION (IF AVAILABLE)
+int	iLogWANInformation		= true		// LOG WAN INFORMATION (IF AVAILABLE)
+int	iLogWANRSSI			= false		// SEND AT COMMANDS FOR RSSI (ONLY ENABLE ON CINTERION HC25 AND MC75 MODEMS)
+int	iLogGatewayPingRTT		= false		// PING DEFAULT GATEWAY AND LOG ROUND TRIP TIME
+int	iLogGPSInformation		= false		// LOG GPS INFORMATION (IF AVAILABLE)
+int iRTLogEnable 				= true		// LOG RETAIL MESSAGES TO FILE IF THIS IS TRUE
+int iIsRTLogSupported			= false		// CHECK IF RTLOG MESSAGES ARE SUPPORTED ON DEVICE - THIS WILL BE ENABLED PER DEVICE BELOW
+
+//-----------------------------------------------------------------------------
+// SNAPSHOT CONFIGURATION
+//-----------------------------------------------------------------------------
+
+int	iSnapshotEnable			= true		// ENABLE SySTEM SNAPSHOTS
+int	iSnapshotInterval		= 1800000	// 30 MINUTES
+int	iSnapshotMax			= 96		// 48 HOURS WORTH
+int	iSnapshotNext			= GetRegistryDWORD( strEMScriptKey, strNextSnapshotKey, 1)
+
+//-----------------------------------------------------------------------------
+// FTP PUSH|PULL CONFIGURATION
+//-----------------------------------------------------------------------------
+
+int	iDoPush				= false			// ENABLE FTP UPLOAD FUNCTIONALITY
+int	iDoPushOnStart			= false		// ENABLE FTP UPLOAD ON STARTUP
+int	iDoPull				= false			// ENABLE FTP COMMAND FILE DOWNLOAD FUNCTIONALITY
+
+String	strPushPullClient		= strEMScriptDir + "PushPullClient.exe"
+String	strEmAgent			= strEMScriptDir + "emAgent.exe"
+String	strPushDir			= strAppDir + "PushPullClient\\Push\\"
+String	strPullDir			= strAppDir + "PushPullClient\\Pull\\"
+String	strCommandScript		= strPulldir + "Command.mot"
+String	strPullHBEvent			= "HBSymScriptGetCommandEvent"	// PULL HEARTBEAT EVENT
+
+String	strPushRegKey			= "HKEY_LOCAL_MACHINE\\Software\\Symbol\\PushPullClient"
+
+String	strFTPHost			= "ftp.somewhere.com"
+String	strFTPUser			= "ftpuser"
+String	strFTPPassword			= "password"
+String	strFTPRemRoot			= "/eMscript/Push"
+String	strFTPRemPullDir		= "/eMscript/Pull"
+String	strFTPRemPullFile		= "Command.mot"
+String	strWakeupTime			= "05:00:00"
+
+int iFTPRetryDelay			= 5000
+int iFTPPushInterval			= 600000
+int iFTPPullInterval			= 800000
+int iFTPDoLog				= 0
+int iFTPDoWakeup			= 1
+
+int iPullDoneEventData			= 900		// EVENT DATA WHEN PULL COMPLETE
+int iCmdFileCRC				= GetRegistryDWORD( strEMScriptKey, strCmdFileCRCKey, 0)
+
+//-----------------------------------------------------------------------------
+// RETAIL MSG CONFIGURATION
+//-----------------------------------------------------------------------------
+int iRMIOCTLs				= 0	// DEFAULT TO MPA1.0 IOCTLS, 1 FOR MPA1.5, 2 FOR MPA 2.0
+int iRMLogMaxFileSize			= ( 512 * 1024 )	// DEFAULT IS 512 KB (1 MB WITH BACKUP). FOR 10 MB (20 MB WITH BACKUP), CHANGE THIS VALUE TO 10485760
+string strRTLogPath			= "\\Application\\emScript"	// PATH WHERE RETAILMSG LOGS WILL BE EXPORTED
+int iRTLogInterval			= 60				// INTERVAL TO WRITE RETILMSG BUFFER FOR BSP'S WHICH DON'T SUPPORT LAZY-EXPORT
+//-----------------------------------------------------------------------------
+// STATUS CODE DEFINITIONS
+//-----------------------------------------------------------------------------
+
+int iInformationalMessage		= 100			
+int iPowerEventMessage			= 200
+int iCommandMessage			= 300
+int iWANEvent				= 400
+int iMemMapMessage			= 500
+	
+//-----------------------------------------------------------------------------
+// SYSTEM GLOBAL|CACHED VARIABLE(S)
+//-----------------------------------------------------------------------------
+
+int iCode				= 0
+
+int iBootCount				= GetBootCount()
+String	strBattSerial			= GetSmartBatteryStatus( 0 )
+String	strBattCycles			= GetSmartBatteryStatus( 2 )
+String	strBattCap			= GetSmartBatteryStatus( 3 )
+//String	strESN				= GetESN()
+
+int iLogMutex				= CreateMutexEx()
+int iLogMessageCode			= iInformationalMessage
+String	strLogMessageText		= "Heartbeat"
+
+string	strOEMInfo			= GetOEMInfo()
+string	strOEMVersion			= GetOEMVersion()
+int iIsWinMobile			= 1
+
+//-----------------------------------------------------------------------------
+// WAN GLOBAL|CACHED VARIABLE(S)
+//-----------------------------------------------------------------------------
+
+String	strWANCallNo			= ""
+String	strWANCallDuration		= ""
+String	strWANCallStart			= ""
+String	strWANCellInfo			= ""
+
+int iWANTemp				= 0
+int iWANIncomingCallTimeTotal		= 0
+int iWANOutgoingCallTimeTotal		= 0
+
+//-----------------------------------------------------------------------------
+// GPS GLOBAL|CACHED VARIABLE(S)
+//-----------------------------------------------------------------------------
+
+float	fGPSInvalidLatitude		= -99.0
+float	fGPSInvalidLongitude		= -190.0
+float	fGPSCachedLatitude		= fGPSInvalidLatitude
+float	fGPSCachedLongitude		= fGPSInvalidLongitude
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// MAIN BODY
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// TERMINAL DETECTION - AUTOMATIC CONFIGURATION
+//-----------------------------------------------------------------------------
+
+// DETECT WINDOWS MOBILE OR WINDOWS CE
+if ( GetPlatformType() == "PocketPC" )
+{
+	iIsWinMobile = 1
+}
+else
+{
+	iIsWinMobile = 0
+}
+
+// NOTE:	This method will not properly detect terminals with older OS's that
+//			display SYMBOL.  This is okay for now as RMLogger doesn't work on
+//			those OS's.  If we need to add an automatic configuration parameter
+//			for these OS's we must change the logic to detect both SYMBOL and
+//			MOTOROLA.
+// MC70 Specific Config
+if ( strOEMInfo == "MOTOROLA MC70" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+	}
+}
+
+// MC3100 Specific Config
+else if ( strOEMInfo == "MOTOROLA MC3100S" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+	else
+	{
+// "MOTOROLA MC3100S-MOTOROLA WinCE"
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// MC3190R Specific Config
+else if ( strOEMInfo == "MOTOROLA MC3100R" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+	else
+	{
+// "MOTOROLA MC3100R-MOTOROLA WinCE"
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// MC3190 Specific Config
+else if ( strOEMInfo == "MOTOROLA MC3100G" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLS = 2
+	}
+	else
+	{
+// "MOTOROLA MC3100G-MOTOROLA WinCE"
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// MC65 Specific Config
+else if ( strOEMInfo == "Motorola MC65" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// ES400 Specific Config
+else if( strOEMInfo == "Motorola ES400" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// MC75 Specific Config
+else if ( strOEMInfo == "MOTOROLA MC75" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 1
+	}
+}
+
+// MC75A Specific Config
+else if ( strOEMInfo == "MOTOROLA MC75A" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// MC55 Specific Config
+else if ( strOEMInfo == "MOTOROLA MC55" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 1
+	}
+}
+
+// MC55A Specific Config
+else if ( strOEMInfo == "MOTOROLA MC55A" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// MC55N Specific Config
+else if ( strOEMInfo == "MOTOROLA MC55N" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// MC9090 Specific Config
+else if (	(strOEMInfo == "MOTOROLA MC9090G") || 
+			(strOEMInfo == "MOTOROLA MC9090K") ||
+			(strOEMInfo == "MOTOROLA MC9090S") )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+	}
+	else
+	{
+//	"MOTOROLA 9090 WinCE"
+		iIsRTLogSupported = true
+	}
+}
+
+// MC95 Specific Config
+else if ( strOEMInfo == "MOTOROLA MC95" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// MC9190 Specific Config
+else if ( strOEMInfo == "MOTOROLA MC9190G" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+	else
+	{
+// "MOTOROLA MC9190G-MOTOROLA WinCE"
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// MC2180 Specific Config
+else if ( strOEMInfo == "MOTOROLA MC2180" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+	else
+	{
+// "MOTOROLA MC2180-MOTOROLA WinCE"
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// MC45 Specific Config
+else if ( strOEMInfo == "Motorola MC45" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// SB1N Specific Config
+else if ( strOEMInfo == "MOTOROLA SB1N" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+	else
+	{
+// "MOTOROLA SB1N WinCE"
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// SB1B Specific Config
+else if ( strOEMInfo == "MOTOROLA SB1B" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+	else
+	{
+// "MOTOROLA SB1B WinCE"
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// MC67 Specific Config
+else if ( strOEMInfo == "Motorola MC67" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+} 
+
+// MC67NA Specific Config
+else if ( strOEMInfo == "Motorola MC67NA" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// MC92N0G Specific Config
+else if ( strOEMInfo == "Motorola MC92N0G" )
+{
+	if ( iIsWinMobile )
+	{
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+	else
+	{
+// "Motorola MC92N0K WinCE
+		iIsRTLogSupported = true
+		iRMIOCTLs = 2
+	}
+}
+
+// MC3090 Specific Config
+else if ( strOEMInfo == "MOTOROLA MC3090" )
+{
+  if ( iIsWinMobile )
+  {
+    iIsRTLogSupported = true
+  }
+}
+
+// WT41N0 Specific Config
+else if ( strOEMInfo == "Motorola WT41N0" )
+{
+  if ( iIsWinMobile )
+  {
+    iIsRTLogSupported = true
+	iRMIOCTLs = 2
+  }
+  else
+  {
+	iIsRTLogSupported = true
+	iRMIOCTLs = 2
+  }
+}
+
+//-----------------------------------------------------------------------------
+// ENSURE ROOT DIRECTORIES EXSIST
+//-----------------------------------------------------------------------------
+
+CreateDirectory( strAppDir )
+CreateDirectory( strStorageDir )
+if( iDoPush )
+	CreateDirectory( strPushDir )
+if( iDoPull )
+	CreateDirectory( strPullDir)
+
+//-----------------------------------------------------------------------------
+// IF WAN LOGGING ENABLED - OPEN WAN API AND CONFIGURE CALLBACKS
+//-----------------------------------------------------------------------------
+if( iLogWANInformation )
+{ 
+	// Open WAN 
+	iCode = WANOpen()			
+	if( iCode >= 0 )			
+	{
+		WANOnCall_IncomingStart( "OnIncomingCallStart" )
+		WANOnCall_IncomingEnd( "OnIncomingCallEnd" )
+		WANOnCall_OutgoingStart( "OnoutgoingCallStart" )
+		WANOnCall_OutgoingEnd( "OnOutgoingCallEnd" )
+	}
+}
+
+//-----------------------------------------------------------------------------
+// IF GPS LOGGING ENABLED - OPEN GPS API | INSURE GPS HARDWARE IS TURNED ON
+//-----------------------------------------------------------------------------
+if( iLogGPSInformation )
+{
+	GPSOn()
+}
+
+//-----------------------------------------------------------------------------
+// IF RETAIL MESSAGE LOGGING ENABLED - BEGIN LOGGING
+//-----------------------------------------------------------------------------
+if( iIsRTLogSupported && iRTLogEnable )
+{
+
+	if (iRMIOCTLs == 2)
+	{		
+		RTLog(1, iRMLogMaxFileSize, strRTLogPath, 60) 		
+	}
+	else
+	{
+		RetailMsgEnable( strRMFile, iRMLogMaxFileSize, iRMIOCTLs )
+	}
+	
+}
+
+//-----------------------------------------------------------------------------
+// PREPARE START UP LOG ENTRY
+//-----------------------------------------------------------------------------
+
+if( FileExists(strLogFile) != true )
+{
+    GOSUB WriteFileHeader
+}
+
+AcquireMutexEx( iLogMutex )
+String strDumpDirectory	= GetRegistryString("HKEY_LOCAL_MACHINE\\System\\ErrorReporting\\DumpSettings", "DumpDirectory")
+strLogMessageText	= "DumpDirectory: " + strDumpDirectory + " | isRTLogSupported: "+ IntToString(iIsRTLogSupported) + " | isRTLogEnabled: "+ IntToString(iRTLogEnable) + " | Bootcount: "+ IntToString(iBootCount) +" (1=cold/clean boot) | eMscript Version: " + strScriptVersion + " | Engine Version: " + strEngineVersion + " | CRC: " + IntToString(iCRC) + " | Terminal Serial Number: " + strESN + " | Battery Charge Cycles: " + strBattCycles + " | Battery Capacity: " + strBattCap + "(mAh) | Battery Serial Number: " + strBattSerial
+iLogMessageCode		= iInformationalMessage + 1
+
+GOSUB LogResource
+
+ReleaseMutexEx( iLogMutex )
+
+//-----------------------------------------------------------------------------
+// SNAPSHOTS ENABLED - INSTALL CALLBACK
+//-----------------------------------------------------------------------------
+if( iSnapshotEnable )
+{
+	// Get OS Major Version
+	int	iOSMajorVersion	= GetOSVersion(0)
+	if(iOSMajorVersion <= 5)
+	{
+		// for CE 5 and earlier - Snapshots and ProcLists
+		GOSUB CreateSnapshot
+		OnTimer( iSnapshotInterval, "CreateSnapshot")
+	}
+	else
+	{
+		// for CE 6 and later - only ProcLists
+		GOSUB CreateProclist
+		OnTimer( iSnapshotInterval, "CreateProclist")
+	}	
+}
+
+//-----------------------------------------------------------------------------
+// FTP PUSH|PULL INIT
+//-----------------------------------------------------------------------------
+if( (iDoPush) || (iDoPull) )
+{
+
+	SetRegistryString( strPushRegKey, "Host", strFTPHost )
+	SetRegistryString( strPushRegKey, "User", strFTPUser )
+	SetRegistryString( strPushRegKey, "Pass", strFTPPassword )
+	SetRegistryString( strPushRegKey, "Remote Root", strFTPRemRoot )
+	SetRegistryString( strPushRegKey, "Remote Pull Dir", strFTPRemPullDir )
+	SetRegistryString( strPushRegKey, "Remote Pull Filename", strFTPRemPullFile )
+	SetRegistryString( strPushRegKey, "Wakeup Time", strWakeupTime )
+
+	// changed PUSH DIR to reg key value instead of #define statement
+	SetRegistryString(strPushRegKey, "PushDir", strPushDir)
+	
+	SetRegistryDWORD( strPushRegKey, "FTP Retry Delay", iFTPRetryDelay )
+	SetRegistryDWORD( strPushRegKey, "Push Interval", iFTPPushInterval )
+	SetRegistryDWORD( strPushRegKey, "Pull Interval", iFTPPullInterval )
+	SetRegistryDWORD( strPushRegKey, "Do Log", iFTPDoLog )
+	SetRegistryDWORD( strPushRegKey, "Do Wakeup", iFTPDoWakeup )
+
+	// Copy this .mot file only once to push directory when this script is started
+	String strMotPushDir		= strPushDir + strStorageDir
+	Compress( strScriptName, strMotPushDir )
+	
+	RUN ( strPushPullClient )
+}
+
+if( iDoPull )
+{
+	OnEvent (strPullHBEvent, "OnPullComplete", TRUE)
+}
+
+//-----------------------------------------------------------------------------
+// Basic Script Event Init
+//-----------------------------------------------------------------------------
+
+OnEvent( "SystemResumeEvent", "PwrResumeEvent" )
+OnEvent( "OnACEvent", "PwrACState" )
+OnEvent( "OnDCEvent", "PwrDCState" )
+OnEvent( "RemoteResourceMonitorCloseEvent", "OnCloseRemoteMonitor" )
+
+RegisterTimeChangeNotification( "eMscriptTimeChangeEvent" )
+OnEvent( "eMscriptTimeChangeEvent", "OnTimeChange" )
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// MAIN LOOP
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+while ( true )
+{
+	Sleep( iLogInterval )
+
+	AcquireMutexEx( iLogMutex )
+
+	strLogMessageText	= "Heartbeat"
+	iLogMessageCode		= iInformationalMessage + 1
+
+	GOSUB LogResource
+
+	ReleaseMutexEx( iLogMutex )
+	
+	if( iDoPushOnStart )
+	{
+		if( GetCurrentIPAddress() != "NOT_FOUND" )
+		{
+			PulseEvent( "SymScriptFTPPushEvent" )
+			iDoPushOnStart		= false
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// SUB ROUTINES
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// OnIncomingCallStart
+//  This routine gets executed when an Call comes in
+//-----------------------------------------------------------------------------
+SUB OnIncomingCallStart
+	
+	strWANCallNo					= WANQueryCall( "INCOMING", "CALL_NUMBER" )
+	strWANCallStart					= WANQueryCall( "INCOMING", "CALL_START" )
+		
+	AcquireMutexEx( iLogMutex )
+
+	strLogMessageText				= "Incoming call from " + strWANCallNo + " started at " + strWANCallStart
+	iLogMessageCode					= iWANEvent + 10
+
+	GOSUB LogResource
+
+	ReleaseMutexEx( iLogMutex )
+
+RETURN	// SUB OnIncomingCallStart
+
+//-----------------------------------------------------------------------------
+// OnIncomingCallEnd
+//  This routine gets executed when an Incoming Call ends
+//-----------------------------------------------------------------------------
+SUB OnIncomingCallEnd
+
+	strWANCallNo					= WANQueryCall( "INCOMING", "CALL_NUMBER" )
+	strWANCallDuration				= WANQueryCall( "INCOMING" , "CALL_DURATION" )
+	iWANTemp					= StringToInt( strWANCallDuration )
+	iWANIncomingCallTimeTotal			= iWANIncomingCallTimeTotal + iWANTemp
+
+	AcquireMutexEx( iLogMutex )
+
+	strLogMessageText				= "Incoming call from " + strWANCallNo + " ended. Call Lasted " + strWANCallDuration + " seconds"
+	iLogMessageCode					= iWANEvent + 20
+    
+	GOSUB LogResource
+
+	ReleaseMutexEx( iLogMutex )
+
+RETURN	// SUB OnIncomingCallEnd
+
+//-----------------------------------------------------------------------------
+// OnOutGoingCallStart
+//  This routine gets executed when a MO call starts
+//-----------------------------------------------------------------------------
+SUB OnOutGoingCallStart
+
+	strWANCallNo  					= WANQueryCall( "OUTGOING", "CALL_NUMBER" )	
+	strWANCallStart   				= WANQueryCall( "OUTGOING", "CALL_START" )
+
+	AcquireMutexEx( iLogMutex )
+
+	strLogMessageText				= "Outgoing call to " + strWANCallNo + " started at " + strWANCallStart
+	iLogMessageCode					= iWANEvent + 30
+
+	GOSUB LogResource
+
+	ReleaseMutexEx( iLogMutex )
+
+RETURN	// SUB OnOutGoingCallStart
+
+//-----------------------------------------------------------------------------
+// OnOutGoingCallEnd
+//  This routine gets executed when a MO call ends
+//-----------------------------------------------------------------------------
+SUB OnOutGoingCallEnd
+
+	strWANCallNo					= WANQueryCall( "OUTGOING", "CALL_NUMBER" )
+	strWANCallDuration				= WANQueryCall( "OUTGOING" , "CALL_DURATION" )
+	iWANTemp					= StringToInt( strWANCallDuration )
+	iWANIncomingCallTimeTotal			= iWANOutgoingCallTimeTotal + iWANTemp
+
+	AcquireMutexEx( iLogMutex )
+
+	strLogMessageText				= "Outgoing call to " + strWANCallNo + " ended. Call Lasted " + strWANCallDuration + " seconds"
+	iLogMessageCode					= iWANEvent + 40
+    
+	GOSUB LogResource
+
+	ReleaseMutexEx( iLogMutex )
+
+RETURN	// SUB OnOutGoingCallEnd
+
+//-----------------------------------------------------------------------------
+// PwrACState
+//  We come here when placed on AC power - normally when placed into a cradle.
+//  We log the same info as always and the fact that we have just been placed 
+//  into a cradle
+//-----------------------------------------------------------------------------
+SUB PwrACState
+
+	Sleep( 3000 )
+
+	AcquireMutexEx( iLogMutex )
+
+	strLogMessageText				= "AC Power"
+	iLogMessageCode					= iPowerEventMessage + 1
+
+	GOSUB LogResource
+
+	ReleaseMutexEx( iLogMutex )
+
+RETURN	// SUB PwrACState
+
+//-----------------------------------------------------------------------------
+// PwrDCState
+//  We come here when placed on DC power - normally when removed from a cradle.
+//  We log the same info as always and the fact that we have just been removed
+//  from the cradle
+//-----------------------------------------------------------------------------
+Sub PwrDCState
+
+	Sleep( 3000 )
+
+	AcquireMutexEx( iLogMutex )
+
+	strLogMessageText				= "DC Power"
+	iLogMessageCode					= iPowerEventMessage + 2
+	
+	GOSUB LogResource
+
+	ReleaseMutexEx( iLogMutex )
+
+RETURN	// Sub PwrDCState
+
+//-----------------------------------------------------------------------------
+// PwrResumeEvent
+//  User has pressed the power button to turn the device on or the device has
+//  woken up
+//-----------------------------------------------------------------------------
+Sub PwrResumeEvent
+
+	Sleep( 3000 )
+
+	String	strSuspendReason 			= GetSuspendReason()
+	String	strResumeReason  			= GetResumeReason()
+	String	strSuspendTime   			= GetSuspendTime()
+
+	AcquireMutexEx( iLogMutex )
+
+	strLogMessageText				= "Power resumed. Reason " + strResumeReason + " Suspended at " + strSuspendReason + " Time suspended " + strSuspendTime
+	iLogMessageCode					= iPowerEventMessage + 3
+
+	GOSUB LogResource
+
+	ReleaseMutexEx( iLogMutex )
+
+RETURN	// Sub PwrResumeEvent
+
+//-----------------------------------------------------------------------------
+// OnTimeChange
+//  We come here when a time change occurs. We log the same info as always and
+//  the fact that a time change has taken place
+//-----------------------------------------------------------------------------
+SUB OnTimeChange
+
+	AcquireMutexEx( iLogMutex )
+
+	strLogMessageText				= "System Time Changed"
+	iLogMessageCode					= iInformationalMessage + 2
+	
+	GOSUB LogResource
+
+	ReleaseMutexEx( iLogMutex )
+
+RETURN	// SUB OnTimeChange
+
+//-----------------------------------------------------------------------------
+// CreateSnapshot
+//  Creates Snapshot Binary, and ProcessList Text File
+//-----------------------------------------------------------------------------
+SUB CreateSnapshot
+
+	String	strSnapshotFlashDir			= strStorageDir + "Snapshots\\"
+	String	strProcListFlashDir			= strStorageDir + "ProcLists\\"
+    
+ 	String	strSnapshotBaseFile			= "SNP" + ToString( iSnapshotNext, "%04d" ) + ".mbs"
+	String	strProcListBaseFile			= "PRC" + ToString( iSnapshotNext, "%04d" ) + ".txt"
+	
+	String	strSnapshotTempFile			= strTmpDir + strSnapshotBaseFile
+	String	strProcListTempFile			= strTmpDir + strProcListBaseFile
+	
+	WriteSnapshotEx( strSnapshotTempFile, strProcListTempFile, "", 1, 4, 1000 )
+	
+	CreateDirectory( strSnapshotFlashDir )
+	CreateDirectory( strProcListFlashDir )
+	
+	Compress( strSnapshotTempFile, strSnapshotFlashDir )
+	Compress( strProcListTempFile, strProcListFlashDir )
+	
+	iSnapshotNext = iSnapshotNext + 1
+	if( iSnapshotNext > iSnapshotMax )
+	{
+		iSnapshotNext = 1
+	}
+
+	GOSUB WriteDataKeysToRegistry
+
+	AcquireMutexEx( iLogMutex )
+
+	iLogMessageCode   = iMemMapMessage + 1
+	strLogMessageText = strSnapshotBaseFile + " Created | " + strProcListBaseFile + " Created"
+
+	GOSUB LogResource
+
+	ReleaseMutexEx( iLogMutex )
+    
+	if( iDoPush == true )
+	{
+
+		String	strLogFileArchiveDir		= strPushDir + strStorageDir
+		String	strSnapshotArchiveDir		= strPushDir + strSnapshotFlashDir
+		String	strProcListArchiveDir		= strPushDir + strProcListFlashDir
+		
+		CreateDirectory( strSnapshotArchiveDir )
+		CreateDirectory( strProcListArchiveDir )
+    
+		Compress( strSnapshotTempFile, strSnapshotArchiveDir )
+		Compress( strProcListTempFile, strProcListArchiveDir )
+		Compress( strLogFile, strLogFileArchiveDir )
+		if( iIsRTLogSupported && iRTLogEnable )
+		{
+			String strRMLog = ""
+			if( iRMIOCTLs == 2 )
+			{
+				strRMLog = strStorageDir + "RTLog.txt"
+				if( FileExists(strRMLog) == true )
+				{
+					Compress( strRMLog, strLogFileArchiveDir )
+				}
+				strRMLog = strStorageDir + "RTLog.bak.txt"
+				if( FileExists(strRMLog) == true )
+				{
+					Compress( strRMLog, strLogFileArchiveDir )
+				}
+			}
+			else
+			{
+				strRMLog = strRMFile
+				if( FileExists(strRMLog) == true )
+				{
+					Compress( strRMLog, strLogFileArchiveDir )
+				}
+				strRMLog = strRMFile + strRMFileBackupExt
+				if( FileExists(strRMLog) == true )
+				{
+					Compress( strRMLog, strLogFileArchiveDir )
+				}
+			}
+		}
+	}
+    	
+	DeleteFile( strSnapshotTempFile )
+	DeleteFile( strProcListTempFile )
+
+RETURN	// SUB CreateSnapshot
+
+//-----------------------------------------------------------------------------
+// CreateProclist
+//  Creates ProcessList Text File
+//-----------------------------------------------------------------------------
+SUB CreateProclist
+
+	String	strProcListFlashDirP			= strStorageDir + "ProcLists\\"
+    
+	String	strProcListBaseFileP			= "PRC" + ToString( iSnapshotNext, "%04d" ) + ".txt"
+	
+	String	strProcListTempFileP			= strTmpDir + strProcListBaseFileP
+	
+	WriteProcessDetail( strProcListTempFileP, 1000 )
+	
+	CreateDirectory( strProcListFlashDirP )
+	
+	Compress( strProcListTempFileP, strProcListFlashDirP )
+	
+	iSnapshotNext = iSnapshotNext + 1
+	if( iSnapshotNext > iSnapshotMax )
+	{
+		iSnapshotNext = 1
+	}
+
+	GOSUB WriteDataKeysToRegistry
+
+	AcquireMutexEx( iLogMutex )
+
+	iLogMessageCode   = iMemMapMessage + 1
+	strLogMessageText = strProcListBaseFileP + " Created"
+
+	GOSUB LogResource
+
+	ReleaseMutexEx( iLogMutex )
+    
+	if( iDoPush == true )
+	{
+
+		String	strLogFileArchiveDirP		= strPushDir + strStorageDir
+		String	strProcListArchiveDirP		= strPushDir + strProcListFlashDirP
+		
+		CreateDirectory( strProcListArchiveDirP )
+    
+		Compress( strProcListTempFileP, strProcListArchiveDirP )
+		Compress( strLogFile, strLogFileArchiveDirP )
+		if( iIsRTLogSupported && iRTLogEnable )
+		{
+			String strRMLogP = ""
+			if( iRMIOCTLs == 2 )
+			{
+				strRMLogP = strStorageDir + "RTLog.txt"
+				if( FileExists(strRMLogP) == true )
+				{
+					Compress( strRMLogP, strLogFileArchiveDirP )
+				}
+				strRMLogP = strStorageDir + "RTLog.bak.txt"
+				if( FileExists(strRMLogP) == true )
+				{
+					Compress( strRMLogP, strLogFileArchiveDirP )
+				}
+			}
+			else
+			{
+				strRMLogP = strRMFile
+				if( FileExists(strRMLogP) == true )
+				{
+					Compress( strRMLogP, strLogFileArchiveDirP )
+				}
+				strRMLogP = strRMFile + strRMFileBackupExt
+				if( FileExists(strRMLogP) == true )
+				{
+					Compress( strRMLogP, strLogFileArchiveDirP )
+				}
+			}
+		}
+	}
+    	
+	DeleteFile( strProcListTempFileP )
+
+RETURN	// SUB CreateProclist
+
+//-----------------------------------------------------------------------------
+// WriteDataKeysToRegistry
+//  Write to the Registry for cold boot persistance
+//-----------------------------------------------------------------------------
+SUB WriteDataKeysToRegistry
+
+	String strTempRegEntry = strNextSnapshotKey + "=dword:" + toString (iSnapshotNext)
+	CreateRegEntry( strEMScriptKey, strTempRegEntry )
+   
+	strTempRegEntry = strCmdFileCRCKey + "=dword:" + toString(iCmdFileCRC) 
+	CreateRegEntry( strEMScriptKey, strTempRegEntry )
+
+RETURN	// SUB WriteDataKeysToRegistry
+
+//-----------------------------------------------------------------------------
+// WriteFileHeader
+//  Write Resource File Column Headers
+//-----------------------------------------------------------------------------
+SUB WriteFileHeader
+
+	String strHeader 	= ""						
+	
+	// DATE AND TIME
+	strHeader	= strHeader + "Date/Time"					+ strParameterSep
+
+	// BATTERY INFORMATION
+	strHeader	= strHeader + "Battery % Remaining"				+ strParameterSep
+	strHeader	= strHeader + "Battery Volts (mV)"				+ strParameterSep
+	strHeader	= strHeader + "Battery Current (mA)"				+ strParameterSep
+	strHeader	= strHeader + "Battery Temp (C)"				+ strParameterSep
+
+	strHeader	= strHeader + "Backup Battery % Remaining"			+ strParameterSep
+	strHeader	= strHeader + "Backup Battery Volts (mV)"			+ strParameterSep
+
+	// SYSTEM HEALTH|STATUS
+	strHeader	= strHeader + "CPU Mode"					+ strParameterSep
+	strHeader	= strHeader + "CPU Load"					+ strParameterSep
+
+	strHeader	= strHeader + "Memory Load"					+ strParameterSep
+	strHeader	= strHeader + "Memory Availiable"				+ strParameterSep
+
+	strHeader	= strHeader + "Free Space \\Windows"				+ strParameterSep
+	strHeader	= strHeader + "Free Space \\Application"			+ strParameterSep
+
+	strHeader	= strHeader + "Notification Count"				+ strParameterSep
+	strHeader	= strHeader + "Process Count"					+ strParameterSep
+	strHeader	= strHeader + "Foreground Process"				+ strParameterSep
+	strHeader	= strHeader + "Foreground Window (Text/Name And Class Name)"	+ strParameterSep
+
+	// BACKLIGHT
+	strHeader	= strHeader + "Backlight On"					+ strParameterSep
+	strHeader	= strHeader + "Backlight Intensity"				+ strParameterSep
+
+	// GLOBAL TCP IP INFORMATION|STATISTICS
+	strHeader	= strHeader + "IP Address"					+ strParameterSep
+	strHeader	= strHeader + "Default Gateway"					+ strParameterSep
+
+	if( iLogGatewayPingRTT )
+	{
+		strHeader	= strHeader + "Ping Default Gateway (mS)"		+ strParameterSep
+	}
+
+	strHeader	= strHeader + "TCP/IP Packets TX"				+ strParameterSep
+	strHeader	= strHeader + "TCP/IP Packets RX"				+ strParameterSep
+	strHeader	= strHeader + "TCP/IP Header Errors"				+ strParameterSep
+	strHeader	= strHeader + "TCP/IP Address Errors"				+ strParameterSep
+
+	// WAN RADIO INFORMATION
+	if( iLogWANInformation )
+	{
+		strHeader	= strHeader + "WAN Radio On"				+ strParameterSep
+		strHeader	= strHeader + "WAN Type"				+ strParameterSep
+		if (iLogWANRSSI == true)
+		{
+			strHeader	= strHeader + "WAN RSSI"				+ strParameterSep
+		}
+		strHeader	= strHeader + "WAN Signal Strength (DBM)"			+ strParameterSep
+		strHeader	= strHeader + "WAN Cell Information"			+ strParameterSep
+		strHeader	= strHeader + "WAN Total Incoming Call Seconds"		+ strParameterSep
+		strHeader	= strHeader + "WAN Total Outgoing Call Seconds"		+ strParameterSep
+		
+	}
+	
+	// RAS
+	strHeader	= strHeader + "RAS Connection(s)"				+ strParameterSep
+
+	// WLAN RADIO INFORMATION
+	if( iLogWLANInformation )
+	{
+	//	strHeader	= strHeader + "WLAN Radio On"				+ strParameterSep
+		strHeader	= strHeader + "WLAN Associated"				+ strParameterSep
+		strHeader	= strHeader + "WLAN ESSID"				+ strParameterSep
+		strHeader	= strHeader + "WLAN BSSID"				+ strParameterSep
+		strHeader	= strHeader + "WLAN Signal Strength"			+ strParameterSep
+	}
+
+	// GPS INFOMRATION
+	if( iLogGPSInformation )
+	{
+		strHeader	= strHeader + "GPS UTC"								+ strParameterSep
+		strHeader	= strHeader + "GPS Fix Satellite Count"				+ strParameterSep
+		strHeader	= strHeader + "GPS Fix Type"						+ strParameterSep
+		strHeader	= strHeader + "GPS Fix Quality"						+ strParameterSep
+		strHeader	= strHeader + "GPS PDOP"							+ strParameterSep
+		strHeader	= strHeader + "GPS HDOP"							+ strParameterSep
+		strHeader	= strHeader + "GPS VDOP"							+ strParameterSep
+		strHeader	= strHeader + "GPS Latitude"						+ strParameterSep
+		strHeader	= strHeader + "GPS Longitude"						+ strParameterSep
+		strHeader	= strHeader + "GPS Altitude (M)"					+ strParameterSep
+		strHeader	= strHeader + "GPS Speed (MPH)"						+ strParameterSep
+		strHeader	= strHeader + "GPS Distance Moved (M)"				+ strParameterSep
+		strHeader	= strHeader + "GPS Num Sats In View"				+ strParameterSep
+		strHeader	= strHeader + "GPS Sats In View PRNs"				+ strParameterSep
+		strHeader	= strHeader + "GPS Sats Used PRNs"					+ strParameterSep
+		strHeader	= strHeader + "GPS Sats Signal to Noise (dB-Hz)"	+ strParameterSep
+	}
+	
+	strHeader	= strHeader + "Number of Dump Files"			+ strParameterSep
+	
+	strHeader	= strHeader + "Message ID"					+ strParameterSep
+	strHeader	= strHeader + "Message Description or Event Status"		+ strParameterSep
+
+	WriteFile(strLogFile, strHeader)
+
+RETURN	// SUB WriteFileHeader
+
+//-----------------------------------------------------------------------------
+// LogResource
+//  This logs the parameters  
+//  Any additions to what is logged need to be added here.
+//  Also ensure the WriteFileHeader method is updated.
+//-----------------------------------------------------------------------------
+SUB LogResource
+	AcquireMutexEx( iLogMutex )
+	String strMessage 		= ""
+
+	// OBTAIN BATTERY INFORMATION	
+	int	iBattLevel		= GetBatteryLevel()
+	int	iBattVolts		= GetBatteryVolts()
+	int	iBattCurrent		= GetBatteryAverageCurrent()
+	int	iBattTemp		= GetBatteryTemperature()
+	
+	String	strBatTemp		= IntToString( iBattTemp )
+	float	fBattTemp		= StringToFloat( strBatTemp ) / 10.0
+
+	int	iBUBattLevel		= GetBackupBatteryRemaining()
+	int	iBUBattVolts		= GetBackupBatteryVolts()
+
+	// OBTAIN SYSTEM HEALTH|STATUS
+	int	iCPULoad		= GetCPULoad()
+
+	int	iMemLoad		= GetMemoryLoad()
+	int	iMemAvail		= GetMemoryAvailPhys()
+
+	int	iFreeWin		= GetFreeDiskSpace( "\\Windows\\" )
+	int	iFreeApp		= GetFreeDiskSpace( "\\Application\\" )
+
+	int	iNotificationCnt	= GetNumberOfNotifications()
+	int	iProcessCnt		= GetNumberOfProcesses()
+
+	// BACKLIGHT INFORMATION
+	int	iBackLightState		= GetBacklightState()
+	int	iBacklightIntensity	= GetBacklightIntensity()
+
+	// OBTAIN GLOBAL TCP IP INFORMATION|STATISTICS
+	int	iPacketsTX		= GetIPStats("IP_INET","IP_OUTREQUESTS")
+	int	iPacketsRX		= GetIPStats("IP_INET","IP_PACKETSRECEIVED")
+	int	iHeaderErrors		= GetIPStats("IP_INET","IP_HEADERERRORS")
+	int	iAddressErrors		= GetIPStats("IP_INET","IP_ADDRERRORS")	
+
+	// ADD DATE AND TIME
+	strMessage	= strMessage + GetTimeDate()					+ strParameterSep
+
+	// ADD BATTERY INFORMATION
+	strMessage	= strMessage + IntToString( iBattLevel )			+ strParameterSep
+	strMessage	= strMessage + IntToString( iBattVolts )			+ strParameterSep
+	strMessage	= strMessage + IntToString( iBattCurrent )			+ strParameterSep
+	strMessage	= strMessage + FloatToString( fBattTemp, "%3.1f" )		+ strParameterSep
+
+	strMessage	= strMessage + IntToString( iBUBattLevel )			+ strParameterSep
+	strMessage	= strMessage + IntToString( iBUBattVolts )			+ strParameterSep
+
+	// ADD SYSTEM HEALTH|STATUS
+	strMessage	= strMessage + GetCPUMode()					+ strParameterSep
+	strMessage	= strMessage + IntToString( iCPULoad )				+ strParameterSep
+
+	strMessage	= strMessage + IntToString( iMemLoad )				+ strParameterSep
+	strMessage	= strMessage + IntToString( iMemAvail )				+ strParameterSep
+
+	strMessage	= strMessage + IntToString( iFreeWin )				+ strParameterSep
+	strMessage	= strMessage + IntToString( iFreeApp )				+ strParameterSep
+
+	strMessage	= strMessage + IntToString( iNotificationCnt )			+ strParameterSep
+	strMessage	= strMessage + IntToString( iProcessCnt )			+ strParameterSep
+	strMessage	= strMessage + GetForegroundProcess()				+ strParameterSep
+	strMessage	= strMessage + GetForegroundWindow()				+ strParameterSep
+
+	// ADD BACKLIGHT INFORMATION
+	strMessage	= strMessage + IntToString( iBackLightState )			+ strParameterSep
+	strMessage	= strMessage + IntToString( iBacklightIntensity )		+ strParameterSep
+
+	// ADD GLOBAL TCP IP INFORMATION|STATISTICS
+	strMessage	= strMessage + GetCurrentIPAddress()				+ strParameterSep
+	strMessage	= strMessage + GetDefaultGateway()				+ strParameterSep
+
+	if( iLogGatewayPingRTT )	
+	{
+		string	strPingRsp	=""
+		string	strDGW		= GetDefaultGateway()
+		int 	iPingRTT	= Ping( strDGW, 5000 )
+		
+		if( iPingRTT >= 0 )
+			strPingRsp = IntToString( iPingRTT )
+		else if( iPingRTT == -3 )		
+			strPingRsp = "Timeout"
+		else 
+			strPingRsp = "Error: " + IntToString(iPingRTT)
+
+		strMessage	= strMessage + strPingRsp 				+ strParameterSep
+	}
+
+	strMessage	= strMessage + IntToString( iPacketsTX )			+ strParameterSep
+	strMessage	= strMessage + IntToString( iPacketsRX )			+ strParameterSep
+	strMessage	= strMessage + IntToString( iHeaderErrors )			+ strParameterSep
+	strMessage	= strMessage + IntToString( iAddressErrors)			+ strParameterSep
+
+	// ADD WAN RADIO INFORMATION
+	if( iLogWANInformation )
+	{
+		int	iWANRadioOn		= WANIsRadioPowered()
+		if (iLogWANRSSI == true)
+		{
+			int	iWANATRSSI		= WANGetSignal("AT")
+		}
+		int	iWANSignalStrength	= WANGetSignal("DBM")
+
+		strMessage	= strMessage + IntToString( iWANRadioOn )		+ strParameterSep
+		strMessage	= strMessage + WANGetType()				+ strParameterSep
+		if (iLogWANRSSI == true)
+		{
+			strMessage	= strMessage + IntToString( iWANATRSSI)			+ strParameterSep
+		}
+		strMessage	= strMessage + IntToString( iWANSignalStrength ) 	+ strParameterSep
+		strMessage	= strMessage + WANGetCellInfo()				+ strParameterSep
+		strMessage	= strMessage + IntToString( iWANIncomingCallTimeTotal )	+ strParameterSep
+		strMessage	= strMessage + IntToString( iWANOutgoingCallTimeTotal )	+ strParameterSep
+	}
+	
+	// ADD RAS
+	strMessage	= strMessage + ListActiveRASConnections()			+ strParameterSep
+
+	// ADD WLAN RADIO INFORMATION
+	if( iLogWLANInformation )
+	{	
+		int	iWLANSignal	= GetSignalStrength()
+    		int	iWLANOn		= 0
+
+    		if( (iWLANSignal > -100) && (iWLANSignal < 0) )
+			iWLANOn		= 1
+
+		strMessage	= strMessage + IntToString( iWLANOn )			+ strParameterSep
+	//	strMessage	= strMessage + "WLAN Associated"			+ strParameterSep
+		strMessage	= strMessage + GetESSID()				+ strParameterSep
+		strMessage	= strMessage + GetBSSID()				+ strParameterSep
+		strMessage	= strMessage + IntToString( iWLANSignal )		+ strParameterSep
+	}
+
+	// ADD GPS INFORMATION
+	if( iLogGPSInformation )
+	{
+		int	iNumSats		= GPSGetNumSats()
+		float	fPDOP			= GPSGetPDOP()
+		float	fHDOP			= GPSGetHDOP()
+		float	fVDOP			= GPSGetVDOP()
+		float	fSpeed 			= GPSGetSpeed()
+		float	fAltitude		= GPSGetAltitude()
+		float	fLatitude		= GPSGetLat()
+		float	fLongitude		= GPSGetLong()
+		float	fDistance		= -1.0
+		int	iNumSatsInView		= GPSGetSatsInView()
+		string	strSatsInViewPRNs	= GPSGetSatsInViewPRNs()
+		string	strSatsUsedPRNs		= GPSGetSatsUsedPRNs()
+		string	strSatsSNR		= GPSGetSatsSNR()
+
+		strMessage	= strMessage + GPSGetUTC()				+ strParameterSep
+		strMessage	= strMessage + IntToString( iNumSats )			+ strParameterSep
+		strMessage	= strMessage + GPSGetFixType()				+ strParameterSep
+		strMessage	= strMessage + GPSGetFixQuality()			+ strParameterSep
+		
+		
+		// AT LEAST PARTIAL FIX 
+		if( (fLatitude != fGPSInvalidLatitude) && (fLongitude != fGPSInvalidLongitude) )
+		{	
+			strMessage	= strMessage + FloatToString( fPDOP )		+ strParameterSep
+			strMessage	= strMessage + FloatToString( fHDOP )		+ strParameterSep
+			strMessage	= strMessage + FloatToString( fVDOP )		+ strParameterSep
+			strMessage	= strMessage + FloatToString( fLatitude )	+ strParameterSep
+			strMessage	= strMessage + FloatToString( fLongitude )	+ strParameterSep
+			strMessage	= strMessage + FloatToString( fAltitude )	+ strParameterSep
+			strMessage	= strMessage + FLoatToString( fSpeed )		+ strParameterSep
+
+			if( (fGPSCachedLatitude != fGPSInvalidLatitude) && (fGPSCachedLongitude != fGPSInvalidLongitude) )
+			{
+				fDistance 	= GPSCalcDistance( fGPSCachedLatitude, fGPSCachedLongitude, fLatitude, flongitude, "K" )
+			}
+
+			if( fDistance != -1.0 )
+			{
+				fDistance	= fDistance * 1000.0	// CONVERT TO METERS
+				strMessage	= strMessage + FloatToString( fDistance )	+ strParameterSep
+			}
+			else
+			{
+				strMessage	= strMessage + "Unavailable"			+ strParameterSep
+			}
+
+			fGPSCachedLatitude	= fLatitude
+			fGPSCachedLongitude	= fLongitude
+		}
+		// FIX INFORMATION INVALID
+		else
+		{
+			strMessage	= strMessage + "No Fix"				+ strParameterSep // PDOP
+			strMessage	= strMessage + "No Fix"				+ strParameterSep // HDOP
+			strMessage	= strMessage + "No Fix"				+ strParameterSep // VDOP
+			strMessage	= strMessage + "No Fix"				+ strParameterSep // LATITUDE
+			strMessage	= strMessage + "No Fix"				+ strParameterSep // LONGITUDE
+			strMessage	= strMessage + "No Fix"				+ strParameterSep // ALTITUDE
+			strMessage	= strMessage + "No Fix"				+ strParameterSep // SPEED
+			strMessage	= strMessage + "No Fix"				+ strParameterSep // DISTANCE TRAVELLED
+		}
+		
+		strMessage	= strMessage + IntToString( iNumSatsInView )	+ strParameterSep
+		strMessage	= strMessage + strSatsInViewPRNs				+ strParameterSep
+		strMessage	= strMessage + strSatsUsedPRNs					+ strParameterSep
+		strMessage	= strMessage + strSatsSNR						+ strParameterSep
+	}
+	
+	// ADD DUMP FILES INFO
+	int iNumOfDF = DumpFilesExist()
+	strMessage	= strMessage + IntToString(iNumOfDF)					+ strParameterSep
+	
+	// ADD MESSAGE CODE|DESCRIPTION TEXT
+	strMessage	= strMessage + IntToString( iLogMessageCode )			+ strParameterSep
+	strMessage	= strMessage + strLogMessageText
+
+	iLogMessageCode 	= iInformationalMessage
+	strLogMessageText	= ""
+
+	WriteFile(strLogFile, strMessage)
+
+	iCode = LimitFileSize( strLogFile, strLogFileBackupExt, iLogFileSizeMax )
+	if( iCode > 0 )
+	{
+		GOSUB WriteFileHeader
+
+		if( iDoPush == true )
+		{
+			String strLogPushDir		= strPushDir + strStorageDir
+			String strBackupLogFile 	= strLogFile + strLogFileBackupExt
+			Compress( strBackupLogFile, strLogPushDir )
+		}
+	}
+
+	String strTimeStamp = "eMscript TimeStamp: " + GetTimeDate()
+
+	RetailMsg(strTimeStamp)
+	
+	// SPLIT strMessage INTO FOUR STRINGS AND PRINT IT TO RTLOG.-BEGIN
+	int istrMessageLen = strlen(strMessage)
+	int iMod = istrMessageLen%2
+	int iHalf = istrMessageLen/2
+	
+	if(iMod != 0)	// odd istrMessageLen
+	{	
+		iHalf++
+	}
+	String strLeft = left(strMessage, iHalf)
+	String strRight = ""
+	if(iMod != 0)
+	{
+		int iHalfRight = iHalf - 1
+		strRight = right(strMessage, iHalfRight)
+	}
+	else
+	{
+		strRight = right(strMessage, iHalf)
+	}
+	int istrLeftLen = strlen(strLeft)
+	int iModLeft = istrLeftLen%2
+	int iHalfa = istrLeftLen/2
+	
+	if(iModLeft != 0)	// odd istrLeftLen
+	{	
+		iHalfa++
+	}
+	
+	int istrRightLen = strlen(strRight)
+	int iModRight = istrRightLen%2
+	int iHalfb = istrRightLen/2
+	
+	if(iModRight != 0)	// odd istrRightLen
+	{
+		iHalfb++
+	}
+	
+	String strLefta = left(strLeft, iHalfa)
+	String strLeftb = ""
+	if(iModLeft != 0)
+	{
+		int iHalfaLeft = iHalfa - 1
+		strLeftb = right(strLeft, iHalfaLeft)
+	}
+	else
+	{
+		strLeftb = right(strLeft, iHalfa)
+	}
+	
+	String strRighta = left(strRight, iHalfb)
+	String strRightb = ""
+	if(iModRight != 0)
+	{
+		int iHalfRightb = iHalfb - 1
+		strRightb = right(strRight, iHalfRightb)
+	}
+	else
+	{
+		strRightb = right(strRight, iHalfb)
+	}
+	
+	RetailMsg(strLefta)
+	RetailMsg(strLeftb)
+	RetailMsg(strRighta)
+	RetailMsg(strRightb)
+	// SPLIT strMessage INTO FOUR STRINGS AND PRINT IT TO RTLOG.-END
+	
+	ReleaseMutexEx( iLogMutex )
+
+RETURN	// SUB LogResource
+
+//-----------------------------------------------------------------------------
+// OnPullComplete
+//  Command script pulled down via FTP, we have to check if it is new and run it
+//-----------------------------------------------------------------------------
+SUB OnPullComplete
+
+	if ( GetEventData( strPullHBEvent ) == iPullDoneEventData )
+	{
+		int iTmpCmdCRC = CalcFileCRC (strCommandScript)
+		if ( iTmpCmdCRC != iCmdFileCRC )
+		{
+			iCmdFileCRC = iTmpCmdCRC
+			GOSUB WriteDataKeysToRegistry
+			RUNWAIT (strEmAgent, strCommandScript)
+
+			 if ( iDoPush == True )
+			 {
+			        int iDay  = GetDay()
+			        int iYear = GetYear()
+			        String strMonth = GetMonthName()
+			        String strMyTime = "_" + ToString( iDay ) + strMonth + ToString(iYear) + "_" + GetTime()
+			        strMyTime = StringReplace ( strMyTime, ":", " - " )
+			        String strCommandFilePushName = strPushDir + SplitPath( strCommandScript, 2 ) + strMyTime + ".mot"
+			       
+			        CopyFile( strCommandScript, strCommandFilePushName )
+
+				AcquireMutexEx( iLogMutex )
+			        strLogMessageText	= "Executed command script: " + strCommandScript + strParameterSep
+				iLogMessageCode		= iCommandMessage + 3
+    				GOSUB LogResource
+				ReleaseMutexEx( iLogMutex )
+			}
+		}
+	}
+
+RETURN	// SUB OnPullComplete
+
+//-----------------------------------------------------------------------------
+// OnCloseRemoteMonitor
+//  Stops the script
+//-----------------------------------------------------------------------------
+SUB OnCloseRemoteMonitor
+
+	CloseMutexEx( iLogMutex )
+	GPSOff()
+	abort
+
+RETURN // SUB OnCloseRemoteMonitor
