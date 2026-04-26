@@ -108,7 +108,7 @@ __email__ = 'sistemas@chedraui.com.mx'
 __status__ = 'Production'
 
 # Core (ex-SACYTY)
-from .core import (
+from core import (
     SACITYCore,
     SACITYConfig,
     SACITYValidator,

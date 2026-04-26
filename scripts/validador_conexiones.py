@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 # CONSTANTES Y CONFIGURACIÓN
 # ===============================================================================
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Colores ANSI para terminal
 class Colors:

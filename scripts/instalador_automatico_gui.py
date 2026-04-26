@@ -129,7 +129,7 @@ class InstaladorAutomaticoGUI:
         self.cancelar_instalacion = False
 
         # Directorio base
-        self.base_dir = Path(__file__).parent.absolute()
+        self.base_dir = Path(__file__).parent.parent.absolute()
 
         # Credenciales (se llenan al final)
         self.credenciales = {

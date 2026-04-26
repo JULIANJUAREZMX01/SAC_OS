@@ -36,7 +36,7 @@ import getpass
 # CONFIGURACIÓN BASE
 # ===============================================================================
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 VERSION = "1.0.0"
 PYTHON_MIN_VERSION = (3, 8)
 

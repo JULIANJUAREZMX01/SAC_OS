@@ -153,7 +153,7 @@ class NotificadorTelegram:
     al equipo de Planning a través de Telegram Bot API.
 
     Uso:
-        from notificaciones_telegram import NotificadorTelegram
+        from .notificaciones_telegram import NotificadorTelegram
 
         notificador = NotificadorTelegram(config)
         notificador.enviar_alerta_critica("Error en OC123456", "Distribución excede cantidad")

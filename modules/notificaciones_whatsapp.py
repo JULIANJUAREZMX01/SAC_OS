@@ -17,7 +17,7 @@ Configuración en .env:
     WHATSAPP_DESTINATARIOS=+521234567890,+521234567891
 
 Uso:
-    from notificaciones_whatsapp import NotificadorWhatsApp
+    from .notificaciones_whatsapp import NotificadorWhatsApp
 
     wa = NotificadorWhatsApp()
     wa.enviar_alerta_critica("Error en OC", "Distribución excede cantidad")

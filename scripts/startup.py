@@ -39,7 +39,7 @@ from datetime import datetime
 from typing import Optional, Dict, List
 
 # Agregar el directorio base al path
-BASE_DIR = Path(__file__).parent.resolve()
+BASE_DIR = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(BASE_DIR))
 
 # ═══════════════════════════════════════════════════════════════════════════════

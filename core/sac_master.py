@@ -386,7 +386,7 @@ class Colores:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # Agregar directorio actual al path
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 # Intentar cargar modulos del sistema
 MODULOS_DISPONIBLES = {
@@ -448,7 +448,7 @@ def cargar_modulos():
         print(f"  {Colores.YELLOW}⚠ Gestor correos no disponible: {e}{Colores.RESET}")
 
     try:
-        from notificaciones_telegram import NotificadorTelegram, TipoAlerta
+        from modules.notificaciones_telegram import NotificadorTelegram, TipoAlerta
         MODULOS_DISPONIBLES['telegram'] = True
     except ImportError as e:
         print(f"  {Colores.YELLOW}⚠ Telegram no disponible: {e}{Colores.RESET}")

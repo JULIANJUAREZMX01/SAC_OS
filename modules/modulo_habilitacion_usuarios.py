@@ -49,7 +49,7 @@ try:
         LOGGING_CONFIG
     )
     from modules.db_connection import DB2Connection, DB2ConnectionError, DB2QueryError
-    from notificaciones_telegram import NotificadorTelegram, TipoAlerta
+    from .notificaciones_telegram import NotificadorTelegram, TipoAlerta
 except ImportError as e:
     print(f"⚠️ Error importando módulos: {e}")
     DB_CONFIG = {}

@@ -21,8 +21,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 
-from .sacyty_config import SACYTYConfig, get_config
-from .sacyty_validator import SACYTYValidator, ValidationResult, Severity
+from sacity.sacyty.sacyty_config import SACYTYConfig, get_config
+from sacity.sacyty.sacyty_validator import SACYTYValidator, ValidationResult, Severity
 
 logger = logging.getLogger(__name__)
 
@@ -467,3 +467,5 @@ if __name__ == "__main__":
     # Cerrar
     sacyty.close()
     print("SACYTY finalizado correctamente")
+# Alias for compatibility
+SACITYCore = SACYTYCore
