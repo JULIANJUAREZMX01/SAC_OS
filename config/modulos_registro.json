@@ -1,78 +1,47 @@
 {
-  "timestamp": "2025-11-22T03:20:56.813067",
-  "version": "1.0.0",
+  "timestamp": "2025-11-22T15:13:36.645320",
+  "version": "2.0.0",
+  "instalacion_completa": true,
   "modulos": {
     "validacion_oc": {
-      "nombre": "Validacion de OC",
-      "descripcion": "Validar Ordenes de Compra vs Distribuciones",
-      "archivo": "main.py",
-      "icono": "1",
+      "nombre": "Validacion OC",
       "habilitado": true,
-      "archivo_existe": true,
-      "razon_deshabilitado": null
+      "icono": "1"
     },
     "reporte_diario": {
       "nombre": "Reporte Diario",
-      "descripcion": "Generar reporte diario de Planning",
-      "archivo": "main.py",
-      "icono": "2",
       "habilitado": true,
-      "archivo_existe": true,
-      "razon_deshabilitado": null
+      "icono": "2"
     },
-    "alertas_criticas": {
+    "alertas": {
       "nombre": "Alertas Criticas",
-      "descripcion": "Enviar alertas criticas por correo/Telegram",
-      "archivo": "gestor_correos.py",
-      "icono": "3",
       "habilitado": true,
-      "archivo_existe": true,
-      "razon_deshabilitado": null
+      "icono": "3"
     },
-    "monitor_tiempo_real": {
-      "nombre": "Monitor Tiempo Real",
-      "descripcion": "Monitoreo continuo de operaciones",
-      "archivo": "monitor.py",
-      "icono": "4",
+    "monitor": {
+      "nombre": "Monitor",
       "habilitado": true,
-      "archivo_existe": true,
-      "razon_deshabilitado": null
+      "icono": "4"
     },
     "reportes_excel": {
       "nombre": "Reportes Excel",
-      "descripcion": "Generacion de reportes Excel corporativos",
-      "archivo": "modules/reportes_excel.py",
-      "icono": "5",
       "habilitado": true,
-      "archivo_existe": true,
-      "razon_deshabilitado": null
+      "icono": "5"
     },
-    "dashboard_web": {
+    "dashboard": {
       "nombre": "Dashboard Web",
-      "descripcion": "Panel de control web (Flask)",
-      "archivo": "dashboard.py",
-      "icono": "6",
-      "habilitado": false,
-      "archivo_existe": true,
-      "razon_deshabilitado": null
-    },
-    "notificaciones_telegram": {
-      "nombre": "Notificaciones Telegram",
-      "descripcion": "Alertas instantaneas por Telegram",
-      "archivo": "notificaciones_telegram.py",
-      "icono": "7",
-      "habilitado": false,
-      "archivo_existe": true,
-      "razon_deshabilitado": null
-    },
-    "maestro_orquestador": {
-      "nombre": "Maestro Orquestador",
-      "descripcion": "Automatizacion programada (daemon)",
-      "archivo": "maestro.py",
-      "icono": "8",
       "habilitado": true,
-      "archivo_existe": true,
-      "razon_deshabilitado": null
+      "icono": "6"
+    },
+    "telegram": {
+      "nombre": "Telegram",
+      "habilitado": false,
+      "icono": "7"
+    },
+    "maestro": {
+      "nombre": "Orquestador",
+      "habilitado": true,
+      "icono": "8"
     }
   }
 }

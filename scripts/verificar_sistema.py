@@ -64,7 +64,7 @@ class VerificadorSistema:
     """Verificador de integridad del sistema SAC"""
     
     def __init__(self):
-        self.base_dir = Path(__file__).parent
+        self.base_dir = Path(__file__).parent.parent
         self.errores = []
         self.advertencias = []
         self.exitos = []

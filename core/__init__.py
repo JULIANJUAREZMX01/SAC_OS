@@ -1,31 +1,20 @@
-"""
-═══════════════════════════════════════════════════════════════
-SACITY CORE - Motor Principal
-Sistema de Automatización de Consultas - CEDIS Cancún 427
-═══════════════════════════════════════════════════════════════
-
-Módulo core consolidado que incluye:
-- Motor principal (engine)
-- Configuración (config)
-- Validador (validator)
-
-Anteriormente conocido como SACYTY (typo corregido)
-
-Desarrollado por: Julián Alexander Juárez Alvarado (ADMJAJA)
-Jefe de Sistemas - CEDIS Chedraui Logística Cancún
-═══════════════════════════════════════════════════════════════
-"""
-
+from .main import main
+from .maestro import MaestroSAC
+from .monitor import MonitorTiempoReal, ValidadorProactivo
+from .gestor_correos import GestorCorreos
 from .engine import SACITYCore
 from .config import SACITYConfig
-from .validator import SACITYValidator, ValidationResult, ValidationStatus
+from .validator import ValidationResult, ValidationStatus, SACITYValidator
 
 __all__ = [
+    'main',
+    'MaestroSAC',
+    'MonitorTiempoReal',
+    'ValidadorProactivo',
+    'GestorCorreos',
     'SACITYCore',
     'SACITYConfig',
     'SACITYValidator',
     'ValidationResult',
-    'ValidationStatus',
+    'ValidationStatus'
 ]
-
-__version__ = '2.0.0'

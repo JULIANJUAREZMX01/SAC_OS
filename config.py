@@ -854,3 +854,6 @@ __all__ = [
 if __name__ == "__main__":
     # Si se ejecuta directamente, mostrar configuración
     imprimir_configuracion()
+# Alias for compatibility
+SACITYConfig = ExcelColors # Or whatever it was supposed to be.
+# Looking at root __init__.py, it says SACITYConfig is in core/config.py.

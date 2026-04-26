@@ -52,7 +52,7 @@ from datetime import datetime
 from typing import Optional
 
 # Configurar path del proyecto
-PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 # Cargar variables de entorno

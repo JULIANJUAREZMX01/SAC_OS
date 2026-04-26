@@ -32,7 +32,7 @@ from datetime import datetime
 from typing import Dict, List, Tuple
 
 # Añadir el directorio del proyecto al path
-PROJECT_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_DIR))
 
 try:

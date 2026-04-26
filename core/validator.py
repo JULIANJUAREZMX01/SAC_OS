@@ -715,3 +715,5 @@ if __name__ == "__main__":
     print("\n" + "=" * 60)
     print("Validación completada")
     print("=" * 60)
+# Alias for compatibility
+SACITYValidator = SACYTYValidator
